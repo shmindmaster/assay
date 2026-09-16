@@ -1,0 +1,19 @@
+{
+  "kind": "tool",
+  "name": "list_ncrs",
+  "evalCase": "ncr-0114-repeat-offender",
+  "calls": [
+    {
+      "arguments": { "part_number": "KC-1015" },
+      "response": {
+        "total": 4,
+        "ncrs": [
+          { "ncr_id": "NCR-2026-0091", "date": "2026-05-12", "part_number": "KC-1015", "defect_type": "shrinkage", "cause_code": "P02", "status": "closed" },
+          { "ncr_id": "NCR-2026-0098", "date": "2026-06-03", "part_number": "KC-1015", "defect_type": "shrinkage", "cause_code": "P02", "status": "closed" },
+          { "ncr_id": "NCR-2026-0107", "date": "2026-06-28", "part_number": "KC-1015", "defect_type": "shrinkage", "cause_code": "P02", "status": "closed" },
+          { "ncr_id": "NCR-2026-0114", "date": "2026-07-30", "part_number": "KC-1015", "defect_type": "shrinkage", "cause_code": "P02", "status": "open" }
+        ]
+      }
+    }
+  ]
+}

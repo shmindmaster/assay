@@ -1,0 +1,36 @@
+{
+  "kind": "tool",
+  "name": "get_ncr",
+  "evalCase": "ncr-0114-repeat-offender",
+  "calls": [
+    {
+      "arguments": { "ncr_id": "NCR-2026-0114" },
+      "response": {
+        "ncr_id": "NCR-2026-0114",
+        "date": "2026-07-30",
+        "part_number": "KC-1015",
+        "part_name": "Transmission Case",
+        "customer": "Helix Rotorcraft",
+        "heat_number": 4478,
+        "defect_type": "shrinkage",
+        "cause_code": "P02",
+        "cause_text": "Gating/risering design inadequate for section thickness",
+        "cell": "Inspection",
+        "severity": "major",
+        "disposition": "rework",
+        "status": "open",
+        "cost_impact_usd": 1724,
+        "narrative": "Fourth occurrence. Awaiting gating redesign disposition from engineering; riser simulation requested.",
+        "repeat_analysis": {
+          "prior_occurrences": [
+            { "ncr_id": "NCR-2026-0091", "date": "2026-05-12", "disposition": "rework" },
+            { "ncr_id": "NCR-2026-0098", "date": "2026-06-03", "disposition": "rework" },
+            { "ncr_id": "NCR-2026-0107", "date": "2026-06-28", "disposition": "scrap" }
+          ],
+          "occurrence_count_90d": 4,
+          "repeat_offender": true
+        }
+      }
+    }
+  ]
+}

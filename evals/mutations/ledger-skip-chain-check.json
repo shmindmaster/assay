@@ -1,0 +1,12 @@
+{
+  "id": "ledger/skip-chain-check",
+  "guard": "ledger-chain-verification",
+  "target": "src/effects/broker.mjs",
+  "patch": {
+    "find": "if (!chain.ok) {",
+    "replace": "if (false && !chain.ok) {"
+  },
+  "expected_eval": "audit-tamper",
+  "catcher_pattern": "a broken ledger chain blocks the effect"
+}
+

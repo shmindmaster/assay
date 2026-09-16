@@ -1,0 +1,11 @@
+{
+  "id": "verifier/flip-completeness-comparison",
+  "guard": "completeness-verifier",
+  "target": "scripts/verify-completeness.mjs",
+  "patch": {
+    "find": "const status = notOk.length === 0 ? 'complete' : 'incomplete';\n  const exitCode = notOk.length === 0 ? EXIT.COMPLETE : EXIT.INCOMPLETE;",
+    "replace": "const status = notOk.length !== 0 ? 'complete' : 'incomplete';\n  const exitCode = notOk.length !== 0 ? EXIT.COMPLETE : EXIT.INCOMPLETE;"
+  },
+  "expected_eval": "coc-po-aer-5519-refusal",
+  "catcher_pattern": "coc-po-aer-5519-refusal"
+}

@@ -1,0 +1,22 @@
+{
+  "kind": "tool",
+  "name": "get_scrap_records",
+  "evalCase": "scrap-top-mover",
+  "calls": [
+    {
+      "arguments": { "weeks": 5 },
+      "response": {
+        "anchor_date": "2026-08-06",
+        "weeks": ["2026-07-05", "2026-07-12", "2026-07-19", "2026-07-26", "2026-08-02"],
+        "weekly_totals": [
+          { "week_ending": "2026-07-05", "cost_usd": 38409, "weight_lbs": 9369 },
+          { "week_ending": "2026-07-12", "cost_usd": 41411, "weight_lbs": 10099 },
+          { "week_ending": "2026-07-19", "cost_usd": 45096, "weight_lbs": 10999 },
+          { "week_ending": "2026-07-26", "cost_usd": 47413, "weight_lbs": 11563 },
+          { "week_ending": "2026-08-02", "cost_usd": 50438, "weight_lbs": 12300 }
+        ],
+        "top_mover_hint": { "cause_code": "P02", "cell": "Molding", "week_cost_usd": 29952, "trailing4_avg_usd": 22718.75, "variance_pct": 31.84 }
+      }
+    }
+  ]
+}

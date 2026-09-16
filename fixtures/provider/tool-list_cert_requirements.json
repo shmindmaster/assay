@@ -1,0 +1,20 @@
+{
+  "kind": "tool",
+  "name": "list_cert_requirements",
+  "evalCase": "coc-po-aer-5519-refusal",
+  "calls": [
+    {
+      "arguments": { "customer": "Aerodyne Systems" },
+      "response": {
+        "total": 1,
+        "requirements": [
+          {
+            "id": "COC-AER-001",
+            "customer": "Aerodyne Systems",
+            "required_records": ["chemistry-cert", "mechanical-test", "heat-treat-cert", "dimensional-report", "traceability-statement"]
+          }
+        ]
+      }
+    }
+  ]
+}

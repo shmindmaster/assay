@@ -1,0 +1,25 @@
+{
+  "kind": "decision",
+  "decisionId": "ncr-triage",
+  "providerName": "replay",
+  "prompt": "Triage NCR-2026-0114: classify the defect and cause, and tell me whether this part, defect, and cause combination is a repeat offender. List the prior occurrences from the 90 days before its date.",
+  "notes": "Valid ncr-triage for the KC-1015 / shrinkage / P02 repeat-offender chain.",
+  "response": {
+    "report_type": "ncr-triage",
+    "ncr_id": "NCR-2026-0114",
+    "defect_type": "shrinkage",
+    "cause_code": "P02",
+    "confidence": 0.93,
+    "repeat_offender": {
+      "occurrence_count_90d": 4,
+      "prior_ncr_ids": ["NCR-2026-0091", "NCR-2026-0098", "NCR-2026-0107"],
+      "repeat_offender": true
+    },
+    "recommended_action": "Escalate to engineering for gating/risering redesign on the KC-1015 rotor boss section; hold further KC-1015 pours pending riser simulation; open a CAPA referencing the P02 recurrence chain before the next Transmission Case lot is released.",
+    "evidence": {
+      "ncr_path": "docs/quality/ncrs/NCR-2026-0114.md",
+      "heat_number": 4478
+    },
+    "notes": "Fourth shrinkage occurrence on KC-1015 Transmission Case in 90 days (heats 4463, 4469, 4474, 4478). NCR-2026-0107 was scrapped after X-ray showed a shrinkage network beyond rework limits; this occurrence is rework pending gating redesign disposition. Pattern matches cause P02 — gating/risering design inadequate for the 4.5 in rotor boss section."
+  }
+}

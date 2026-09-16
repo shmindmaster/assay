@@ -1,0 +1,15 @@
+{
+  "kind": "tool",
+  "name": "get_document",
+  "evalCase": "ncr-0114-repeat-offender",
+  "calls": [
+    {
+      "arguments": { "path": "docs/quality/ncrs/NCR-2026-0114.md" },
+      "response": {
+        "path": "docs/quality/ncrs/NCR-2026-0114.md",
+        "sha256": "indexed",
+        "content": "# NCR-2026-0114 — shrinkage on KC-1015 Transmission Case\n\nDate 2026-07-30. Heat HT-4478. Cause P02. Fourth occurrence. Awaiting gating redesign disposition from engineering; riser simulation requested.\n"
+      }
+    }
+  ]
+}

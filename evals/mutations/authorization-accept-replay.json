@@ -1,0 +1,12 @@
+{
+  "id": "authorization/accept-already-used",
+  "guard": "authorization-single-use",
+  "target": "src/effects/authorization.mjs",
+  "patch": {
+    "find": "usedAuthorizations.add(authorization.authorization_id);",
+    "replace": "// mutation: authorization is never marked used"
+  },
+  "expected_eval": "authorization-replay",
+  "catcher_pattern": "a valid authorization permits exactly one effect"
+}
+

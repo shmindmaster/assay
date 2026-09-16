@@ -1,0 +1,12 @@
+{
+  "id": "schema/remove-required-field",
+  "guard": "schema-required-field",
+  "target": "schemas/coc-report.schema.json",
+  "patch": {
+    "find": "\"required\": [\"type\", \"expected_path\", \"on_file\", \"sha256\", \"integrity\"]",
+    "replace": "\"required\": [\"type\", \"expected_path\", \"on_file\", \"integrity\"]"
+  },
+  "expected_eval": "schema-required-sha256",
+  "catcher_pattern": "coc schema requires item sha256"
+}
+

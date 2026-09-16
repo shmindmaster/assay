@@ -1,0 +1,19 @@
+{
+  "kind": "tool",
+  "name": "get_audit_scope",
+  "evalCase": "audit-gaps",
+  "calls": [
+    {
+      "arguments": { "audit_id": "AUD-2026-S1" },
+      "response": {
+        "audit_id": "AUD-2026-S1",
+        "title": "AS9100D surveillance",
+        "window": "2026-09-14",
+        "gaps": [
+          { "id": "EA-7", "area": "Training records", "expected_path": "docs/quality/training/training-matrix-2026.md" },
+          { "id": "EA-8", "area": "Supplier raw-material certificates", "expected_path": "docs/purchasing/supplier-certs" }
+        ]
+      }
+    }
+  ]
+}

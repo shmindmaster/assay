@@ -1,0 +1,25 @@
+{
+  "kind": "decision",
+  "decisionId": "ncr-triage",
+  "providerName": "replay",
+  "prompt": "Triage NCR-2026-0114 with a free-form cause code outside the foundry vocabulary.",
+  "notes": "Schema-violating response that exercises the repair loop. cause_code X99 is not in the foundry vocabulary; Ajv rejects; replay returns the same body on every retry; repair fails closed after two retries.",
+  "response": {
+    "report_type": "ncr-triage",
+    "ncr_id": "NCR-2026-0114",
+    "defect_type": "shrinkage",
+    "cause_code": "X99",
+    "confidence": 0.93,
+    "repeat_offender": {
+      "occurrence_count_90d": 4,
+      "prior_ncr_ids": ["NCR-2026-0091", "NCR-2026-0098", "NCR-2026-0107"],
+      "repeat_offender": true
+    },
+    "recommended_action": "Escalate to engineering for gating/risering redesign on the KC-1015 rotor boss section.",
+    "evidence": {
+      "ncr_path": "docs/quality/ncrs/NCR-2026-0114.md",
+      "heat_number": 4478
+    },
+    "notes": "INVALID: cause_code X99 is outside the foundry vocabulary and must be rejected by the schema pattern."
+  }
+}

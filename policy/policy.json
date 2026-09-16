@@ -1,0 +1,115 @@
+{
+  "$comment": "The single policy document. Permissions, write boundaries and tripwires live here as data, not as instructions the model is asked to respect. hooks/publish-gate.mjs, src/effects/broker.mjs and scripts/policy-explain.mjs all read this file and hold no rules of their own. A missing or malformed policy is a hard failure, never a default-allow.",
+  "schemaVersion": 1,
+
+  "writeBoundary": {
+    "$comment": "Allowlist applied to every filesystem write an agent attempts. Paths are repo-relative and match by prefix. Anything not listed is denied.",
+    "allow": [
+      "reports/drafts/"
+    ],
+    "guarded": [
+      {
+        "path": "reports/published/",
+        "requiresVerdict": "coc-completeness",
+        "requiresOutcome": "COMPLETE"
+      }
+    ],
+    "deny": [
+      "data/",
+      "schemas/",
+      "policy/",
+      "hooks/",
+      "evals/",
+      "ledger/",
+      ".git/"
+    ]
+  },
+
+  "agents": {
+    "quality-lead": {
+      "reads": ["context/quality-lead.memory.md", "reports/drafts/"],
+      "tools": [],
+      "decisions": ["route-request", "compose-digest"],
+      "contextBudgetTokens": 8000
+    },
+    "ncr-triage": {
+      "reads": ["references/01-defect-taxonomy.md", "references/02-cause-codes.md"],
+      "tools": ["list_ncrs", "get_ncr"],
+      "decisions": ["ncr-triage"],
+      "contextBudgetTokens": 6000
+    },
+    "coc-assembler": {
+      "reads": ["references/03-cert-requirements-by-customer.md"],
+      "tools": ["get_purchase_order", "get_heat_lot", "get_test_record", "list_cert_requirements", "get_document"],
+      "decisions": ["coc-report"],
+      "effects": ["publish-coc"],
+      "contextBudgetTokens": 12000
+    },
+    "scrap-rollup": {
+      "reads": ["references/02-cause-codes.md"],
+      "tools": ["get_scrap_records"],
+      "decisions": ["scrap-rollup"],
+      "contextBudgetTokens": 6000
+    },
+    "audit-prep": {
+      "reads": ["references/04-audit-evidence-standards.md"],
+      "tools": ["get_audit_scope", "search_documents", "get_document"],
+      "decisions": ["audit-gap-list"],
+      "contextBudgetTokens": 10000
+    }
+  },
+
+  "effects": {
+    "$comment": "Every side effect names the deterministic verdict that must authorize it. An authorization is single-use, bound to the effect payload hash and to the verdict's input hashes. No verdict, no effect - there is no override path.",
+    "publish-coc": {
+      "description": "Move a certificate-of-conformance report from drafts to published.",
+      "requiresVerdict": "coc-completeness",
+      "requiresOutcome": "COMPLETE",
+      "bindsTo": ["payload_sha256", "verdict_input_hashes"],
+      "singleUse": true
+    }
+  },
+
+  "tripwires": {
+    "input": [
+      {
+        "id": "instruction-shaped-source",
+        "$comment": "Retrieved source content that reads like an instruction to the agent. The block is labelled untrusted rather than stripped: stripping hides the attack, labelling makes it auditable and lets the broker refuse any authorization tracing to it.",
+        "appliesTo": "retrieved-document-content",
+        "patterns": [
+          "(?i)\\b(ignore|disregard|override)\\b[^.]{0,40}\\b(previous|prior|above|earlier)\\b[^.]{0,40}\\b(instruction|prompt|rule|direction)s?\\b",
+          "(?i)^\\s*(system|assistant|developer)\\s*:",
+          "(?i)\\b(you\\s+(must|should|are\\s+to)|do\\s+not\\s+report|mark\\s+(this|it)\\s+as\\s+(complete|approved|passing))\\b",
+          "(?i)\\b(approve|release|sign\\s*off|certify)\\b[^.]{0,30}\\b(without|regardless|despite|even\\s+if)\\b",
+          "(?i)<\\s*/?\\s*(system|instructions?|prompt)\\s*>"
+        ],
+        "action": "mark-untrusted",
+        "onFire": "record-receipt"
+      }
+    ],
+    "output": [
+      {
+        "id": "unsourced-completeness-claim",
+        "$comment": "A decision asserting completeness must cite record paths. A claim with no citations never reaches the broker.",
+        "appliesTo": "coc-report",
+        "requires": "items[].expected_path",
+        "action": "reject",
+        "onFire": "record-receipt"
+      }
+    ]
+  },
+
+  "ledger": {
+    "path": "ledger/",
+    "kinds": [
+      "context_assembled",
+      "decision_requested",
+      "decision_returned",
+      "verdict",
+      "authorization_minted",
+      "effect_performed",
+      "effect_denied",
+      "tripwire_fired"
+    ]
+  }
+}

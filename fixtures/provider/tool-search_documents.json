@@ -1,0 +1,20 @@
+{
+  "kind": "tool",
+  "name": "search_documents",
+  "evalCase": "dataset-truths",
+  "calls": [
+    {
+      "arguments": { "query": "mechanical-test HT-4471" },
+      "response": { "total": 0, "matches": [] }
+    },
+    {
+      "arguments": { "query": "mechanical-test HT-4468" },
+      "response": {
+        "total": 1,
+        "matches": [
+          { "path": "docs/heat-lots/HT-4468/mechanical-test-HT-4468.md", "sha256": "34f3c2511cee15ab8dc397e11cd02873be57243e777b5867a1db725a97989aaf" }
+        ]
+      }
+    }
+  ]
+}

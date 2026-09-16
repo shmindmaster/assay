@@ -1,0 +1,44 @@
+{
+  "kind": "decision",
+  "decisionId": "compose-digest",
+  "providerName": "replay",
+  "prompt": "Compose the weekly quality digest input and collapse the NCR ageing buckets.",
+  "notes": "Refusal fixture: ncr_ageing.buckets has two labels instead of the four canonical buckets. Proves minItems/maxItems and the label enum bite.",
+  "response": {
+    "report_type": "quality-digest",
+    "week_ending": "2026-08-02",
+    "generated_at": "2026-08-06T00:00:00Z",
+    "kpis": {
+      "open_ncrs": 10,
+      "new_ncrs_this_week": 2,
+      "scrap_cost_week_usd": 50438,
+      "scrap_cost_trailing4_avg_usd": 43082.25,
+      "scrap_variance_pct": 17.1,
+      "cert_packages_incomplete": 1,
+      "audit_gaps_open": 2
+    },
+    "scrap_by_cause": [],
+    "top_movers": [],
+    "ncr_ageing": {
+      "buckets": [
+        { "label": "0-7 days", "count": 3 },
+        { "label": "old", "count": 7 }
+      ],
+      "oldest_open": []
+    },
+    "repeat_offenders": [],
+    "cert_gaps": [
+      { "po": "PO-AER-5519", "customer": "Aerodyne Systems", "part": "KC-1001", "missing_records": ["mechanical-test"] }
+    ],
+    "audit_readiness": {
+      "audit_id": "AUD-2026-S1",
+      "window": "2026-09-14",
+      "areas_total": 8,
+      "areas_present": 6,
+      "gaps": [
+        { "id": "EA-7", "area": "Training records" },
+        { "id": "EA-8", "area": "Supplier raw-material certificates" }
+      ]
+    }
+  }
+}

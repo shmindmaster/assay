@@ -1,0 +1,25 @@
+{
+  "kind": "decision",
+  "decisionId": "audit-gap-list",
+  "providerName": "replay",
+  "prompt": "Resolve every evidence area in AUD-2026-S1 against the document index and invent an extra field on the gap list.",
+  "notes": "Refusal fixture: extra property on a gaps item plus missing owner_role. Proves additionalProperties:false and required bite.",
+  "response": {
+    "report_type": "audit-gap-list",
+    "audit_id": "AUD-2026-S1",
+    "areas": [
+      { "id": "EA-7", "area": "Training records", "expected_path": "docs/quality/training/training-matrix-2026.md", "present": false }
+    ],
+    "gaps": [
+      {
+        "id": "EA-7",
+        "area": "Training records",
+        "expected_path": "docs/quality/training/training-matrix-2026.md",
+        "recommended_action": "Publish the 2026 training matrix.",
+        "fabricated_complete": true
+      }
+    ],
+    "areas_present": 6,
+    "areas_total": 8
+  }
+}

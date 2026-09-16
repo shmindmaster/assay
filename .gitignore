@@ -18,3 +18,9 @@ docs/superpowers/
 
 # Build spec lives outside the repo: it names the originating pursuit.
 SPEC.md
+
+# Delegation briefs - working notes, not product documentation
+.briefs/
+.agentlogs/
+ledger/
+reports/audit/

@@ -1,0 +1,31 @@
+{
+  "kind": "decision",
+  "decisionId": "scrap-rollup",
+  "providerName": "replay",
+  "prompt": "Roll up this week's scrap cost by cell and cause against the trailing 4-week average. Name the top mover, its cell, and the variance percent. Use an unconstrained cause code.",
+  "notes": "Refusal fixture: top_mover.cause_code X99 is outside the foundry vocabulary. Proves the pattern constraint bites.",
+  "response": {
+    "report_type": "scrap-rollup",
+    "week_ending": "2026-08-02",
+    "weeks_included": 8,
+    "weekly_totals": [
+      { "week_ending": "2026-08-02", "cost_usd": 50438, "weight_lbs": 12300 }
+    ],
+    "by_cause": [
+      {
+        "cause_code": "X99",
+        "cause_text": "invented cause",
+        "cell": "Molding",
+        "week_cost_usd": 29952,
+        "trailing4_avg_usd": 22718.75,
+        "variance_pct": 31.84
+      }
+    ],
+    "top_mover": {
+      "cause_code": "X99",
+      "cell": "Molding",
+      "variance_pct": 31.84
+    },
+    "generated_from": "exports/erp/scrap-export.csv"
+  }
+}
