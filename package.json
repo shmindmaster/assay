@@ -6,6 +6,22 @@
   "description": "The agent drafts. Software decides. A runnable reference implementation of the deterministic control layer for AI agents.",
   "author": "Sarosh Hussain",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shmindmaster/assay.git"
+  },
+  "homepage": "https://github.com/shmindmaster/assay#readme",
+  "bugs": {
+    "url": "https://github.com/shmindmaster/assay/issues"
+  },
+  "keywords": [
+    "ai-agents",
+    "agent-safety",
+    "deterministic-control",
+    "evals",
+    "mcp",
+    "structured-outputs"
+  ],
   "engines": {
     "node": ">=20"
   },

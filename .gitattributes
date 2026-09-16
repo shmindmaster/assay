@@ -2,5 +2,7 @@
 * text=auto
 *.mjs text eol=lf
 *.json text eol=lf
-*.md text
-*.csv text
+*.md text eol=lf
+*.csv text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
