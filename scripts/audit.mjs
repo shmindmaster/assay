@@ -19,6 +19,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { append, openLedger, readChain, verifyChain } from '../src/ledger/index.mjs';
+import {
+  contextAssembled,
+  decisionRequested,
+  decisionReturned,
+  tripwireFired,
+  verdictRecorded,
+} from '../src/ledger/receipts.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const EXIT = { OK: 0, FAIL: 1, USAGE: 2 };
@@ -67,6 +74,14 @@ const STAGE_TITLES = {
   tripwire_fired: 'Tripwire fired',
 };
 
+const PAYLOAD_BUILDERS = {
+  context_assembled: contextAssembled,
+  decision_requested: decisionRequested,
+  decision_returned: decisionReturned,
+  verdict: verdictRecorded,
+  tripwire_fired: tripwireFired,
+};
+
 function esc(value) {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -82,6 +97,11 @@ function dump(value) {
 
 function receiptsOf(chain, kind) {
   return chain.filter((receipt) => receipt.kind === kind);
+}
+
+function receiptPayload(receipt) {
+  const build = PAYLOAD_BUILDERS[receipt.kind];
+  return build ? build(receipt.payload) : receipt.payload;
 }
 
 function accountLines(subject, verification, chain, kinds) {
@@ -102,7 +122,7 @@ function accountLines(subject, verification, chain, kinds) {
     const title = STAGE_TITLES[receipt.kind] ?? receipt.kind;
     lines.push(`  seq ${receipt.seq}  ts_logical ${receipt.ts_logical}  ${title}`);
     lines.push(`    actor=${receipt.actor}  sha256=${receipt.sha256}`);
-    const payload = dump(receipt.payload).split('\n');
+    const payload = dump(receiptPayload(receipt)).split('\n');
     for (const row of payload) lines.push(`    ${row}`);
     lines.push('');
   }
@@ -117,13 +137,13 @@ function accountLines(subject, verification, chain, kinds) {
     }
     if (kind === 'context_assembled') {
       for (const receipt of matches) {
-        const p = receipt.payload;
-        lines.push(`  ${title}: agent=${p.agent} used ${p.used_tokens}/${p.budget_tokens} tokens, ${p.block_count} kept, ${p.dropped_count} dropped`);
-        if (Array.isArray(p.sources) && p.sources.length > 0) {
-          lines.push(`    sources: ${p.sources.join(', ')}`);
-        }
-        if (Array.isArray(p.untrusted_sources) && p.untrusted_sources.length > 0) {
-          lines.push(`    untrusted: ${p.untrusted_sources.join(', ')}`);
+        const p = receiptPayload(receipt);
+        const details = [];
+        if (p.blocks !== undefined) details.push(`${p.blocks} blocks`);
+        if (p.used_tokens !== undefined) details.push(`${p.used_tokens} tokens used`);
+        lines.push(`  ${title}: ${details.length > 0 ? details.join(', ') : 'receipt present'}`);
+        if (Array.isArray(p.untrusted) && p.untrusted.length > 0) {
+          lines.push(`    untrusted: ${p.untrusted.join(', ')}`);
         }
       }
     } else if (kind === 'authorization_minted') {
@@ -138,7 +158,7 @@ function accountLines(subject, verification, chain, kinds) {
       }
     } else if (kind === 'verdict') {
       for (const receipt of matches) {
-        lines.push(`  ${title}: ${dump(receipt.payload)}`);
+        lines.push(`  ${title}: ${dump(receiptPayload(receipt))}`);
       }
     } else {
       lines.push(`  ${title}: ${matches.length} receipt${matches.length === 1 ? '' : 's'}`);
@@ -160,7 +180,7 @@ function renderHtml(subject, verification, chain, kinds, lines) {
   <p class="meta">actor ${esc(receipt.actor)} · ts_logical ${esc(receipt.ts_logical)}</p>
   <p class="hash">sha256 ${esc(receipt.sha256)}</p>
   <p class="hash">prev ${esc(receipt.prev_sha256)}</p>
-  <pre>${esc(dump(receipt.payload))}</pre>
+  <pre>${esc(dump(receiptPayload(receipt)))}</pre>
 </article>`;
   }).join('\n');
 
@@ -169,7 +189,7 @@ function renderHtml(subject, verification, chain, kinds, lines) {
     const matches = receiptsOf(chain, kind);
     const body = matches.length === 0
       ? '<p class="missing">no receipt</p>'
-      : `<pre>${esc(dump(matches.map((receipt) => receipt.payload)))}</pre>`;
+      : `<pre>${esc(dump(matches.map(receiptPayload)))}</pre>`;
     return `<section><h3>${esc(title)}</h3>${body}</section>`;
   }).join('\n');
 

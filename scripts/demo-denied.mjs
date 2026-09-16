@@ -17,7 +17,7 @@ const result = spawnSync(process.execPath, ['hooks/publish-gate.mjs'], {
   cwd: REPO_ROOT,
   input: JSON.stringify(hookPayload),
   encoding: 'utf8',
-  env: Object.fromEntries(Object.entries(process.env).filter(([key]) => key !== 'KESTREL_PUBLISH_CONFIRMED')),
+  env: process.env,
 });
 
 if (result.error) {

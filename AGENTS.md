@@ -16,9 +16,13 @@ before changing anything.
 Every one of these is load-bearing. A change that breaks one is a defect even if
 the tests pass.
 
-- **Offline.** No documented command requires an API key, an account, or a
-  network call. The default provider replays fixtures; live calls are opt-in
-  behind `ASSAY_LIVE=1` and belong only to `npm run verify:live`.
+- **Offline.** Once `npm install` has fetched dependencies, no command in this
+  repository requires an API key, an account, or a network call. Setup —
+  `git clone` and `npm install` — obviously needs the network; nothing after it
+  does. The default provider replays fixtures, demo scripts name replay
+  explicitly rather than relying on the default, and spawned children have
+  `ASSAY_LIVE` stripped. Live calls are opt-in behind `ASSAY_LIVE=1` and belong
+  only to `npm run verify:live`.
 - **Reproducible.** Seeded generators, logical counters, no wall clock in any
   output a test or a reviewer compares. Two runs produce identical bytes.
 - **Fail closed.** A missing or malformed input is an error. Never a default,

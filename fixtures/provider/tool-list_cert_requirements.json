@@ -4,13 +4,13 @@
   "evalCase": "coc-po-aer-5519-refusal",
   "calls": [
     {
-      "arguments": { "customer": "Aerodyne Systems" },
+      "arguments": { "customer": "Aerbridge Systems" },
       "response": {
         "total": 1,
         "requirements": [
           {
             "id": "COC-AER-001",
-            "customer": "Aerodyne Systems",
+            "customer": "Aerbridge Systems",
             "required_records": ["chemistry-cert", "mechanical-test", "heat-treat-cert", "dimensional-report", "traceability-statement"]
           }
         ]

@@ -35,8 +35,16 @@ const STEPS = [
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const results = [];
 
+// Children run offline whatever the caller's shell holds. ASSAY_LIVE is opt-in
+// for `npm run verify:live` alone, and inheriting it here would quietly make
+// these steps depend on a network and a key.
+const OFFLINE_ENV = { ...process.env };
+delete OFFLINE_ENV.ASSAY_LIVE;
+
 for (const step of STEPS) {
-  const run = spawnSync(npm, step.args, { cwd: REPO_ROOT, encoding: 'utf8', shell: process.platform === 'win32' });
+  const run = spawnSync(npm, step.args, {
+    cwd: REPO_ROOT, encoding: 'utf8', env: OFFLINE_ENV, shell: process.platform === 'win32',
+  });
   const code = run.status;
   const ok = code === step.expect;
   results.push({ ...step, code, ok, output: `${run.stdout ?? ''}${run.stderr ?? ''}` });

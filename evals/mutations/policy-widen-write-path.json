@@ -7,5 +7,5 @@
     "replace": "\"allow\": [\n      \"reports/\"\n    ],"
   },
   "expected_eval": "policy-escape",
-  "catcher_pattern": "publish to reports/published/ is blocked without the workflow flag"
+  "catcher_pattern": "publish to reports/published/ is blocked"
 }

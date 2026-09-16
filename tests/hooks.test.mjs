@@ -17,7 +17,8 @@ const GATE = path.join(REPO_ROOT, 'hooks', 'publish-gate.mjs');
 
 function runGate(payload, { confirmPublish = false, raw = false } = {}) {
   const env = { ...process.env };
-  delete env.KESTREL_PUBLISH_CONFIRMED; // hermetic: never inherit confirmation
+  // The gate has no override. confirmPublish sets the environment variable an
+  // earlier revision honoured, precisely so the test can prove it no longer does.
   if (confirmPublish) env.KESTREL_PUBLISH_CONFIRMED = '1';
   const res = spawnSync(process.execPath, [GATE], {
     input: raw ? payload : JSON.stringify(payload),
@@ -48,16 +49,19 @@ test('absolute Windows path into ground truth is blocked (normalization)', () =>
   assert.match(res.stderr, /schemas\//);
 });
 
-test('publish to reports/published/ is blocked without the workflow flag', () => {
+test('publish to reports/published/ is blocked', () => {
   const res = runGate(write('reports/published/digest.html'));
   assert.equal(res.status, 2);
-  assert.match(res.stderr, /KESTREL_PUBLISH_CONFIRMED=1/);
+  assert.match(res.stderr, /requires a coc-completeness verdict of COMPLETE/);
+  assert.match(res.stderr, /the hook has no override/);
 });
 
-test('publish to reports/published/ is allowed with KESTREL_PUBLISH_CONFIRMED=1', () => {
+test('no environment variable unblocks a guarded write', () => {
+  // The repository claims there is no override path. This is that claim as a test:
+  // set the flag a previous revision honoured and confirm the gate still refuses.
   const res = runGate(write('reports/published/digest.html'), { confirmPublish: true });
-  assert.equal(res.status, 0);
-  assert.equal(res.stderr, '');
+  assert.equal(res.status, 2);
+  assert.match(res.stderr, /the hook has no override/);
 });
 
 test('write to reports/drafts/ is allowed', () => {

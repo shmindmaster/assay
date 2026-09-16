@@ -28,7 +28,7 @@
     },
     "repeat_offenders": [],
     "cert_gaps": [
-      { "po": "PO-AER-5519", "customer": "Aerodyne Systems", "part": "KC-1001", "missing_records": ["mechanical-test"] }
+      { "po": "PO-AER-5519", "customer": "Aerbridge Systems", "part": "KC-1001", "missing_records": ["mechanical-test"] }
     ],
     "audit_readiness": {
       "audit_id": "AUD-2026-S1",

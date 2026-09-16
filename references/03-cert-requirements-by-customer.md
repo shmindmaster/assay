@@ -2,7 +2,7 @@
 
 The 5 customer COC specs, verbatim from `CERT_REQUIREMENTS` in `scripts/generate-data.mjs`. Mirrored in `data/docs/quality/cert-requirements/` and `data/exports/customers/cert-requirements.json`; served by `mcp__kestrel-foundry-data__list_cert_requirements`.
 
-## COC-AER-001 — Aerodyne Systems
+## COC-AER-001 — Aerbridge Systems
 1. `chemistry-cert`
 2. `mechanical-test`
 3. `heat-treat-cert`

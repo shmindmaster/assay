@@ -77,7 +77,7 @@ The AZ91D iron limit (0.004%) is tight on purpose — HT-4466 exceeded it (NCR-2
 
 | PN | Name | Alloy | Weight (lbs) | Customer |
 |---|---|---|---|---|
-| KC-1001 | Gearbox Housing | A356-T6 | 1,850 | Aerodyne Systems |
+| KC-1001 | Gearbox Housing | A356-T6 | 1,850 | Aerbridge Systems |
 | KC-1002 | Impeller | C355-T6 | 220 | Summit Aero Engines |
 | KC-1004 | Pump Body | A356-T6 | 640 | Meridian Aerostructures |
 | KC-1007 | Bell Crank | C355-T6 | 95 | Kestrel Defense Systems |
@@ -90,7 +90,7 @@ The AZ91D iron limit (0.004%) is tight on purpose — HT-4466 exceeded it (NCR-2
 
 ### Customers (5)
 
-Aerodyne Systems · Helix Rotorcraft · Meridian Aerostructures · Kestrel Defense Systems ·
+Aerbridge Systems · Helix Rotorcraft · Meridian Aerostructures · Kestrel Defense Systems ·
 Summit Aero Engines. (All fictional.)
 
 ### Cause codes (12)
@@ -132,7 +132,7 @@ chemistry 3 — plus 5 hand-authored story NCRs (below) = 36.
 
 | Spec | Customer | Required records |
 |---|---|---|
-| COC-AER-001 | Aerodyne Systems | chemistry-cert, mechanical-test, heat-treat-cert, dimensional-report, traceability-statement |
+| COC-AER-001 | Aerbridge Systems | chemistry-cert, mechanical-test, heat-treat-cert, dimensional-report, traceability-statement |
 | COC-HEL-002 | Helix Rotorcraft | the 5 above + radiographic-report, penetrant-report |
 | COC-MER-001 | Meridian Aerostructures | chemistry-cert, mechanical-test, traceability-statement |
 | COC-KES-003 | Kestrel Defense Systems | all 7 above + first-article (8 total) |
@@ -147,7 +147,7 @@ manager before ship approval; never substitute or summarize a record that is not
 
 | PO | Customer | Part | Qty | Heat | Spec | Due | State at anchor |
 |---|---|---|---|---|---|---|---|
-| PO-AER-5519 | Aerodyne Systems | KC-1001 | 6 | HT-4471 | COC-AER-001 | 2026-08-14 | **INCOMPLETE** — mechanical-test absent |
+| PO-AER-5519 | Aerbridge Systems | KC-1001 | 6 | HT-4471 | COC-AER-001 | 2026-08-14 | **INCOMPLETE** — mechanical-test absent |
 | PO-MER-5532 | Meridian Aerostructures | KC-1022 | 12 | HT-4468 | COC-MER-001 | 2026-08-21 | complete |
 
 ### Audit evidence areas (8) — AUD-2026-S1, window 2026-09-14 to 2026-09-15

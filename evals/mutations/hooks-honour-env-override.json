@@ -1,0 +1,12 @@
+{
+  "$comment": "The repository claims there is no override path. This mutation puts one back — the environment-variable bypass an earlier revision actually shipped — and asserts a test notices. Without it, that claim rests on nobody re-adding the line.",
+  "id": "hooks/honour-env-override",
+  "guard": "write-boundary-no-override",
+  "target": "hooks/publish-gate.mjs",
+  "patch": {
+    "find": "  const guarded = boundary.guarded.find((entry) => startsIn(target.relative, entry.path));\n  if (guarded) {",
+    "replace": "  const guarded = boundary.guarded.find((entry) => startsIn(target.relative, entry.path));\n  if (guarded) {\n    if (process.env.KESTREL_PUBLISH_CONFIRMED === '1') return null;"
+  },
+  "expected_eval": "no-env-override",
+  "catcher_pattern": "no environment variable unblocks a guarded write"
+}

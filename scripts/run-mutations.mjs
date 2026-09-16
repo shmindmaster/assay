@@ -62,7 +62,14 @@ function run(command, args, cwd) {
   const result = spawnSync(command, args, {
     cwd,
     encoding: 'utf8',
-    env: { ...process.env, ASSAY_MUTATION_CHILD: '1' },
+    // ASSAY_LIVE is stripped rather than inherited. A mutation child that could
+    // reach a live provider would be non-deterministic and billable, and this
+    // harness spawns one per mutation.
+    env: (() => {
+      const child = { ...process.env, ASSAY_MUTATION_CHILD: '1' };
+      delete child.ASSAY_LIVE;
+      return child;
+    })(),
   });
   if (result.error) throw result.error;
   return { status: result.status, output: `${result.stdout}${result.stderr}` };

@@ -25,8 +25,11 @@ to what was claimed.
 **Attribution.** For any release or refusal, it is reconstructible after the fact
 who decided what, on what inputs, under which rule.
 
-**Tamper-evidence.** An alteration to that record is detectable without trusting
-the party who holds it.
+**Tamper-evidence.** A *partial* alteration of that record is detectable against
+any prior observation of the chain. Full replacement by someone with write access
+is not, because the chain head is held on the same host; detecting that needs an
+externally observed or anchored head, which this repository does not have. §3.5
+sets this out, and nothing here should be read as a stronger claim.
 
 Note what is absent: availability. A control layer that fails closed will refuse
 work when it is confused, and that is the intended behaviour, not a denial of

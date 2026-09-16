@@ -11,7 +11,7 @@ Read this at the start of every session.
 ## The two known POs (always re-verify; states at anchor 2026-08-06)
 | PO | Customer | Part | Heat | Spec | Due | State |
 |---|---|---|---|---|---|---|
-| PO-AER-5519 | Aerodyne Systems | KC-1001 x6 | HT-4471 | COC-AER-001 | 2026-08-14 | INCOMPLETE — mechanical-test absent |
+| PO-AER-5519 | Aerbridge Systems | KC-1001 x6 | HT-4471 | COC-AER-001 | 2026-08-14 | INCOMPLETE — mechanical-test absent |
 | PO-MER-5532 | Meridian Aerostructures | KC-1022 x12 | HT-4468 | COC-MER-001 | 2026-08-21 | complete |
 
 ## Output contract

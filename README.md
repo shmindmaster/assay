@@ -12,8 +12,10 @@ side effect, final state — is owned and enforced by code. The model supplies
 judgment and language, and nothing else. Every boundary between the two is
 typed, enforced, and recorded.
 
-Clone it and run it in sixty seconds. There is no API key, no account, and no
-network call in any documented command.
+Clone it and run it in sixty seconds. Past `npm install`, there is no API key, no
+account, and no network call in any documented command — the default provider
+replays recorded responses, so the demos are reproducible byte-for-byte and cost
+nothing to run.
 
 ```bash
 git clone https://github.com/shmindmaster/assay
@@ -37,13 +39,20 @@ npm run demo
 The battery runs and ends on a refusal:
 
 ```
-PO-AER-5519  heat HT-4471
-  draft verdict   (model)   COMPLETE
-  computed verdict (code)   INCOMPLETE — missing: mechanical-test
-  authorization             REFUSED
-  receipt                   ledger/PO-AER-5519.jsonl  (chain verified, 14 receipts)
+PO-AER-5519   heat HT-4471
+  draft verdict    (model)   COMPLETE
+  computed verdict (code)    INCOMPLETE — missing: mechanical-test
+  context                    10 blocks, 1 untrusted (data/docs/purchasing/PO-AER-5519.md)
+  authorization              REFUSED — untrusted-context
+  effect publish-coc         DENIED
+  receipt                    ledger/PO-AER-5519.jsonl (chain verified, 7 receipts)
+
+ The model said complete. The files said otherwise. Nothing shipped.
 exit 3
 ```
+
+The exit code is deliberate: `3` is what the verifier returns for an incomplete
+package, and the demo working means the release not happening.
 
 The model said the certificate package was complete. It is not: heat HT-4471 has
 no tensile test report. A deterministic verifier computed that from the files on
@@ -75,14 +84,21 @@ A test suite that has never caught anything is decoration. This harness proves
 each guard can fail:
 
 ```
-mutation  verifier/flip-completeness-comparison   CAUGHT by coc-po-aer-5519-refusal
-mutation  policy/widen-write-path                 CAUGHT by policy-escape
-mutation  schema/drop-required-field              CAUGHT by schema-fixtures
-mutation  broker/accept-used-authorization        CAUGHT by broker-replay
-mutation  ledger/skip-chain-check                 CAUGHT by audit-tamper
+mutation  authorization/accept-already-used         CAUGHT by authorization-replay
+mutation  hooks/honour-env-override                 CAUGHT by no-env-override
+mutation  ledger/skip-chain-check                   CAUGHT by audit-tamper
+mutation  policy/widen-write-path                   CAUGHT by policy-escape
+mutation  schema/remove-required-field              CAUGHT by schema-required-sha256
+mutation  verifier/flip-completeness-comparison     CAUGHT by coc-po-aer-5519-refusal
 
-5/5 mutations caught — every guard in this repo is demonstrably able to fail.
+6/6 mutations caught — every guard in this repo is demonstrably able to fail.
 ```
+
+`hooks/honour-env-override` is the one to look at. This repository claims there
+is no override path; an earlier revision of `hooks/publish-gate.mjs` shipped one
+anyway, an environment variable that waved a guarded write through. That mutation
+puts the line back and asserts a test notices, so the claim is enforced rather
+than remembered.
 
 Each mutation is a declarative patch in `evals/mutations/`, applied to a scratch
 copy and reverted. A mutation the suite survives is reported as a coverage gap
@@ -264,7 +280,12 @@ these hold on any machine.
 Worth stating plainly, because a control layer that claims too much is worse than
 none. This design stops an injected instruction from changing an outcome, a model
 from asserting a fact it cannot evidence, an effect from happening without an
-authorization, and a record from being altered undetected.
+authorization, and a draft from being edited between approval and publication.
+
+It makes a record *partially* alterable without detection impossible. It does not
+make the record unforgeable: the chain head lives on the same host, so anyone with
+write access can regenerate a consistent chain. That needs an external anchor,
+which this repository does not have and does not pretend to.
 
 It does not save you from a deterministic rule that is wrong, a schema that
 permits something it should not, a compromised host, or a verifier fed the wrong

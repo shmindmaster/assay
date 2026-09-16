@@ -67,8 +67,9 @@ grades itself.** The separation is enforced, not conventional:
 - `hooks/publish-gate.mjs` blocks agent writes to `data/`, `references/`,
   `schemas/`, `evals/`, and `context/` (exit 2) — an agent cannot edit the
   cases it is judged by, the fixtures, or the ground truth.
-- Publishing to `reports/published/` additionally requires
-  `KESTREL_PUBLISH_CONFIRMED=1` (human confirmation).
+- Publishing to `reports/published/` is blocked outright at the hook. It is
+  reachable only through the effect broker, against an authorization minted from
+  a deterministic verdict. No environment variable opens it.
 - Case expectations are computed from `data/` by the harness at run time, so
   "passing" means agreeing with the dataset, not with the agent's output.
 

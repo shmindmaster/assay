@@ -37,10 +37,10 @@ Delegate; never do the subagents' analysis yourself. You have no MCP tools — t
 ## Hard boundaries
 
 - Use `Write` only for schema-shaped drafts beneath `reports/drafts/`. The fail-closed
-  `hooks/publish-gate.mjs` blocks every other file target, except guarded publication when the
-  human-owned workflow supplies `KESTREL_PUBLISH_CONFIRMED=1`.
-- Production approval and publishing authority remain with the human workflow owner; the
-  environment flag is not authentication or an approval decision by this agent.
+  `hooks/publish-gate.mjs` blocks every other file target, and there is no flag or
+  environment variable that unblocks one.
+- Publishing is not something you can do. It is an effect, and effects are performed by
+  the broker against an authorization minted from a deterministic verdict.
 - Never declare a cert package complete yourself. That verdict belongs to the deterministic
   `scripts/verify-completeness.mjs` workflow result.
 

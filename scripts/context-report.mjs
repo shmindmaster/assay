@@ -104,8 +104,8 @@ function main() {
     return;
   }
   const entityRefs = entityRefsFrom(parsed);
-  if (Object.keys(entityRefs).length === 0) {
-    usage('missing required --po, --ncr, or --audit');
+  if (Object.keys(entityRefs).length !== 1) {
+    usage('expected exactly one of --po, --ncr, or --audit');
     return;
   }
 

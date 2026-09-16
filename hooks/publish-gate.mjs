@@ -67,11 +67,14 @@ function decide(filePath, boundary) {
 
   const guarded = boundary.guarded.find((entry) => startsIn(target.relative, entry.path));
   if (guarded) {
-    // This flag belongs to the existing human-owned hook workflow. The effect
-    // broker itself has no flag or override and independently requires a bound
-    // deterministic authorization before it writes.
-    if (process.env.KESTREL_PUBLISH_CONFIRMED === '1') return null;
-    return `writing ${guarded.path} requires ${guarded.requiresVerdict}=${guarded.requiresOutcome} and KESTREL_PUBLISH_CONFIRMED=1`;
+    // Deliberately no escape hatch. An earlier revision honoured an environment
+    // variable here on the reasoning that the effect broker enforces the real
+    // rule anyway. That reasoning is wrong twice over: it makes the repository's
+    // "no override path" claim false, and a guard that can be switched off by
+    // anyone who can set an env var is not a guard — it is a suggestion with a
+    // password. A guarded path is reachable only through the broker, which
+    // requires a bound deterministic authorization and has no flag of its own.
+    return `writing ${guarded.path} requires a ${guarded.requiresVerdict} verdict of ${guarded.requiresOutcome}, minted by the effect broker; the hook has no override`;
   }
 
   return `write target ${target.relative ?? target.display} is outside policy.writeBoundary.allow (${boundary.allow.join(', ')})`;

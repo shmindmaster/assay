@@ -1,6 +1,6 @@
-# COC-AER-001 — Certificate of Conformance requirements — Aerodyne Systems
+# COC-AER-001 — Certificate of Conformance requirements — Aerbridge Systems
 
-Each shipment to Aerodyne Systems must include a certification package containing the
+Each shipment to Aerbridge Systems must include a certification package containing the
 following records, traceable to the heat lot of manufacture:
 
 1. `chemistry-cert`

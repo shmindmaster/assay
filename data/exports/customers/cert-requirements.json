@@ -3,7 +3,7 @@
   "requirements": [
     {
       "req_id": "COC-AER-001",
-      "customer": "Aerodyne Systems",
+      "customer": "Aerbridge Systems",
       "required_records": [
         "chemistry-cert",
         "mechanical-test",

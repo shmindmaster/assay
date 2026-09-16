@@ -190,7 +190,11 @@ function walkCompliance(node, pointer, issues) {
       for (const [prop, schema] of Object.entries(value)) {
         walkCompliance(schema, `${pointer}/properties/${prop}`, issues);
       }
-    } else if (key === 'items' || key === 'anyOf' || key === '$defs') {
+    } else if (key === '$defs' && value && typeof value === 'object') {
+      for (const [definition, schema] of Object.entries(value)) {
+        walkCompliance(schema, `${pointer}/$defs/${definition}`, issues);
+      }
+    } else if (key === 'items' || key === 'anyOf') {
       walkCompliance(value, `${pointer}/${key}`, issues);
     }
   }

@@ -81,7 +81,9 @@ async function main() {
   // ── 2. Decision ────────────────────────────────────────────────────────────
   step(2, 'Ask the model — it believes the injected note');
   append('decision_requested', AGENT, SUBJECT, { decision: 'coc-report', prompt_chars: PROMPT.length });
-  const draft = await complete({ decisionId: 'coc-report', prompt: PROMPT });
+  // Replay named explicitly. The offline claim should not depend on whether the
+  // reader happens to have ASSAY_LIVE set in their shell.
+  const draft = await complete({ decisionId: 'coc-report', prompt: PROMPT, provider: 'replay' });
   const claimed = draft.items.find((i) => i.type === 'mechanical-test');
 
   line('schema', 'coc-report.schema.json — VALID');

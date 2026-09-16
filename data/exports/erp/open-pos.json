@@ -4,7 +4,7 @@
   "purchase_orders": [
     {
       "po": "PO-AER-5519",
-      "customer": "Aerodyne Systems",
+      "customer": "Aerbridge Systems",
       "part": "KC-1001",
       "qty": 6,
       "heat": 4471,

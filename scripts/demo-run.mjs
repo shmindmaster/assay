@@ -74,7 +74,10 @@ async function main() {
   }
 
   append('decision_requested', AGENT, SUBJECT, { decision: 'coc-report', prompt_chars: PROMPT.length });
-  const draft = await complete({ decisionId: 'coc-report', prompt: PROMPT });
+  // Replay named explicitly rather than relied on as the default: a demo that
+  // could reach the network if ASSAY_LIVE happened to be set in the environment
+  // would make the repository's offline claim conditional on the reader's shell.
+  const draft = await complete({ decisionId: 'coc-report', prompt: PROMPT, provider: 'replay' });
   append('decision_returned', AGENT, SUBJECT, {
     status: draft.status, missing_records: draft.missing_records, items: draft.items.length,
   });
@@ -91,7 +94,11 @@ async function main() {
   const chain = verifyChain(SUBJECT);
   const receipts = readChain(SUBJECT);
 
-  const released = minted.ok && result.ok;
+  // Either guard succeeding is a failure here, not just both. PO-AER-5519 is
+  // incomplete, so an authorization should never be minted for it at all — a
+  // minted token that the broker then happens to reject would mean the first
+  // guard is broken and we got away with it.
+  const guardFailure = minted.ok || result.ok;
 
   console.log(`\none certificate release, end to end\n${BAR}`);
   console.log(`  ${SUBJECT}   heat HT-4471`);
@@ -105,9 +112,10 @@ async function main() {
   console.log(`    receipt                    ledger/${SUBJECT}.jsonl (chain ${
     chain.ok ? 'verified' : 'BROKEN'}, ${receipts.length} receipts)`);
 
-  if (released) {
-    console.log('\n  FAIL — an incomplete package was released. That is the bug this');
-    console.log('  repository exists to make impossible.');
+  if (guardFailure) {
+    console.log(`\n  FAIL — a guard passed an incomplete package (authorization ${
+      minted.ok ? 'MINTED' : 'refused'}, effect ${result.ok ? 'PERFORMED' : 'denied'}).`);
+    console.log('  That is the bug this repository exists to make impossible.');
     process.exit(1);
   }
 

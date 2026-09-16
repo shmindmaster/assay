@@ -12,10 +12,10 @@ import Ajv2020 from 'ajv/dist/2020.js';
 export const MAX_RETRIES = 2;
 
 export class RepairClosedError extends Error {
-  constructor(attempts) {
+  constructor(attempts, maxRetries = MAX_RETRIES) {
     const last = attempts.at(-1);
     const detail = formatErrors(last?.errors);
-    super(`repair failed closed after ${MAX_RETRIES} retries (${attempts.length} attempts): ${detail}`);
+    super(`repair failed closed after ${maxRetries} retries (${attempts.length} attempts): ${detail}`);
     this.name = 'RepairClosedError';
     this.attempts = attempts;
   }
@@ -72,5 +72,5 @@ export async function repair(generate, schema, { maxRetries = MAX_RETRIES, log =
   }
 
   log({ event: 'repair-closed', attempts: attempts.length });
-  throw new RepairClosedError(attempts);
+  throw new RepairClosedError(attempts, maxRetries);
 }

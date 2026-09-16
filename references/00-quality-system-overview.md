@@ -49,7 +49,7 @@ Nominal mechanicals: 30 ksi tensile, 20 ksi yield, 2.5% elongation, 62 BHN.
 
 | PN | Name | Alloy | Weight (lbs) | Customer |
 |---|---|---|---|---|
-| KC-1001 | Gearbox Housing | A356-T6 | 1850 | Aerodyne Systems |
+| KC-1001 | Gearbox Housing | A356-T6 | 1850 | Aerbridge Systems |
 | KC-1002 | Impeller | C355-T6 | 220 | Summit Aero Engines |
 | KC-1004 | Pump Body | A356-T6 | 640 | Meridian Aerostructures |
 | KC-1007 | Bell Crank | C355-T6 | 95 | Kestrel Defense Systems |
@@ -60,7 +60,7 @@ Nominal mechanicals: 30 ksi tensile, 20 ksi yield, 2.5% elongation, 62 BHN.
 | KC-1026 | Sump Cover | AZ91D | 85 | Summit Aero Engines |
 | KC-1030 | Main Rotor Hub Housing | ZE41A | 3900 | Helix Rotorcraft |
 
-Customers (5): Aerodyne Systems, Helix Rotorcraft, Meridian Aerostructures, Kestrel Defense Systems, Summit Aero Engines.
+Customers (5): Aerbridge Systems, Helix Rotorcraft, Meridian Aerostructures, Kestrel Defense Systems, Summit Aero Engines.
 
 ## Data layout (`data/`)
 

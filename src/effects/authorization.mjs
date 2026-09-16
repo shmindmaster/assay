@@ -50,18 +50,24 @@ function verdictBody(verifier, contextBlocks) {
   };
 }
 
+function contextBlockError(contextBlocks) {
+  for (const block of contextBlocks) {
+    if (!block || typeof block.source !== 'string' || !/^[0-9a-f]{64}$/.test(block.sha256)) {
+      return 'each context block must name source and sha256';
+    }
+    if (block.trust !== 'trusted' && block.trust !== 'untrusted') {
+      return 'each context block trust must be "trusted" or "untrusted"';
+    }
+  }
+  return null;
+}
+
 export function createVerdictRecord(subject, { contextBlocks = [] } = {}) {
   const verifier = verifyCompleteness(subject);
   if (verifier === null) throw new Error(`cannot create verdict: unknown subject "${subject}"`);
   if (!Array.isArray(contextBlocks)) throw new TypeError('contextBlocks must be an array');
-  for (const block of contextBlocks) {
-    if (!block || typeof block.source !== 'string' || !/^[0-9a-f]{64}$/.test(block.sha256)) {
-      throw new TypeError('each context block must name source and sha256');
-    }
-    if (block.trust !== 'trusted' && block.trust !== 'untrusted') {
-      throw new TypeError('each context block trust must be "trusted" or "untrusted"');
-    }
-  }
+  const invalidContext = contextBlockError(contextBlocks);
+  if (invalidContext) throw new TypeError(invalidContext);
 
   const body = verdictBody(verifier, contextBlocks);
   return Object.freeze({ ...body, verdict_sha256: sha256(body) });
@@ -145,6 +151,28 @@ export function inspectAuthorization(effect, candidate) {
       },
     };
   }
+  const invalidContext = contextBlockError(candidate.context_blocks);
+  if (invalidContext) {
+    return {
+      rule: 'authorization-shape', verdict: candidate.verdict ?? null,
+      mismatch: {
+        field: 'authorization.context_blocks',
+        expected: 'blocks with source, sha256, and trust',
+        actual: invalidContext,
+      },
+    };
+  }
+  const verifier = verifyCompleteness(candidate.subject);
+  if (verifier === null) {
+    return {
+      rule: 'authorization-shape', verdict: candidate.verdict ?? null,
+      mismatch: {
+        field: 'authorization.subject',
+        expected: 'known subject',
+        actual: candidate.subject ?? null,
+      },
+    };
+  }
   if (candidate.effect_id !== effect.id) {
     return {
       rule: 'effect-binding', verdict: candidate.verdict,
@@ -158,7 +186,7 @@ export function inspectAuthorization(effect, candidate) {
       mismatch: { field: 'payload_sha256', expected: candidate.payload_sha256, actual: actualPayloadHash },
     };
   }
-  const currentVerdict = createVerdictRecord(candidate.subject, { contextBlocks: candidate.context_blocks });
+  const currentVerdict = verdictBody(verifier, candidate.context_blocks);
   if (canonicalJson(candidate.verdict_input_hashes) !== canonicalJson(currentVerdict.input_hashes)) {
     return {
       rule: 'verdict-input-binding', verdict: candidate.verdict,
