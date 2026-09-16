@@ -1,0 +1,11 @@
+{
+  "id": "ncr-0114-repeat-offender",
+  "subagent": "ncr-triage",
+  "kind": "data-truth",
+  "prompt": "Triage NCR-2026-0114: classify the defect and cause, and tell me whether this part, defect, and cause combination is a repeat offender. List the prior occurrences from the 90 days before its date.",
+  "expect": {
+    "ncr": "NCR-2026-0114",
+    "prior_ids": ["NCR-2026-0091", "NCR-2026-0098", "NCR-2026-0107"],
+    "occurrence_count_90d": 4
+  }
+}

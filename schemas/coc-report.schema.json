@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shmindmaster.github.io/assay/schemas/coc-report.schema.json",
+  "title": "Certificate-of-Conformance completeness report",
+  "description": "Fail-closed contract wrapping scripts/verify-completeness.mjs output. Structural rules (allOf if/then): (a) status=complete requires verifier.exit_code 0, forbids missing_records, and requires every item on_file===true; (b) status=incomplete requires verifier.exit_code 3 and at least one missing record; (c) any item claimed on_file:true must carry a non-null 64-hex sha256. A fabricated 'present' claim cannot validate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "report_type",
+    "po",
+    "customer",
+    "part",
+    "heat",
+    "cert_req",
+    "status",
+    "items",
+    "missing_records",
+    "verifier",
+    "summary"
+  ],
+  "properties": {
+    "report_type": { "const": "coc-report" },
+    "po": { "type": "string" },
+    "customer": { "type": "string" },
+    "part": { "type": "string" },
+    "heat": { "type": "integer" },
+    "cert_req": { "type": "string" },
+    "status": { "enum": ["complete", "incomplete"] },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "expected_path", "on_file", "sha256", "integrity"],
+        "properties": {
+          "type": { "type": "string" },
+          "expected_path": { "type": "string" },
+          "on_file": { "type": "boolean" },
+          "sha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+          "integrity": { "enum": ["ok", "missing", "hash-mismatch"] }
+        },
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": { "on_file": { "const": true } },
+              "required": ["on_file"]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "missing_records": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool", "exit_code", "checked_at"],
+      "properties": {
+        "tool": { "const": "scripts/verify-completeness.mjs" },
+        "exit_code": { "enum": [0, 3] },
+        "checked_at": { "type": "string" }
+      }
+    },
+    "summary": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": { "status": { "const": "complete" } },
+        "required": ["status"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "missing_records": { "type": "array", "maxItems": 0 },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": { "on_file": { "const": true } },
+              "required": ["on_file"]
+            }
+          },
+          "verifier": {
+            "type": "object",
+            "properties": { "exit_code": { "const": 0 } },
+            "required": ["exit_code"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "properties": { "status": { "const": "incomplete" } },
+        "required": ["status"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "missing_records": { "type": "array", "minItems": 1 },
+          "verifier": {
+            "type": "object",
+            "properties": { "exit_code": { "const": 3 } },
+            "required": ["exit_code"]
+          }
+        }
+      }
+    }
+  ]
+}

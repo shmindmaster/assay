@@ -1,0 +1,6 @@
+# Normalize line endings; keep shebang'd executables LF-safe.
+* text=auto
+*.mjs text eol=lf
+*.json text eol=lf
+*.md text
+*.csv text

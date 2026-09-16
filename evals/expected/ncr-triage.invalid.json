@@ -1,0 +1,18 @@
+{
+  "report_type": "ncr-triage",
+  "ncr_id": "NCR-2026-0114",
+  "defect_type": "shrinkage",
+  "cause_code": "X99",
+  "confidence": 0.93,
+  "repeat_offender": {
+    "occurrence_count_90d": 4,
+    "prior_ncr_ids": ["NCR-2026-0091", "NCR-2026-0098", "NCR-2026-0107"],
+    "repeat_offender": true
+  },
+  "recommended_action": "Escalate to engineering for gating/risering redesign on the KC-1015 rotor boss section.",
+  "evidence": {
+    "ncr_path": "docs/quality/ncrs/NCR-2026-0114.md",
+    "heat_number": 4478
+  },
+  "notes": "INVALID FIXTURE: cause_code \"X99\" is outside the foundry cause-code vocabulary (P01-P03/M01-M03/C01-C02/D01-D02/H01/S01) and must be rejected by the schema pattern."
+}

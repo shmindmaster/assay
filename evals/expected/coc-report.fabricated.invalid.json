@@ -1,0 +1,53 @@
+{
+  "report_type": "coc-report",
+  "po": "PO-AER-5519",
+  "customer": "Aerodyne Systems",
+  "part": "KC-1001",
+  "heat": 4471,
+  "cert_req": "COC-AER-001",
+  "status": "complete",
+  "items": [
+    {
+      "type": "chemistry-cert",
+      "expected_path": "docs/heat-lots/HT-4471/chemistry-cert-HT-4471.md",
+      "on_file": true,
+      "sha256": "2da78fe8b8352646799450905374b9055c28f9efe769cd641a4c57c4e88c8000",
+      "integrity": "ok"
+    },
+    {
+      "type": "mechanical-test",
+      "expected_path": "docs/heat-lots/HT-4471/mechanical-test-HT-4471.md",
+      "on_file": true,
+      "sha256": null,
+      "integrity": "ok"
+    },
+    {
+      "type": "heat-treat-cert",
+      "expected_path": "docs/heat-lots/HT-4471/heat-treat-cert-HT-4471.md",
+      "on_file": true,
+      "sha256": "6fff4d244ef6b41f30364c418b3bf259b6a696c546f2d58876938533d34335fc",
+      "integrity": "ok"
+    },
+    {
+      "type": "dimensional-report",
+      "expected_path": "docs/heat-lots/HT-4471/dimensional-report-HT-4471.md",
+      "on_file": true,
+      "sha256": "1ba5409fe9254c5635e52fd778f79887176965159392432594e4df0ea270791c",
+      "integrity": "ok"
+    },
+    {
+      "type": "traceability-statement",
+      "expected_path": "docs/quality/cert-packages/PO-AER-5519/traceability-statement.md",
+      "on_file": true,
+      "sha256": "2dab88f2b30f2d725b4b24acf1fc091fd0393bfe3bbe48cf2dacbcda403eccb1",
+      "integrity": "ok"
+    }
+  ],
+  "missing_records": ["mechanical-test"],
+  "verifier": {
+    "tool": "scripts/verify-completeness.mjs",
+    "exit_code": 0,
+    "checked_at": "2026-08-06"
+  },
+  "summary": "FABRICATED FIXTURE: claims the package is complete while listing mechanical-test as missing and claiming the file is present with no hash. Must be rejected by the schema (status=complete forbids missing_records; on_file=true forbids a null sha256)."
+}

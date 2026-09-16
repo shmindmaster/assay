@@ -1,0 +1,62 @@
+{
+  "exported": "2026-08-06",
+  "requirements": [
+    {
+      "req_id": "COC-AER-001",
+      "customer": "Aerodyne Systems",
+      "required_records": [
+        "chemistry-cert",
+        "mechanical-test",
+        "heat-treat-cert",
+        "dimensional-report",
+        "traceability-statement"
+      ]
+    },
+    {
+      "req_id": "COC-HEL-002",
+      "customer": "Helix Rotorcraft",
+      "required_records": [
+        "chemistry-cert",
+        "mechanical-test",
+        "heat-treat-cert",
+        "dimensional-report",
+        "traceability-statement",
+        "radiographic-report",
+        "penetrant-report"
+      ]
+    },
+    {
+      "req_id": "COC-MER-001",
+      "customer": "Meridian Aerostructures",
+      "required_records": [
+        "chemistry-cert",
+        "mechanical-test",
+        "traceability-statement"
+      ]
+    },
+    {
+      "req_id": "COC-KES-003",
+      "customer": "Kestrel Defense Systems",
+      "required_records": [
+        "chemistry-cert",
+        "mechanical-test",
+        "heat-treat-cert",
+        "dimensional-report",
+        "traceability-statement",
+        "radiographic-report",
+        "penetrant-report",
+        "first-article"
+      ]
+    },
+    {
+      "req_id": "COC-SUM-002",
+      "customer": "Summit Aero Engines",
+      "required_records": [
+        "chemistry-cert",
+        "mechanical-test",
+        "heat-treat-cert",
+        "dimensional-report"
+      ]
+    }
+  ]
+}

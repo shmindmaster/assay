@@ -1,0 +1,514 @@
+{
+  "system": "CASTLINE",
+  "exported": "2026-08-06",
+  "heat_lots": [
+    {
+      "heat_number": 4460,
+      "heat_id": "HT-4460",
+      "alloy": "A356-T6",
+      "family": "aluminum",
+      "pour_date": "2026-05-14",
+      "furnace": "F-1",
+      "weight_poured_lbs": 2156,
+      "primary_part": "KC-1001",
+      "chemistry": {
+        "Si": 7.02,
+        "Mg": 0.385,
+        "Cu": 0.122,
+        "Fe": 0.075,
+        "Ti": 0.112,
+        "Sr": 0.021
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4460-A",
+        "tensile_ksi": 34.4,
+        "yield_ksi": 24.6,
+        "elongation_pct": 3.8,
+        "hardness_bhn": 78
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4461,
+      "heat_id": "HT-4461",
+      "alloy": "C355-T6",
+      "family": "aluminum",
+      "pour_date": "2026-05-18",
+      "furnace": "F-3",
+      "weight_poured_lbs": 255,
+      "primary_part": "KC-1002",
+      "chemistry": {
+        "Si": 5.015,
+        "Cu": 1.269,
+        "Mg": 0.489,
+        "Fe": 0.091,
+        "Ti": 0.093
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4461-A",
+        "tensile_ksi": 40.1,
+        "yield_ksi": 28.4,
+        "elongation_pct": 3.1,
+        "hardness_bhn": 90
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4462,
+      "heat_id": "HT-4462",
+      "alloy": "A356-T6",
+      "family": "aluminum",
+      "pour_date": "2026-05-22",
+      "furnace": "F-3",
+      "weight_poured_lbs": 727,
+      "primary_part": "KC-1004",
+      "chemistry": {
+        "Si": 7.092,
+        "Mg": 0.369,
+        "Cu": 0.094,
+        "Fe": 0.117,
+        "Ti": 0.081,
+        "Sr": 0.022
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4462-A",
+        "tensile_ksi": 33.7,
+        "yield_ksi": 23.4,
+        "elongation_pct": 3.6,
+        "hardness_bhn": 77
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4463,
+      "heat_id": "HT-4463",
+      "alloy": "ZE41A",
+      "family": "magnesium",
+      "pour_date": "2026-05-24",
+      "furnace": "F-2",
+      "weight_poured_lbs": 2770,
+      "primary_part": "KC-1015",
+      "chemistry": {
+        "Zn": 4.069,
+        "Zr": 0.66,
+        "RE": 1.153,
+        "Cu": 0.014,
+        "Fe": 0.006
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4463-A",
+        "tensile_ksi": 29.4,
+        "yield_ksi": 19.8,
+        "elongation_pct": 2.6,
+        "hardness_bhn": 64
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4464,
+      "heat_id": "HT-4464",
+      "alloy": "AZ91D",
+      "family": "magnesium",
+      "pour_date": "2026-05-28",
+      "furnace": "F-2",
+      "weight_poured_lbs": 140,
+      "primary_part": "KC-1011",
+      "chemistry": {
+        "Al": 9.042,
+        "Zn": 0.666,
+        "Mn": 0.294,
+        "Si": 0.035,
+        "Cu": 0.013,
+        "Fe": 0.002
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4464-A",
+        "tensile_ksi": 31.9,
+        "yield_ksi": 22.9,
+        "elongation_pct": 3.1,
+        "hardness_bhn": 69
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4465,
+      "heat_id": "HT-4465",
+      "alloy": "ZE41A",
+      "family": "magnesium",
+      "pour_date": "2026-06-01",
+      "furnace": "F-2",
+      "weight_poured_lbs": 2785,
+      "primary_part": "KC-1015",
+      "chemistry": {
+        "Zn": 4.195,
+        "Zr": 0.718,
+        "RE": 1.22,
+        "Cu": 0.016,
+        "Fe": 0.005
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4465-A",
+        "tensile_ksi": 29.5,
+        "yield_ksi": 20.5,
+        "elongation_pct": 2.6,
+        "hardness_bhn": 64
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4466,
+      "heat_id": "HT-4466",
+      "alloy": "AZ91D",
+      "family": "magnesium",
+      "pour_date": "2026-06-06",
+      "furnace": "F-2",
+      "weight_poured_lbs": 180,
+      "primary_part": "KC-1011",
+      "chemistry": {
+        "Al": 8.913,
+        "Zn": 0.646,
+        "Mn": 0.258,
+        "Si": 0.044,
+        "Cu": 0.014,
+        "Fe": 0.006
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4466-A",
+        "tensile_ksi": 33.6,
+        "yield_ksi": 22.6,
+        "elongation_pct": 3.2,
+        "hardness_bhn": 64
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4467,
+      "heat_id": "HT-4467",
+      "alloy": "C355-T6",
+      "family": "aluminum",
+      "pour_date": "2026-06-10",
+      "furnace": "F-2",
+      "weight_poured_lbs": 573,
+      "primary_part": "KC-1022",
+      "chemistry": {
+        "Si": 5.005,
+        "Cu": 1.259,
+        "Mg": 0.475,
+        "Fe": 0.11,
+        "Ti": 0.114
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4467-A",
+        "tensile_ksi": 39.4,
+        "yield_ksi": 27.2,
+        "elongation_pct": 3,
+        "hardness_bhn": 87
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4468,
+      "heat_id": "HT-4468",
+      "alloy": "C355-T6",
+      "family": "aluminum",
+      "pour_date": "2026-06-15",
+      "furnace": "F-1",
+      "weight_poured_lbs": 533,
+      "primary_part": "KC-1022",
+      "chemistry": {
+        "Si": 4.918,
+        "Cu": 1.188,
+        "Mg": 0.494,
+        "Fe": 0.091,
+        "Ti": 0.079
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4468-A",
+        "tensile_ksi": 38.2,
+        "yield_ksi": 27.9,
+        "elongation_pct": 3,
+        "hardness_bhn": 94
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4469,
+      "heat_id": "HT-4469",
+      "alloy": "ZE41A",
+      "family": "magnesium",
+      "pour_date": "2026-06-19",
+      "furnace": "F-1",
+      "weight_poured_lbs": 2759,
+      "primary_part": "KC-1015",
+      "chemistry": {
+        "Zn": 4.405,
+        "Zr": 0.772,
+        "RE": 1.343,
+        "Cu": 0.013,
+        "Fe": 0.006
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4469-A",
+        "tensile_ksi": 29.5,
+        "yield_ksi": 19,
+        "elongation_pct": 2.4,
+        "hardness_bhn": 59
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4470,
+      "heat_id": "HT-4470",
+      "alloy": "A356-T6",
+      "family": "aluminum",
+      "pour_date": "2026-06-22",
+      "furnace": "F-2",
+      "weight_poured_lbs": 2104,
+      "primary_part": "KC-1001",
+      "chemistry": {
+        "Si": 6.914,
+        "Mg": 0.37,
+        "Cu": 0.087,
+        "Fe": 0.083,
+        "Ti": 0.098,
+        "Sr": 0.018
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4470-A",
+        "tensile_ksi": 33.6,
+        "yield_ksi": 24.6,
+        "elongation_pct": 3.9,
+        "hardness_bhn": 76
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4471,
+      "heat_id": "HT-4471",
+      "alloy": "A356-T6",
+      "family": "aluminum",
+      "pour_date": "2026-06-26",
+      "furnace": "F-1",
+      "weight_poured_lbs": 2093,
+      "primary_part": "KC-1001",
+      "chemistry": {
+        "Si": 7.118,
+        "Mg": 0.383,
+        "Cu": 0.087,
+        "Fe": 0.123,
+        "Ti": 0.112,
+        "Sr": 0.022
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4471-A",
+        "tensile_ksi": 33.8,
+        "yield_ksi": 23.7,
+        "elongation_pct": 3.8,
+        "hardness_bhn": 81
+      },
+      "tensile_report_on_file": false
+    },
+    {
+      "heat_number": 4472,
+      "heat_id": "HT-4472",
+      "alloy": "A356-T6",
+      "family": "aluminum",
+      "pour_date": "2026-07-01",
+      "furnace": "F-2",
+      "weight_poured_lbs": 738,
+      "primary_part": "KC-1004",
+      "chemistry": {
+        "Si": 7.119,
+        "Mg": 0.365,
+        "Cu": 0.112,
+        "Fe": 0.105,
+        "Ti": 0.111,
+        "Sr": 0.019
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4472-A",
+        "tensile_ksi": 33.3,
+        "yield_ksi": 23.4,
+        "elongation_pct": 3.9,
+        "hardness_bhn": 82
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4473,
+      "heat_id": "HT-4473",
+      "alloy": "C355-T6",
+      "family": "aluminum",
+      "pour_date": "2026-07-05",
+      "furnace": "F-2",
+      "weight_poured_lbs": 107,
+      "primary_part": "KC-1007",
+      "chemistry": {
+        "Si": 4.876,
+        "Cu": 1.215,
+        "Mg": 0.491,
+        "Fe": 0.112,
+        "Ti": 0.092
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4473-A",
+        "tensile_ksi": 40.1,
+        "yield_ksi": 28.9,
+        "elongation_pct": 2.8,
+        "hardness_bhn": 90
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4474,
+      "heat_id": "HT-4474",
+      "alloy": "ZE41A",
+      "family": "magnesium",
+      "pour_date": "2026-07-07",
+      "furnace": "F-1",
+      "weight_poured_lbs": 2747,
+      "primary_part": "KC-1015",
+      "chemistry": {
+        "Zn": 4.079,
+        "Zr": 0.771,
+        "RE": 1.264,
+        "Cu": 0.017,
+        "Fe": 0.005
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4474-A",
+        "tensile_ksi": 29,
+        "yield_ksi": 19.9,
+        "elongation_pct": 2.8,
+        "hardness_bhn": 62
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4475,
+      "heat_id": "HT-4475",
+      "alloy": "ZE41A",
+      "family": "magnesium",
+      "pour_date": "2026-07-12",
+      "furnace": "F-1",
+      "weight_poured_lbs": 2747,
+      "primary_part": "KC-1015",
+      "chemistry": {
+        "Zn": 4.242,
+        "Zr": 0.726,
+        "RE": 1.371,
+        "Cu": 0.018,
+        "Fe": 0.005
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4475-A",
+        "tensile_ksi": 29.5,
+        "yield_ksi": 19.6,
+        "elongation_pct": 2.8,
+        "hardness_bhn": 64
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4476,
+      "heat_id": "HT-4476",
+      "alloy": "A356-T6",
+      "family": "aluminum",
+      "pour_date": "2026-07-15",
+      "furnace": "F-1",
+      "weight_poured_lbs": 96,
+      "primary_part": "KC-1018",
+      "chemistry": {
+        "Si": 6.9,
+        "Mg": 0.376,
+        "Cu": 0.116,
+        "Fe": 0.087,
+        "Ti": 0.079,
+        "Sr": 0.022
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4476-A",
+        "tensile_ksi": 34.1,
+        "yield_ksi": 24.1,
+        "elongation_pct": 3.1,
+        "hardness_bhn": 82
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4477,
+      "heat_id": "HT-4477",
+      "alloy": "C355-T6",
+      "family": "aluminum",
+      "pour_date": "2026-07-21",
+      "furnace": "F-3",
+      "weight_poured_lbs": 521,
+      "primary_part": "KC-1022",
+      "chemistry": {
+        "Si": 4.941,
+        "Cu": 1.292,
+        "Mg": 0.499,
+        "Fe": 0.115,
+        "Ti": 0.093
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4477-A",
+        "tensile_ksi": 38.3,
+        "yield_ksi": 27.2,
+        "elongation_pct": 2.8,
+        "hardness_bhn": 87
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4478,
+      "heat_id": "HT-4478",
+      "alloy": "ZE41A",
+      "family": "magnesium",
+      "pour_date": "2026-07-23",
+      "furnace": "F-2",
+      "weight_poured_lbs": 2794,
+      "primary_part": "KC-1015",
+      "chemistry": {
+        "Zn": 4.213,
+        "Zr": 0.627,
+        "RE": 1.203,
+        "Cu": 0.018,
+        "Fe": 0.006
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4478-A",
+        "tensile_ksi": 29.7,
+        "yield_ksi": 20.6,
+        "elongation_pct": 2.8,
+        "hardness_bhn": 61
+      },
+      "tensile_report_on_file": true
+    },
+    {
+      "heat_number": 4479,
+      "heat_id": "HT-4479",
+      "alloy": "ZE41A",
+      "family": "magnesium",
+      "pour_date": "2026-07-29",
+      "furnace": "F-2",
+      "weight_poured_lbs": 4514,
+      "primary_part": "KC-1030",
+      "chemistry": {
+        "Zn": 4.193,
+        "Zr": 0.635,
+        "RE": 1.287,
+        "Cu": 0.018,
+        "Fe": 0.005
+      },
+      "mechanical": {
+        "test_bar_id": "TB-4479-A",
+        "tensile_ksi": 30.5,
+        "yield_ksi": 19.5,
+        "elongation_pct": 2.5,
+        "hardness_bhn": 64
+      },
+      "tensile_report_on_file": true
+    }
+  ]
+}

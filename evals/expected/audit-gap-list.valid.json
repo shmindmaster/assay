@@ -1,0 +1,32 @@
+{
+  "report_type": "audit-gap-list",
+  "audit_id": "AUD-2026-S1",
+  "areas": [
+    { "id": "EA-1", "area": "Nonconformance log and disposition records", "expected_path": "exports/qms/ncr-export.json", "present": true },
+    { "id": "EA-2", "area": "Certificate-of-conformance packages for open POs", "expected_path": "docs/quality/cert-packages", "present": true },
+    { "id": "EA-3", "area": "Heat-lot traceability records", "expected_path": "docs/heat-lots", "present": true },
+    { "id": "EA-4", "area": "Calibration records", "expected_path": "docs/quality/calibration/calibration-log-2026.md", "present": true },
+    { "id": "EA-5", "area": "Internal audit schedule", "expected_path": "docs/quality/audits/internal-audit-schedule-2026.md", "present": true },
+    { "id": "EA-6", "area": "Corrective action log", "expected_path": "docs/quality/corrective-actions/capa-log-2026.md", "present": true },
+    { "id": "EA-7", "area": "Training records", "expected_path": "docs/quality/training/training-matrix-2026.md", "present": false },
+    { "id": "EA-8", "area": "Supplier raw-material certificates", "expected_path": "docs/purchasing/supplier-certs", "present": false }
+  ],
+  "gaps": [
+    {
+      "id": "EA-7",
+      "area": "Training records",
+      "expected_path": "docs/quality/training/training-matrix-2026.md",
+      "recommended_action": "Publish the 2026 training matrix with role-based competency requirements and current sign-offs at docs/quality/training/training-matrix-2026.md before the 2026-09-14 audit window.",
+      "owner_role": "Quality Manager"
+    },
+    {
+      "id": "EA-8",
+      "area": "Supplier raw-material certificates",
+      "expected_path": "docs/purchasing/supplier-certs",
+      "recommended_action": "Collect current mill certs for all active ingot and returns suppliers and file them under docs/purchasing/supplier-certs with an index before the 2026-09-14 audit window.",
+      "owner_role": "Purchasing Lead"
+    }
+  ],
+  "areas_present": 6,
+  "areas_total": 8
+}

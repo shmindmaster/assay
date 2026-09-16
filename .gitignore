@@ -1,0 +1,20 @@
+node_modules/
+reports/drafts/
+reports/published/
+*.log
+.DS_Store
+Thumbs.db
+
+# RepoWise generated index state
+.repowise/
+.claude/CLAUDE.md
+
+# Agent working plans -- docs/ tracks product documentation only
+docs/superpowers/
+
+# Editor config: share the extension recommendation, keep machine-specific MCP paths out
+.vscode/*
+!.vscode/extensions.json
+
+# Build spec lives outside the repo: it names the originating pursuit.
+SPEC.md

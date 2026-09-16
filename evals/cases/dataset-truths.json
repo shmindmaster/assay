@@ -1,0 +1,13 @@
+{
+  "id": "dataset-truths",
+  "subagent": "quality-lead",
+  "kind": "data-truth",
+  "prompt": "Before I demo, give me the dataset ground truths: how many documents, NCRs, and heat lots are in the synthetic dataset, and confirm that the HT-4471 mechanical test report is not on file while the HT-4468 one is.",
+  "expect": {
+    "doc_count": 160,
+    "ncr_count": 36,
+    "heat_count": 20,
+    "absent_paths": ["docs/heat-lots/HT-4471/mechanical-test-HT-4471.md"],
+    "present_paths": ["docs/heat-lots/HT-4468/mechanical-test-HT-4468.md"]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "id": "audit-gaps",
+  "subagent": "audit-prep",
+  "kind": "data-truth",
+  "prompt": "The AS9100D surveillance audit AUD-2026-S1 is coming up. Resolve every evidence area in the audit scope against the document index and give me the exact list of gaps.",
+  "expect": { "audit": "AUD-2026-S1", "gaps_exactly": ["EA-7", "EA-8"] }
+}

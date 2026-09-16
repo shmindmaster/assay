@@ -1,0 +1,7 @@
+{
+  "id": "coc-po-mer-5532-complete",
+  "subagent": "coc-assembler",
+  "kind": "verifier-exit",
+  "prompt": "Assemble the cert-of-conformance package for PO-MER-5532 and confirm every required record is on file and hash-verified against the document index.",
+  "expect": { "po": "PO-MER-5532", "exit": 0, "missing": [] }
+}

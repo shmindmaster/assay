@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shmindmaster.github.io/assay/schemas/audit-gap-list.schema.json",
+  "title": "Audit evidence gap list",
+  "description": "Evidence-readiness report for an audit scope (e.g. AUD-2026-S1): every evidence area with presence flag, the gaps requiring action with a recommended action and owner role, and present/total counters.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["report_type", "audit_id", "areas", "gaps", "areas_present", "areas_total"],
+  "properties": {
+    "report_type": { "const": "audit-gap-list" },
+    "audit_id": { "type": "string" },
+    "areas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "area", "expected_path", "present"],
+        "properties": {
+          "id": { "type": "string" },
+          "area": { "type": "string" },
+          "expected_path": { "type": "string" },
+          "present": { "type": "boolean" }
+        }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "area", "expected_path", "recommended_action", "owner_role"],
+        "properties": {
+          "id": { "type": "string" },
+          "area": { "type": "string" },
+          "expected_path": { "type": "string" },
+          "recommended_action": { "type": "string" },
+          "owner_role": { "type": "string" }
+        }
+      }
+    },
+    "areas_present": { "type": "integer", "minimum": 0 },
+    "areas_total": { "type": "integer", "minimum": 0 }
+  }
+}

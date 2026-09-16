@@ -1,0 +1,39 @@
+{
+  "report_type": "coc-report",
+  "po": "PO-MER-5532",
+  "customer": "Meridian Aerostructures",
+  "part": "KC-1022",
+  "heat": 4468,
+  "cert_req": "COC-MER-001",
+  "status": "complete",
+  "items": [
+    {
+      "type": "chemistry-cert",
+      "expected_path": "docs/heat-lots/HT-4468/chemistry-cert-HT-4468.md",
+      "on_file": true,
+      "sha256": "bf2a0e391a875a1e43a9ddc3342ca891e2bb198f59c7bc999cf670f55e99badd",
+      "integrity": "ok"
+    },
+    {
+      "type": "mechanical-test",
+      "expected_path": "docs/heat-lots/HT-4468/mechanical-test-HT-4468.md",
+      "on_file": true,
+      "sha256": "34f3c2511cee15ab8dc397e11cd02873be57243e777b5867a1db725a97989aaf",
+      "integrity": "ok"
+    },
+    {
+      "type": "traceability-statement",
+      "expected_path": "docs/quality/cert-packages/PO-MER-5532/traceability-statement.md",
+      "on_file": true,
+      "sha256": "588bea0acb43439ec3b1433382e7002a9714b6d7d69a5cdc1dd914ab1bb0cb2c",
+      "integrity": "ok"
+    }
+  ],
+  "missing_records": [],
+  "verifier": {
+    "tool": "scripts/verify-completeness.mjs",
+    "exit_code": 0,
+    "checked_at": "2026-08-06"
+  },
+  "summary": "All 3 records required by COC-MER-001 for PO-MER-5532 (KC-1022 Compressor Housing, heat HT-4468) are on file and hash-verified against data/index.json. Package cleared for cert assembly."
+}

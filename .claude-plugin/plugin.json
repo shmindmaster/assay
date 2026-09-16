@@ -1,0 +1,21 @@
+{
+  "name": "assay",
+  "version": "0.1.0",
+  "description": "Quality department agent for Kestrel Castings: four narrowly scoped subagents (NCR triage, cert-of-conformance assembly, scrap rollup, audit prep) composed by a primary quality-lead agent, running on synthetic foundry data behind a read-only MCP data boundary. Fail-closed verification, JSON Schema output contracts, and an eval suite with refusal cases.",
+  "author": { "name": "Sarosh Hussain (shmindmaster)" },
+  "keywords": [
+    "claude-code",
+    "subagents",
+    "skills",
+    "mcp",
+    "manufacturing",
+    "quality",
+    "foundry",
+    "aerospace",
+    "certificate-of-conformance",
+    "nonconformance",
+    "html-reports",
+    "evals"
+  ],
+  "license": "UNLICENSED"
+}

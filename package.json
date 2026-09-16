@@ -1,0 +1,32 @@
+{
+  "name": "assay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Kestrel Castings Quality department agent — Claude Code plugin prototype on synthetic foundry data.",
+  "author": "Sarosh Hussain (shmindmaster)",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "generate:data": "node scripts/generate-data.mjs",
+    "render:digest": "node scripts/render-digest.mjs --from-data",
+    "render:atlas": "node scripts/render-atlas.mjs",
+    "verify:coc": "node scripts/verify-completeness.mjs",
+    "validate:schemas": "node scripts/validate-schemas.mjs",
+    "evals": "node scripts/run-evals.mjs",
+    "smoke:mcp": "node scripts/smoke-mcp.mjs",
+    "demo": "node scripts/demo-run.mjs",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "effort:log": "node scripts/effort-log.mjs",
+    "effort": "node scripts/effort-rollup.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1"
+  }
+}

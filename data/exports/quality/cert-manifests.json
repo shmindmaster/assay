@@ -1,0 +1,59 @@
+{
+  "exported": "2026-08-06",
+  "manifests": {
+    "PO-AER-5519": {
+      "po": "PO-AER-5519",
+      "customer": "Aerodyne Systems",
+      "part": "KC-1001",
+      "qty": 6,
+      "heat": 4471,
+      "cert_req": "COC-AER-001",
+      "due": "2026-08-14",
+      "required": [
+        {
+          "type": "chemistry-cert",
+          "expected_path": "docs/heat-lots/HT-4471/chemistry-cert-HT-4471.md"
+        },
+        {
+          "type": "mechanical-test",
+          "expected_path": "docs/heat-lots/HT-4471/mechanical-test-HT-4471.md"
+        },
+        {
+          "type": "heat-treat-cert",
+          "expected_path": "docs/heat-lots/HT-4471/heat-treat-cert-HT-4471.md"
+        },
+        {
+          "type": "dimensional-report",
+          "expected_path": "docs/heat-lots/HT-4471/dimensional-report-HT-4471.md"
+        },
+        {
+          "type": "traceability-statement",
+          "expected_path": "docs/quality/cert-packages/PO-AER-5519/traceability-statement.md"
+        }
+      ]
+    },
+    "PO-MER-5532": {
+      "po": "PO-MER-5532",
+      "customer": "Meridian Aerostructures",
+      "part": "KC-1022",
+      "qty": 12,
+      "heat": 4468,
+      "cert_req": "COC-MER-001",
+      "due": "2026-08-21",
+      "required": [
+        {
+          "type": "chemistry-cert",
+          "expected_path": "docs/heat-lots/HT-4468/chemistry-cert-HT-4468.md"
+        },
+        {
+          "type": "mechanical-test",
+          "expected_path": "docs/heat-lots/HT-4468/mechanical-test-HT-4468.md"
+        },
+        {
+          "type": "traceability-statement",
+          "expected_path": "docs/quality/cert-packages/PO-MER-5532/traceability-statement.md"
+        }
+      ]
+    }
+  }
+}

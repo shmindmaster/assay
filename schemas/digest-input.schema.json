@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shmindmaster.github.io/assay/schemas/digest-input.schema.json",
+  "title": "Weekly quality digest input",
+  "description": "Composed input contract for the weekly quality digest rendered by scripts/render-digest.mjs. Aggregates the four subagent domains: NCR posture (open count, new this week, ageing, repeat offenders), scrap cost vs the trailing-4-week average, cert-of-conformance package gaps, and audit evidence readiness. All figures trace to data/exports resolved against data/index.json at the dataset anchor.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "report_type",
+    "week_ending",
+    "generated_at",
+    "kpis",
+    "scrap_by_cause",
+    "top_movers",
+    "ncr_ageing",
+    "repeat_offenders",
+    "cert_gaps",
+    "audit_readiness"
+  ],
+  "properties": {
+    "report_type": { "const": "quality-digest" },
+    "week_ending": { "type": "string", "format": "date" },
+    "generated_at": { "type": "string", "description": "Deterministic generation timestamp derived from the dataset anchor, e.g. 2026-08-06T00:00:00Z. Never a wall-clock read." },
+    "kpis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "open_ncrs",
+        "new_ncrs_this_week",
+        "scrap_cost_week_usd",
+        "scrap_cost_trailing4_avg_usd",
+        "scrap_variance_pct",
+        "cert_packages_incomplete",
+        "audit_gaps_open"
+      ],
+      "properties": {
+        "open_ncrs": { "type": "integer", "minimum": 0 },
+        "new_ncrs_this_week": { "type": "integer", "minimum": 0 },
+        "scrap_cost_week_usd": { "type": "integer", "minimum": 0 },
+        "scrap_cost_trailing4_avg_usd": { "type": "number", "minimum": 0 },
+        "scrap_variance_pct": { "type": "number" },
+        "cert_packages_incomplete": { "type": "integer", "minimum": 0 },
+        "audit_gaps_open": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "scrap_by_cause": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cause_code", "cause_text", "cell", "week_cost_usd", "trailing4_avg_usd", "variance_pct"],
+        "properties": {
+          "cause_code": { "type": "string", "pattern": "^(P0[1-3]|M0[1-3]|C0[12]|D0[12]|H01|S01)$" },
+          "cause_text": { "type": "string" },
+          "cell": { "type": "string" },
+          "week_cost_usd": { "type": "integer", "minimum": 0 },
+          "trailing4_avg_usd": { "type": "number", "minimum": 0 },
+          "variance_pct": { "type": "number" }
+        }
+      }
+    },
+    "top_movers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cause_code", "cell", "variance_pct", "note"],
+        "properties": {
+          "cause_code": { "type": "string", "pattern": "^(P0[1-3]|M0[1-3]|C0[12]|D0[12]|H01|S01)$" },
+          "cell": { "type": "string" },
+          "variance_pct": { "type": "number" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "ncr_ageing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["buckets", "oldest_open"],
+      "properties": {
+        "buckets": {
+          "type": "array",
+          "description": "Exactly the four canonical age buckets, in order, measured from the dataset anchor over open NCRs.",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "count"],
+            "properties": {
+              "label": { "type": "string", "enum": ["0-7 days", "8-14 days", "15-30 days", ">30 days"] },
+              "count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "oldest_open": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ncr_id", "age_days", "part_number", "severity"],
+            "properties": {
+              "ncr_id": { "type": "string", "pattern": "^NCR-2026-\\d{4}$" },
+              "age_days": { "type": "integer", "minimum": 0 },
+              "part_number": { "type": "string" },
+              "severity": { "type": "string", "enum": ["minor", "major", "critical"] }
+            }
+          }
+        }
+      }
+    },
+    "repeat_offenders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["part_number", "defect_type", "cause_code", "occurrences_90d", "ncr_ids"],
+        "properties": {
+          "part_number": { "type": "string" },
+          "defect_type": {
+            "type": "string",
+            "enum": ["porosity", "shrinkage", "sand-inclusion", "misrun-cold-shut", "dimensional", "chemistry"]
+          },
+          "cause_code": { "type": "string", "pattern": "^(P0[1-3]|M0[1-3]|C0[12]|D0[12]|H01|S01)$" },
+          "occurrences_90d": { "type": "integer", "minimum": 3 },
+          "ncr_ids": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^NCR-2026-\\d{4}$" }
+          }
+        }
+      }
+    },
+    "cert_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["po", "customer", "part", "missing_records"],
+        "properties": {
+          "po": { "type": "string" },
+          "customer": { "type": "string" },
+          "part": { "type": "string" },
+          "missing_records": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "audit_readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["audit_id", "window", "areas_total", "areas_present", "gaps"],
+      "properties": {
+        "audit_id": { "type": "string" },
+        "window": { "type": "string" },
+        "areas_total": { "type": "integer", "minimum": 0 },
+        "areas_present": { "type": "integer", "minimum": 0 },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "area"],
+            "properties": {
+              "id": { "type": "string" },
+              "area": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

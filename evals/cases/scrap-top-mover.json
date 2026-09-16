@@ -1,0 +1,7 @@
+{
+  "id": "scrap-top-mover",
+  "subagent": "scrap-rollup",
+  "kind": "data-truth",
+  "prompt": "Roll up this week's scrap cost by cell and cause against the trailing 4-week average. Name the top mover, its cell, and the variance percent.",
+  "expect": { "week": "2026-08-02", "top_cause": "P02", "top_cell": "Molding", "min_variance_pct": 30 }
+}

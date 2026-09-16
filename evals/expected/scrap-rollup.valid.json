@@ -1,0 +1,127 @@
+{
+  "report_type": "scrap-rollup",
+  "week_ending": "2026-08-02",
+  "weeks_included": 8,
+  "weekly_totals": [
+    {
+      "week_ending": "2026-06-14",
+      "cost_usd": 28312,
+      "weight_lbs": 6905
+    },
+    {
+      "week_ending": "2026-06-21",
+      "cost_usd": 32532,
+      "weight_lbs": 7935
+    },
+    {
+      "week_ending": "2026-06-28",
+      "cost_usd": 35059,
+      "weight_lbs": 8550
+    },
+    {
+      "week_ending": "2026-07-05",
+      "cost_usd": 38409,
+      "weight_lbs": 9369
+    },
+    {
+      "week_ending": "2026-07-12",
+      "cost_usd": 41411,
+      "weight_lbs": 10099
+    },
+    {
+      "week_ending": "2026-07-19",
+      "cost_usd": 45096,
+      "weight_lbs": 10999
+    },
+    {
+      "week_ending": "2026-07-26",
+      "cost_usd": 47413,
+      "weight_lbs": 11563
+    },
+    {
+      "week_ending": "2026-08-02",
+      "cost_usd": 50438,
+      "weight_lbs": 12300
+    }
+  ],
+  "by_cause": [
+    {
+      "cause_code": "P02",
+      "cause_text": "Gating/risering design inadequate for section thickness",
+      "cell": "Molding",
+      "week_cost_usd": 29952,
+      "trailing4_avg_usd": 22718.75,
+      "variance_pct": 31.84
+    },
+    {
+      "cause_code": "P01",
+      "cause_text": "Mold compaction below specification",
+      "cell": "Molding",
+      "week_cost_usd": 4688,
+      "trailing4_avg_usd": 4660.75,
+      "variance_pct": 0.58
+    },
+    {
+      "cause_code": "P03",
+      "cause_text": "Sand moisture above control limit",
+      "cell": "Molding",
+      "week_cost_usd": 2059,
+      "trailing4_avg_usd": 2252.75,
+      "variance_pct": -8.6
+    },
+    {
+      "cause_code": "M01",
+      "cause_text": "Melt temperature excursion during pour",
+      "cell": "Melting",
+      "week_cost_usd": 3970,
+      "trailing4_avg_usd": 3611,
+      "variance_pct": 9.94
+    },
+    {
+      "cause_code": "M03",
+      "cause_text": "Hydrogen porosity — degassing cycle incomplete",
+      "cell": "Melting",
+      "week_cost_usd": 3605,
+      "trailing4_avg_usd": 3516,
+      "variance_pct": 2.53
+    },
+    {
+      "cause_code": "C01",
+      "cause_text": "Core shift during mold close",
+      "cell": "Core Room",
+      "week_cost_usd": 1834,
+      "trailing4_avg_usd": 1910.75,
+      "variance_pct": -4.02
+    },
+    {
+      "cause_code": "D01",
+      "cause_text": "Machining damage at finishing",
+      "cell": "Finishing",
+      "week_cost_usd": 1263,
+      "trailing4_avg_usd": 1407.25,
+      "variance_pct": -10.25
+    },
+    {
+      "cause_code": "H01",
+      "cause_text": "Heat-treat distortion",
+      "cell": "Heat Treat",
+      "week_cost_usd": 2160,
+      "trailing4_avg_usd": 2040.5,
+      "variance_pct": 5.86
+    },
+    {
+      "cause_code": "S01",
+      "cause_text": "Handling damage post-cast",
+      "cell": "Inspection",
+      "week_cost_usd": 907,
+      "trailing4_avg_usd": 964.5,
+      "variance_pct": -5.96
+    }
+  ],
+  "top_mover": {
+    "cause_code": "P02",
+    "cell": "Molding",
+    "variance_pct": 31.84
+  },
+  "generated_from": "exports/erp/scrap-export.csv"
+}

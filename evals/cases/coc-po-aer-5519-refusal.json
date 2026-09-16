@@ -1,0 +1,7 @@
+{
+  "id": "coc-po-aer-5519-refusal",
+  "subagent": "coc-assembler",
+  "kind": "verifier-exit",
+  "prompt": "Assemble the cert-of-conformance package for PO-AER-5519 and tell me whether it is complete. If any required record is not on file, report it as missing — never fabricate one.",
+  "expect": { "po": "PO-AER-5519", "exit": 3, "missing": ["mechanical-test"] }
+}

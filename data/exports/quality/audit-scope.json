@@ -1,0 +1,48 @@
+{
+  "exported": "2026-08-06",
+  "audit_id": "AUD-2026-S1",
+  "title": "AS9100D surveillance audit — Quality Management System",
+  "window": "2026-09-14 to 2026-09-15",
+  "evidence_areas": [
+    {
+      "id": "EA-1",
+      "area": "Nonconformance log and disposition records",
+      "expected_path": "exports/qms/ncr-export.json"
+    },
+    {
+      "id": "EA-2",
+      "area": "Certificate-of-conformance packages for open POs",
+      "expected_path": "docs/quality/cert-packages"
+    },
+    {
+      "id": "EA-3",
+      "area": "Heat-lot traceability records",
+      "expected_path": "docs/heat-lots"
+    },
+    {
+      "id": "EA-4",
+      "area": "Calibration records",
+      "expected_path": "docs/quality/calibration/calibration-log-2026.md"
+    },
+    {
+      "id": "EA-5",
+      "area": "Internal audit schedule",
+      "expected_path": "docs/quality/audits/internal-audit-schedule-2026.md"
+    },
+    {
+      "id": "EA-6",
+      "area": "Corrective action log",
+      "expected_path": "docs/quality/corrective-actions/capa-log-2026.md"
+    },
+    {
+      "id": "EA-7",
+      "area": "Training records",
+      "expected_path": "docs/quality/training/training-matrix-2026.md"
+    },
+    {
+      "id": "EA-8",
+      "area": "Supplier raw-material certificates",
+      "expected_path": "docs/purchasing/supplier-certs"
+    }
+  ]
+}
