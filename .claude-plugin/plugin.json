@@ -1,7 +1,7 @@
 {
   "name": "assay",
-  "version": "0.1.0",
-  "description": "Quality department agent for Kestrel Castings: four narrowly scoped subagents (NCR triage, cert-of-conformance assembly, scrap rollup, audit prep) composed by a primary quality-lead agent, running on synthetic foundry data behind a read-only MCP data boundary. Fail-closed verification, JSON Schema output contracts, and an eval suite with refusal cases.",
+  "version": "0.2.0",
+  "description": "A runnable deterministic control layer for AI agents: typed decisions, externalized policy, a fail-closed effect broker, hash-chained receipts, and mutation-tested guardrails.",
   "author": { "name": "Sarosh Hussain (shmindmaster)" },
   "keywords": [
     "claude-code",
@@ -17,5 +17,5 @@
     "html-reports",
     "evals"
   ],
-  "license": "UNLICENSED"
+  "license": "Apache-2.0"
 }

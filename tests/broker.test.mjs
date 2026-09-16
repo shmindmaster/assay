@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { broker } from '../src/effects/broker.mjs';
-import { createVerdictRecord, mintAuthorization } from '../src/effects/authorization.mjs';
+import { createVerdictRecord, mintAuthorization, sha256 } from '../src/effects/authorization.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const published = (name) => path.join(REPO_ROOT, 'reports', 'published', name);
@@ -26,6 +26,11 @@ function authorizationFor(effect, options) {
   const minted = mintAuthorization(effect, verdict);
   assert.equal(minted.ok, true, JSON.stringify(minted));
   return minted.authorization;
+}
+
+function rehashAuthorization(authorization) {
+  const { authorization_id: _discarded, ...body } = authorization;
+  return { ...body, authorization_id: sha256(body) };
 }
 
 test('a valid authorization permits exactly one effect', () => {
@@ -78,6 +83,45 @@ test('a verdict over changed input hashes is refused', () => {
   assert.equal(existsSync(published('broker-input-tamper.json')), false);
 });
 
+test('a forged complete outcome over an incomplete verdict is refused', () => {
+  const target = published('broker-forged-outcome.json');
+  rmSync(target, { force: true });
+  const effect = {
+    id: 'publish-coc',
+    payload: {
+      subject: 'PO-AER-5519',
+      target: 'reports/published/broker-forged-outcome.json',
+      content: '{"status":"COMPLETE"}\n',
+    },
+  };
+  const authorization = authorizationFor(effect);
+  const forged = structuredClone(authorization);
+  forged.outcome = 'COMPLETE';
+
+  const result = broker.perform(effect, rehashAuthorization(forged));
+
+  assert.equal(result.ok, false);
+  assert.equal(result.denial.payload.rule, 'verdict-outcome-binding');
+  assert.equal(result.denial.payload.mismatch.field, 'outcome');
+  assert.equal(result.denial.payload.mismatch.expected, 'INCOMPLETE');
+  assert.equal(result.denial.payload.mismatch.actual, 'COMPLETE');
+  assert.equal(existsSync(target), false);
+});
+
+test('a forged verdict summary is refused even with a recomputed authorization id', () => {
+  const effect = completeEffect('broker-forged-summary.json');
+  const authorization = authorizationFor(effect);
+  const forged = structuredClone(authorization);
+  forged.verdict.missing_records = ['fabricated-record'];
+
+  const result = broker.perform(effect, rehashAuthorization(forged));
+
+  assert.equal(result.ok, false);
+  assert.equal(result.denial.payload.rule, 'verdict-outcome-binding');
+  assert.equal(result.denial.payload.mismatch.field, 'verdict');
+  assert.equal(existsSync(published('broker-forged-summary.json')), false);
+});
+
 test('authorization tracing to an untrusted context block is refused', () => {
   const effect = completeEffect('broker-untrusted.json');
   const verdict = createVerdictRecord(effect.payload.subject, {
@@ -126,6 +170,21 @@ test('context block hashes must be deterministic sha256 values', () => {
   assert.throws(() => createVerdictRecord('PO-MER-5532', {
     contextBlocks: [{ source: 'retrieved/bad.md', sha256: 'not-a-hash', trust: 'trusted' }],
   }), /sha256/);
+});
+
+test('a malformed self-hashed verdict is refused instead of throwing', () => {
+  const effect = completeEffect('broker-malformed-verdict.json');
+  const malformed = structuredClone(createVerdictRecord(effect.payload.subject));
+  delete malformed.missing_records;
+  const { verdict_sha256: _discarded, ...body } = malformed;
+  malformed.verdict_sha256 = sha256(body);
+
+  const minted = mintAuthorization(effect, malformed);
+
+  assert.equal(minted.ok, false);
+  assert.equal(minted.refusal.rule, 'verdict-shape');
+  assert.equal(minted.refusal.mismatch.field, 'verdict');
+  assert.match(minted.refusal.mismatch.actual, /missing_records/);
 });
 
 test('the PO-AER-5519 COMPLETE draft is denied by the deterministic INCOMPLETE verdict', () => {

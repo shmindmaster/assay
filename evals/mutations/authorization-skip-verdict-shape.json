@@ -1,0 +1,11 @@
+{
+  "id": "authorization/skip-verdict-shape",
+  "guard": "authorization-verdict-shape",
+  "target": "src/effects/authorization.mjs",
+  "patch": {
+    "find": "  const invalidVerdict = verdictShapeError(verdict);\n  if (invalidVerdict) {\n    return refusal('verdict-shape', verdict, 'verdict', 'complete VerdictRecord', invalidVerdict);\n  }",
+    "replace": "  // mutation: malformed verdict records reach authorization construction"
+  },
+  "expected_eval": "authorization-verdict-shape",
+  "catcher_pattern": "a malformed self-hashed verdict is refused instead of throwing"
+}

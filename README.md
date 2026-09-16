@@ -1,11 +1,17 @@
 # Assay
 
+[![CI](https://github.com/shmindmaster/assay/actions/workflows/ci.yml/badge.svg)](https://github.com/shmindmaster/assay/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/shmindmaster/assay/actions/workflows/codeql.yml/badge.svg)](https://github.com/shmindmaster/assay/actions/workflows/codeql.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D20-339933?logo=node.js&logoColor=white)](package.json)
+
 **The agent drafts. Software decides.**
 
-A runnable reference implementation of the deterministic control layer that both
-major model vendors tell you to build, demonstrated on a domain where being
-wrong leaves a paper trail: manufacturing quality and certificate-of-conformance
-release.
+A runnable reference implementation of a deterministic control layer synthesized
+from published guidance by Anthropic and OpenAI, demonstrated on a domain where
+being wrong leaves a paper trail: manufacturing quality and
+certificate-of-conformance release. The vendors do not endorse this project;
+their primary guidance is linked below so each mapping can be checked.
 
 Anything that needs a hard guarantee — schema, permission, routing, approval,
 side effect, final state — is owned and enforced by code. The model supplies
@@ -85,13 +91,15 @@ each guard can fail:
 
 ```
 mutation  authorization/accept-already-used         CAUGHT by authorization-replay
+mutation  authorization/skip-outcome-binding        CAUGHT by authorization-verdict-outcome-binding
+mutation  authorization/skip-verdict-shape           CAUGHT by authorization-verdict-shape
 mutation  hooks/honour-env-override                 CAUGHT by no-env-override
 mutation  ledger/skip-chain-check                   CAUGHT by audit-tamper
 mutation  policy/widen-write-path                   CAUGHT by policy-escape
 mutation  schema/remove-required-field              CAUGHT by schema-required-sha256
 mutation  verifier/flip-completeness-comparison     CAUGHT by coc-po-aer-5519-refusal
 
-6/6 mutations caught — every guard in this repo is demonstrably able to fail.
+8/8 mutations caught — every guard in this repo is demonstrably able to fail.
 ```
 
 `hooks/honour-env-override` is the one to look at. This repository claims there
@@ -122,6 +130,21 @@ demonstrations of this stop at the diagram. This repository is the diagram, run.
 The test of such a layer is not whether it works when the model behaves. It is
 whether the outcome holds when the model is wrong, or has been manipulated into
 being wrong. That is why the headline demo is a refusal rather than a success.
+
+Primary guidance used for the mapping:
+
+- Anthropic: [structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs),
+  [strict tool use](https://platform.claude.com/docs/en/agents-and-tools/tool-use/strict-tool-use),
+  [Claude Code hooks](https://code.claude.com/docs/en/hooks-guide),
+  [context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents),
+  [agent evals](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents),
+  [tool design](https://www.anthropic.com/engineering/writing-tools-for-agents), and
+  [effective agents](https://www.anthropic.com/engineering/building-effective-agents).
+- OpenAI: [structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs),
+  [function calling](https://developers.openai.com/api/docs/guides/function-calling),
+  [Agents SDK guardrails](https://openai.github.io/openai-agents-python/guardrails/),
+  [evals](https://developers.openai.com/api/docs/guides/evals), and the
+  [practical guide to building agents](https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf).
 
 ---
 
@@ -329,4 +352,7 @@ foundries; the foundry is what makes it legible.
 
 ## 10. Licence
 
-Apache-2.0.
+[Apache-2.0](LICENSE). Security reports belong in a
+[private vulnerability report](SECURITY.md), while changes and design proposals
+follow [CONTRIBUTING.md](CONTRIBUTING.md) and [GOVERNANCE.md](GOVERNANCE.md).
+The bounded next steps are tracked in [ROADMAP.md](ROADMAP.md).

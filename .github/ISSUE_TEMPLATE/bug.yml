@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a reproducible defect or broken invariant
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, customer data, or non-public records. Report security issues privately as described in SECURITY.md.
+  - type: textarea
+    id: invariant
+    attributes:
+      label: Expected invariant
+      description: What property should Assay have preserved?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include the command, fixture, and observed exit code or receipt.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system and Node.js version
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Additional evidence
+      description: Sanitized logs, failing tests, or a proposed mutation

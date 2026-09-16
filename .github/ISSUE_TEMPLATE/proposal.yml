@@ -1,0 +1,31 @@
+name: Design proposal
+description: Propose a control-surface, policy, or portability change
+title: "proposal: "
+labels: [proposal]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What concrete failure mode or portability gap does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Deterministic boundary
+      description: Which guarantee moves into software, and what remains model judgment?
+    validations:
+      required: true
+  - type: textarea
+    id: proof
+    attributes:
+      label: Proof
+      description: What test, refusal case, receipt, or mutation would prove the change?
+    validations:
+      required: true
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Trade-offs and alternatives
+      description: What becomes harder, and what alternatives did you consider?
