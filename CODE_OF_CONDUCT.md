@@ -13,11 +13,10 @@ bad-faith behavior are not acceptable in project spaces.
 
 ## Enforcement
 
-Report conduct concerns privately to the repository maintainer through the
-contact method on the maintainer's GitHub profile. Reports will be reviewed in
-context and handled as confidentially as practical. The maintainer may edit or
-remove content, limit participation, or ban contributors when necessary to
-protect the project and its participants.
+Report conduct concerns privately to `sarosh.hussain@gmail.com`. Reports will be
+reviewed in context and handled as confidentially as practical. The maintainer
+may edit or remove content, limit participation, or ban contributors when
+necessary to protect the project and its participants.
 
 This code applies in repository discussions and in public spaces where someone
 is representing Assay.
