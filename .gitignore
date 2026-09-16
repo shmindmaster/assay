@@ -1,9 +1,16 @@
 node_modules/
-reports/drafts/
-reports/published/
 *.log
 .DS_Store
 Thumbs.db
+
+# Generated output. Anchored with a leading slash on purpose: an unanchored
+# `ledger/` also matches src/ledger/, which silently kept the entire receipt
+# implementation out of the repository. A clean clone failed six of twelve
+# verification steps before that was caught.
+/ledger/
+/reports/drafts/
+/reports/published/
+/reports/audit/
 
 # RepoWise generated index state
 .repowise/
@@ -16,11 +23,7 @@ docs/superpowers/
 .vscode/*
 !.vscode/extensions.json
 
-# Build spec lives outside the repo: it names the originating pursuit.
+# Build notes that name the originating pursuit; they live outside the repo.
 SPEC.md
-
-# Delegation briefs - working notes, not product documentation
 .briefs/
 .agentlogs/
-ledger/
-reports/audit/
