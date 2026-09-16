@@ -10,7 +10,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MUTATIONS_DIR = path.join(REPO_ROOT, 'evals', 'mutations');
 
-test('five declarative mutations cover five distinct guards', () => {
+test('declarative mutations cover at least five distinct guards', () => {
   const definitions = readdirSync(MUTATIONS_DIR)
     .filter((file) => file.endsWith('.json'))
     .map((file) => JSON.parse(readFileSync(path.join(MUTATIONS_DIR, file), 'utf8')));

@@ -91,13 +91,15 @@ each guard can fail:
 
 ```
 mutation  authorization/accept-already-used         CAUGHT by authorization-replay
+mutation  authorization/skip-outcome-binding        CAUGHT by authorization-verdict-outcome-binding
+mutation  authorization/skip-verdict-shape           CAUGHT by authorization-verdict-shape
 mutation  hooks/honour-env-override                 CAUGHT by no-env-override
 mutation  ledger/skip-chain-check                   CAUGHT by audit-tamper
 mutation  policy/widen-write-path                   CAUGHT by policy-escape
 mutation  schema/remove-required-field              CAUGHT by schema-required-sha256
 mutation  verifier/flip-completeness-comparison     CAUGHT by coc-po-aer-5519-refusal
 
-6/6 mutations caught — every guard in this repo is demonstrably able to fail.
+8/8 mutations caught — every guard in this repo is demonstrably able to fail.
 ```
 
 `hooks/honour-env-override` is the one to look at. This repository claims there

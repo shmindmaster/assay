@@ -50,6 +50,16 @@ function verdictBody(verifier, contextBlocks) {
   };
 }
 
+function verdictSummary(verdict) {
+  return {
+    rule: verdict.rule,
+    subject: verdict.subject,
+    outcome: verdict.outcome,
+    missing_records: [...verdict.missing_records],
+    checked_at: verdict.checked_at,
+  };
+}
+
 function contextBlockError(contextBlocks) {
   for (const block of contextBlocks) {
     if (!block || typeof block.source !== 'string' || !/^[0-9a-f]{64}$/.test(block.sha256)) {
@@ -59,6 +69,28 @@ function contextBlockError(contextBlocks) {
       return 'each context block trust must be "trusted" or "untrusted"';
     }
   }
+  return null;
+}
+
+function verdictShapeError(verdict) {
+  for (const field of ['rule', 'subject', 'outcome', 'checked_at']) {
+    if (typeof verdict[field] !== 'string' || verdict[field] === '') return `${field} must be a non-empty string`;
+  }
+  if (!['COMPLETE', 'INCOMPLETE'].includes(verdict.outcome)) return 'outcome must be COMPLETE or INCOMPLETE';
+  if (!Array.isArray(verdict.missing_records)) return 'missing_records must be an array';
+  if (!verdict.missing_records.every((record) => typeof record === 'string' && record !== '')) {
+    return 'missing_records must contain non-empty strings';
+  }
+  if (!Array.isArray(verdict.input_hashes)) return 'input_hashes must be an array';
+  for (const input of verdict.input_hashes) {
+    if (!input || typeof input.source !== 'string' || !/^[0-9a-f]{64}$/.test(input.sha256)) {
+      return 'each input hash must name source and sha256';
+    }
+  }
+  if (!Array.isArray(verdict.context_blocks)) return 'context_blocks must be an array';
+  const invalidContext = contextBlockError(verdict.context_blocks);
+  if (invalidContext) return invalidContext;
+  if (!/^[0-9a-f]{64}$/.test(verdict.verdict_sha256 ?? '')) return 'verdict_sha256 must be sha256';
   return null;
 }
 
@@ -91,6 +123,10 @@ export function mintAuthorization(effect, verdict) {
   if (!verdict || verdict.type !== 'VerdictRecord') {
     return refusal('verdict-required', verdict ?? null, 'verdict.type', 'VerdictRecord', verdict?.type ?? null);
   }
+  const invalidVerdict = verdictShapeError(verdict);
+  if (invalidVerdict) {
+    return refusal('verdict-shape', verdict, 'verdict', 'complete VerdictRecord', invalidVerdict);
+  }
   const { verdict_sha256: suppliedVerdictHash, ...verdictWithoutHash } = verdict;
   const actualVerdictHash = sha256(verdictWithoutHash);
   if (suppliedVerdictHash !== actualVerdictHash) {
@@ -111,13 +147,7 @@ export function mintAuthorization(effect, verdict) {
     verdict_sha256: verdict.verdict_sha256,
     verdict_input_hashes: structuredClone(verdict.input_hashes),
     context_blocks: structuredClone(verdict.context_blocks),
-    verdict: {
-      rule: verdict.rule,
-      subject: verdict.subject,
-      outcome: verdict.outcome,
-      missing_records: [...verdict.missing_records],
-      checked_at: verdict.checked_at,
-    },
+    verdict: verdictSummary(verdict),
   };
   const authorization = Object.freeze({ ...body, authorization_id: sha256(body) });
   append('authorization_minted', 'effect-authorization', verdict.subject, {
@@ -191,6 +221,26 @@ export function inspectAuthorization(effect, candidate) {
     return {
       rule: 'verdict-input-binding', verdict: candidate.verdict,
       mismatch: { field: 'verdict_input_hashes', expected: currentVerdict.input_hashes, actual: candidate.verdict_input_hashes },
+    };
+  }
+  if (candidate.outcome !== currentVerdict.outcome) {
+    return {
+      rule: 'verdict-outcome-binding', verdict: candidate.verdict,
+      mismatch: { field: 'outcome', expected: currentVerdict.outcome, actual: candidate.outcome ?? null },
+    };
+  }
+  const currentVerdictHash = sha256(currentVerdict);
+  if (candidate.verdict_sha256 !== currentVerdictHash) {
+    return {
+      rule: 'verdict-outcome-binding', verdict: candidate.verdict,
+      mismatch: { field: 'verdict_sha256', expected: currentVerdictHash, actual: candidate.verdict_sha256 ?? null },
+    };
+  }
+  const currentSummary = verdictSummary(currentVerdict);
+  if (canonicalJson(candidate.verdict) !== canonicalJson(currentSummary)) {
+    return {
+      rule: 'verdict-outcome-binding', verdict: candidate.verdict,
+      mismatch: { field: 'verdict', expected: currentSummary, actual: candidate.verdict ?? null },
     };
   }
   const untrusted = candidate.context_blocks.find((block) => block.trust === 'untrusted');

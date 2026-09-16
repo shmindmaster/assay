@@ -1,0 +1,11 @@
+{
+  "id": "authorization/skip-outcome-binding",
+  "guard": "authorization-verdict-outcome-binding",
+  "target": "src/effects/authorization.mjs",
+  "patch": {
+    "find": "  if (candidate.outcome !== currentVerdict.outcome) {\n    return {\n      rule: 'verdict-outcome-binding', verdict: candidate.verdict,\n      mismatch: { field: 'outcome', expected: currentVerdict.outcome, actual: candidate.outcome ?? null },\n    };\n  }",
+    "replace": "  // mutation: accept a top-level outcome that disagrees with the current deterministic verdict"
+  },
+  "expected_eval": "authorization-verdict-outcome-binding",
+  "catcher_pattern": "a forged complete outcome over an incomplete verdict is refused"
+}
