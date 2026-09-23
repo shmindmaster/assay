@@ -20,10 +20,10 @@ Thumbs.db
 docs/superpowers/
 
 # Editor config: share the extension recommendation, keep machine-specific MCP paths out
-.vscode/*
 !.vscode/extensions.json
 
 # Build notes that name the originating pursuit; they live outside the repo.
 SPEC.md
 .briefs/
 .agentlogs/
+config.bat
