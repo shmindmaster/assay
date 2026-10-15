@@ -67,17 +67,7 @@ async function main() {
 
   const bundle = assemble({ agent: AGENT, task: TASK, entityRefs: { po: SUBJECT } });
   const untrusted = bundle.blocks.filter((b) => b.trust === 'untrusted');
-  append('context_assembled', AGENT, SUBJECT, {
-    blocks: bundle.blocks.length,
-    used_tokens: bundle.used_tokens,
-    untrusted: untrusted.map((b) => b.source),
-    bundle_sha256: bundle.sha256,
-  });
-  for (const block of untrusted) {
-    append('tripwire_fired', 'policy', SUBJECT, {
-      tripwire: 'instruction-shaped-source', source: block.source, action: 'mark-untrusted',
-    });
-  }
+  // assemble() records context_assembled and any tripwire_fired receipts itself.
 
   const prompt = renderLivePrompt(TASK, bundle.blocks);
   append('decision_requested', AGENT, SUBJECT, { decision: 'coc-report', prompt_chars: prompt.length, provider });

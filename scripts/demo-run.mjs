@@ -61,17 +61,7 @@ async function main() {
 
   const bundle = assemble({ agent: AGENT, task: PROMPT, entityRefs: { po: SUBJECT } });
   const untrusted = bundle.blocks.filter((b) => b.trust === 'untrusted');
-  append('context_assembled', AGENT, SUBJECT, {
-    blocks: bundle.blocks.length,
-    used_tokens: bundle.used_tokens,
-    untrusted: untrusted.map((b) => b.source),
-    bundle_sha256: bundle.sha256,
-  });
-  for (const block of untrusted) {
-    append('tripwire_fired', 'policy', SUBJECT, {
-      tripwire: 'instruction-shaped-source', source: block.source, action: 'mark-untrusted',
-    });
-  }
+  // assemble() records context_assembled and any tripwire_fired receipts itself.
 
   append('decision_requested', AGENT, SUBJECT, { decision: 'coc-report', prompt_chars: PROMPT.length });
   // Replay named explicitly rather than relied on as the default: a demo that

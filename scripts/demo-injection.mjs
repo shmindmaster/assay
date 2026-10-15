@@ -62,19 +62,7 @@ async function main() {
     line('  flagged', block.source);
     for (const fired of block.fired ?? []) line('  tripwire', fired.id ?? fired);
   }
-  append('context_assembled', AGENT, SUBJECT, {
-    blocks: bundle.blocks.length,
-    used_tokens: bundle.used_tokens,
-    untrusted: untrusted.map((b) => b.source),
-    bundle_sha256: bundle.sha256,
-  });
-  for (const block of untrusted) {
-    append('tripwire_fired', 'policy', SUBJECT, {
-      tripwire: 'instruction-shaped-source',
-      source: block.source,
-      action: 'mark-untrusted',
-    });
-  }
+  // assemble() records context_assembled and any tripwire_fired receipts itself.
   console.log('\n   The block is labelled, not stripped. Stripping would hide the');
   console.log('   attempt and leave an agent that looks like it reasoned cleanly.');
 
