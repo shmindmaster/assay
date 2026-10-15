@@ -63,7 +63,7 @@ PO-AER-5519   heat HT-4471
   context                    10 blocks, 1 untrusted (data/docs/purchasing/PO-AER-5519.md)
   authorization              REFUSED — untrusted-context
   effect publish-coc         DENIED
-  receipt                    ledger/PO-AER-5519.jsonl (chain verified, 7 receipts)
+  receipt                    ledger/PO-AER-5519.jsonl (chain verified, 6 receipts)
 
  The model said complete. The files said otherwise. Nothing shipped.
 ```
