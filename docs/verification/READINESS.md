@@ -10,8 +10,8 @@ deployed_sha: 46cc33d (release v0.3.0, published as Assay, https://github.com/sh
 tests: "CI Node 20 + 22 verify:all 12/12, gate RELEASE ALLOWED with 15/15 mutations @ e522e8e (run 38741917669)"
 films: ["D:\\OneDrive - Maya Modest LLC\\Videos\\Portfolio\\Assay\\01 - The Agent Drafts, Software Decides.mp4 (Assay; superseded by the Heatlot film, not yet made)"]
 blockers: ["npm publish of heatlot needs the owner's one-time npm login"]
-api_surface: "Planned for Heatlot: CLI heatlot verify, HTTP API with generated OpenAPI + Scalar, MCP server. Today: the Assay-era read-only MCP server and the internal packages/broker library."
-next_action: "M2: synthetic supplier packets (CoC + MTR PDFs, malicious hidden-text packet) and spec tables"
+api_surface: "HTTP API (Hono) with OpenAPI 3.1.1 generated from zod, Scalar at /docs/api, Redocly lint, oasdiff and Schemathesis in CI; heatlot MCP server (list/inspect/lines/receipts, no release tool) with conformance at both revisions"
+next_action: "Land the inspection console (M6); maintainer: one-time npm login and first publish per docs/RELEASING.md; then the Heatlot film on Local-AI narration"
 updated: 2026-10-15T08:45:00-05:00
 ```
 

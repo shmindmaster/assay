@@ -53,6 +53,17 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 | `npm test` | `afea269` (PR #26) | 2026-10-15 | 102/102 pass |
 | `npm audit --audit-level=high` (all deps, incl. the conformance devDependency) | `afea269` (PR #26) | 2026-10-15 | 0 vulnerabilities |
 
+## Heatlot (local, Windows 11, Node 26.11.1, 2026-10-15)
+
+| Command | Result |
+|---|---|
+| `npm test` | 141/141 pass: inspection flow, API (responses parsed with their own schemas), heatlot MCP, packets, broker, control layer |
+| `npm run evals:mutate` (inspection and API mutations run individually) | every new mutation caught; 26 in total, gate floor 26 |
+| `st run docs/api/openapi.json --checks all --max-examples 25` (Schemathesis 4.29.1) against `heatlot serve` | 545/545 generated cases pass, after fixing 415/400/405 handling the first run exposed |
+| `npm run conformance:mcp` | heatlot and kestrel-foundry-data servers PASS at 2026-07-28 and 2025-11-25 against their baselines |
+| `npm run lint:openapi` (Redocly 2.64.0) | valid, no warnings |
+| `npm run smoke:package` | 6/6: the packed tarball carries exactly the runtime, installs into an empty directory, `heatlot demo` exits 3, `heatlot verify PKT-24002R` exits 0, output stays out of `node_modules` |
+
 ## By category
 
 | Category | Coverage | Evidence |

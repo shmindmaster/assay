@@ -64,7 +64,7 @@ milestones:
 | Specification rules, verdicts, single-use release, quarantine and NCR | **Done**, CLI `heatlot verify` |
 | HTTP API with a generated OpenAPI 3.1 document and Scalar docs; MCP server | **Done**, `heatlot serve`, `/docs/api` |
 | Inspection console: queue, PDF with cited highlights, rule-by-rule verdict, receipt replay | Next |
-| npm package `heatlot` | Planned |
+| npm package `heatlot` | Ready: packed, installed and run in CI (`smoke:package`); first publish waits on the maintainer's npm login ([RELEASING.md](docs/RELEASING.md)) |
 
 Every record, company, mill, part number and specification in this repository is synthetic.
 Specification tables are modelled on the shape of public material specifications; no
@@ -180,9 +180,12 @@ stating a control does nothing to enforce it.
 | Command | Proves |
 |---|---|
 | `npm test` | Unit tests for the inspection flow, the control layer and `packages/broker` |
-| `npm run evals:mutate` | Every guard can fail: 24/24 mutations caught |
+| `npm run evals:mutate` | Every guard can fail: 26/26 mutations caught |
 | `npm run verify:all` | Everything deterministic, at the expected exit codes |
 | `npm run gate` / `gate:drill` | The release gate holds its floors and blocks each deliberate regression |
+| `npm run docs:openapi -- --check` / `lint:openapi` | The committed OpenAPI 3.1 document is generated from the code, and passes Redocly |
+| Schemathesis, oasdiff (in CI) | The live API holds to its spec under fuzzing; no breaking change against main |
+| `npm run smoke:package` | The npm package installs from its tarball and runs on its own |
 | `npm run smoke:mcp` / `conformance:mcp` | The MCP server across both protocol eras, plus the official conformance suite with a baseline that may only shrink |
 
 CI runs all of it on Node 22 and 24. The evidence behind each claim, with run IDs, is in

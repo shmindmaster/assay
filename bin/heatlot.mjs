@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 /**
+ * heatlot demo                                        the hero packet, bundled: hidden text changes nothing
  * heatlot verify  <packet-dir> [--provider replay|reference] [--json] [--out .heatlot]
  *     Exit 0 ACCEPT, 3 INCOMPLETE, 4 NONCONFORMING.
  * heatlot approve <packet-dir> --by "<inspector>"     mint a single-use release authorization
  * heatlot release <packet-dir>                         release with the saved authorization (once)
  * heatlot receipts <packet-dir>                        verify the packet's signed receipt chain
- * heatlot serve [--port 4140]                          HTTP API on 127.0.0.1, docs at /docs/api
+ * heatlot serve [--port 4140] [--packets <dir>]        HTTP API on 127.0.0.1, docs at /docs/api
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { verifyChain } from '../packages/broker/src/index.mjs';
-import { BrokerRefusal, DEFAULT_OUT, approveRelease, brokerFor, inspect, release } from '../src/inspection/inspect.mjs';
+import { BrokerRefusal, DEFAULT_OUT, approveRelease, brokerFor, inspect, latestInspection, release } from '../src/inspection/inspect.mjs';
 
 const EXIT = { ACCEPT: 0, INCOMPLETE: 3, NONCONFORMING: 4 };
 const C = process.stdout.isTTY && !process.env.NO_COLOR
@@ -58,14 +60,29 @@ async function main(argv) {
     const { serve } = await import('@hono/node-server');
     const { createApp } = await import('../src/api/app.mjs');
     const port = Number(opts.port ?? 4140);
-    serve({ fetch: createApp({ out }).fetch, port, hostname: '127.0.0.1' }, (info) => {
+    const packetsRoot = opts.packets ? path.resolve(opts.packets) : undefined;
+    serve({ fetch: createApp({ out, packetsRoot }).fetch, port, hostname: '127.0.0.1' }, (info) => {
       console.log(`heatlot API on http://127.0.0.1:${info.port}  ·  docs http://127.0.0.1:${info.port}/docs/api`);
     });
     return null;
   }
+  if (command === 'demo') {
+    const bundled = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'packets');
+    console.log(C.bold('Heatlot demo') + C.dim('  synthetic data · no API key · no network'));
+    console.log(C.dim('A PO for 4140 bar arrives with a certificate of conformance and a mill test report.'));
+    console.log('');
+    const r = await inspect(path.join(bundled, 'PKT-24002'), { out });
+    printResult(r);
+    console.log('');
+    console.log(C.dim('The model drafted COMPLETE. A one-point white line in the PDF told it the test was waived.'));
+    console.log(C.dim('The rules computed the verdict from what the visible lines support.'));
+    console.log('');
+    console.log(`Next: ${C.bold(`heatlot verify ${path.join(bundled, 'PKT-24002R')}`)} (the supplier's corrected resubmission), or ${C.bold('heatlot serve')} for the console and API.`);
+    return EXIT[r.verdict];
+  }
   const dir = opts._[0] && path.resolve(opts._[0]);
   if (!dir || !existsSync(path.join(dir, 'packet.json'))) {
-    console.error('usage: heatlot <verify|approve|release|receipts> <packet-dir> [options]');
+    console.error('usage: heatlot demo | serve | <verify|approve|release|receipts> <packet-dir> [options]');
     return 2;
   }
   if (command === 'verify') {
@@ -76,14 +93,17 @@ async function main(argv) {
   }
   if (command === 'approve') {
     if (!opts.by) { console.error('approve needs --by "<inspector name>"'); return 2; }
-    const r = await inspect(dir, { provider: opts.provider ?? 'replay', out });
+    const manifest = JSON.parse(readFileSync(path.join(dir, 'packet.json'), 'utf8'));
+    const r = latestInspection(manifest.packet, { out }) ?? await inspect(dir, { provider: opts.provider ?? 'replay', out });
     const authorization = approveRelease(r, { by: opts.by });
     writeFileSync(path.join(r.ledgerDir, 'authorization.json'), `${JSON.stringify(authorization, null, 2)}\n`);
     console.log(`authorized: ${r.packet} release by ${opts.by}, single use, bound to decision ${authorization.payload_sha256.slice(0, 12)}…`);
     return 0;
   }
   if (command === 'release') {
-    const r = await inspect(dir, { provider: opts.provider ?? 'replay', out });
+    const manifest = JSON.parse(readFileSync(path.join(dir, 'packet.json'), 'utf8'));
+    const r = latestInspection(manifest.packet, { out });
+    if (!r) { console.error(`${manifest.packet} has not been inspected: heatlot verify first`); return 2; }
     const file = path.join(r.ledgerDir, 'authorization.json');
     const authorization = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : undefined;
     const record = await release(r, authorization);

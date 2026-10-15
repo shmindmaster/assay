@@ -2,7 +2,7 @@
   "openapi": "3.1.1",
   "info": {
     "title": "Heatlot API",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "license": {
       "name": "Apache-2.0",
       "identifier": "Apache-2.0"
@@ -139,6 +139,8 @@
                 "enum": [
                   "not-found",
                   "invalid-request",
+                  "unsupported-media-type",
+                  "method-not-allowed",
                   "refused",
                   "internal"
                 ]
@@ -1098,13 +1100,68 @@
         }
       }
     },
+    "/api/packets/{packet}/inspection": {
+      "get": {
+        "operationId": "getInspection",
+        "tags": [
+          "inspection"
+        ],
+        "summary": "The last recorded inspection of the packet (no new receipts)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^PKT-\\d{5}R?$",
+              "example": "PKT-24002",
+              "description": "Inbound supplier packet id"
+            },
+            "required": true,
+            "description": "Inbound supplier packet id",
+            "name": "packet",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The stored inspection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inspection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown packet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/packets/{packet}/approve": {
       "post": {
         "operationId": "approveRelease",
         "tags": [
           "release"
         ],
-        "summary": "The inspector's approval: a single-use release authorization bound to this decision",
+        "summary": "The inspector's approval of the last inspection: a single-use release authorization bound to its decision",
         "parameters": [
           {
             "schema": {
@@ -1161,7 +1218,17 @@
             }
           },
           "409": {
-            "description": "Refused: not ACCEPT, or untrusted input fed the decision",
+            "description": "Refused: not inspected, not ACCEPT, already released, or untrusted input fed the decision",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body must be application/json",
             "content": {
               "application/json": {
                 "schema": {
@@ -1236,7 +1303,17 @@
             }
           },
           "409": {
-            "description": "Refused: already used, never minted, or the decision changed",
+            "description": "Refused: not inspected, already used, already released, never minted, the decision changed, or the packet changed after inspection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body must be application/json",
             "content": {
               "application/json": {
                 "schema": {

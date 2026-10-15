@@ -97,3 +97,32 @@ test('a required statement in hidden text does not count', async () => {
   docs.mtr[0].hidden = false;
   assert.equal(findStatements(['mercury-free'], docs)['mercury-free'].line, 30);
 });
+
+test('material is released once: a second approval cannot mint a second release', async () => {
+  const dir = out();
+  const r = await inspect(packetDir('PKT-24002R'), { out: dir });
+  await release(r, approveRelease(r, { by: 'J. Mendez' }));
+  assert.throws(() => approveRelease(r, { by: 'someone else' }), refused('already-released'));
+});
+
+test('a packet changed after inspection cannot be released', async () => {
+  const { cpSync, writeFileSync: write } = await import('node:fs');
+  const dir = out();
+  const copy = path.join(dir, 'packets', 'PKT-24001');
+  cpSync(packetDir('PKT-24001'), copy, { recursive: true });
+  const r = await inspect(copy, { out: dir });
+  const auth = approveRelease(r, { by: 'inspector' });
+  write(path.join(copy, 'coc.pdf'), Buffer.concat([readFileSync(path.join(copy, 'coc.pdf')), Buffer.from('\n%tampered\n')]));
+  await assert.rejects(release(r, auth), refused('packet-changed'));
+});
+
+test('the stored inspection is what approval and release act on', async () => {
+  const { latestInspection } = await import('../src/inspection/inspect.mjs');
+  const dir = out();
+  assert.equal(latestInspection('PKT-24002R', { out: dir }), null);
+  const r = await inspect(packetDir('PKT-24002R'), { out: dir });
+  const stored = latestInspection('PKT-24002R', { out: dir });
+  assert.deepEqual(stored.decision, r.decision);
+  const auth = approveRelease(stored, { by: 'inspector' });
+  assert.equal((await release(stored, auth)).released, true);
+});

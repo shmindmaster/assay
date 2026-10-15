@@ -38,14 +38,31 @@ test('api: inspecting the hero packet returns INCOMPLETE with the hidden citatio
 
 test('api: release works once; refusals use the error envelope with the broker rule', async () => {
   const a = app();
+  const early = await valid(await post(a, '/api/packets/PKT-24002R/approve', { by: 'J. Mendez' }), S.ErrorBody, 409);
+  assert.equal(early.error.rule, 'not-inspected');
+  await post(a, '/api/packets/PKT-24002/inspect');
+  await post(a, '/api/packets/PKT-24002R/inspect');
   const refused = await valid(await post(a, '/api/packets/PKT-24002/approve', { by: 'inspector' }), S.ErrorBody, 409);
   assert.equal(refused.error.rule, 'verdict-not-accept');
   const auth = await valid(await post(a, '/api/packets/PKT-24002R/approve', { by: 'J. Mendez' }), S.Authorization);
   await valid(await post(a, '/api/packets/PKT-24002R/release', { authorization: auth }), S.ReleaseRecord);
   const again = await valid(await post(a, '/api/packets/PKT-24002R/release', { authorization: auth }), S.ErrorBody, 409);
   assert.equal(again.error.rule, 'already-used');
+  const second = await valid(await post(a, '/api/packets/PKT-24002R/approve', { by: 'someone else' }), S.ErrorBody, 409);
+  assert.equal(second.error.rule, 'already-released');
   const chain = await valid(await a.request('/api/packets/PKT-24002R/receipts'), S.ReceiptChain);
   assert.equal(chain.verified, true);
+});
+
+test('api: the last inspection can be read without re-inspecting', async () => {
+  const a = app();
+  await valid(await a.request('/api/packets/PKT-24003/inspection'), S.ErrorBody, 404);
+  await post(a, '/api/packets/PKT-24003/inspect');
+  const before = (await (await a.request('/api/packets/PKT-24003/receipts')).json()).receipts.length;
+  const stored = await valid(await a.request('/api/packets/PKT-24003/inspection'), S.Inspection);
+  assert.equal(stored.verdict, 'NONCONFORMING');
+  const after = (await (await a.request('/api/packets/PKT-24003/receipts')).json()).receipts.length;
+  assert.equal(after, before, 'reading an inspection writes no receipts');
 });
 
 test('api: invalid input is rejected at the boundary', async () => {

@@ -22,7 +22,9 @@ import { evaluate } from './rules.mjs';
 import { findStatements } from './statements.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-export const DEFAULT_OUT = path.join(REPO_ROOT, '.heatlot');
+// Receipts, keys and records go to HEATLOT_OUT, or .heatlot in the working directory: never inside
+// the installed package.
+export const DEFAULT_OUT = process.env.HEATLOT_OUT ? path.resolve(process.env.HEATLOT_OUT) : path.join(process.cwd(), '.heatlot');
 export const RELEASE_TOOL = 'release-material';
 export { BrokerRefusal };
 
@@ -123,18 +125,46 @@ export async function inspect(packetDir, { provider = 'replay', out = DEFAULT_OU
     ledger.append('ncr_opened', { id: ncr.id, disposition: 'quarantine', verdict, reasons });
   }
 
-  return { packet, po, verdict, reasons, findings, rejected, untrusted: untrustedLines, decision, ncr, docs, extraction, ledgerDir: ledger.dir, out };
+  // 7. The inspection is stored, so approval and release act on exactly what was inspected.
+  const record = {
+    packet, packet_dir: path.resolve(packetDir), po, verdict, reasons, findings, rejected,
+    untrusted: untrustedLines.map(({ doc, page, line, text, why, sha256: s }) => ({ doc, page, line, text, why, sha256: s })),
+    decision, ncr,
+    extraction: { draft_verdict: extraction.draft_verdict ?? null, provenance: extraction.provenance ?? null },
+    docs_lines: Object.fromEntries(Object.entries(docs).map(([d, lines]) => [d, lines.map((l) => ({ line: l.line, sha256: l.sha256 }))])),
+    verdict_receipt_sha256: decisionReceipt.receipt_sha256,
+  };
+  writeFileSync(path.join(broker.ledger.dir, 'inspection.json'), `${JSON.stringify(record, null, 2)}\n`);
+
+  return { ...record, docs, extraction, ledgerDir: ledger.dir, out };
+}
+
+/** The last stored inspection of a packet, or null if it has never been inspected. */
+export function latestInspection(packet, { out = DEFAULT_OUT } = {}) {
+  const file = path.join(out, packet, 'inspection.json');
+  if (!existsSync(file)) return null;
+  return { ...JSON.parse(readFileSync(file, 'utf8')), ledgerDir: path.join(out, packet), out };
+}
+
+/** True once release-material has been performed for this packet. Material is released at most once. */
+function alreadyReleased(broker) {
+  return broker.ledger.read().some((r) => r.kind === 'effect_performed' && r.payload.tool === RELEASE_TOOL);
 }
 
 /** The inspector's approval. Refused unless the verdict is ACCEPT and no untrusted line fed the decision. */
 export function approveRelease(result, { by, out = result.out } = {}) {
   const broker = brokerFor(result.packet, { out });
+  if (alreadyReleased(broker)) {
+    const receipt = broker.ledger.append('authorization_refused', { tool: RELEASE_TOOL, payload_sha256: hashOf(result.decision), by, rule: 'already-released' });
+    throw new BrokerRefusal('already-released', `${result.packet} has already been released; material is released once`, receipt);
+  }
   if (result.decision.verdict !== 'ACCEPT') {
     const receipt = broker.ledger.append('authorization_refused', { tool: RELEASE_TOOL, payload_sha256: hashOf(result.decision), by, rule: 'verdict-not-accept', verdict: result.decision.verdict });
     throw new BrokerRefusal('verdict-not-accept', `${result.packet} is ${result.decision.verdict}; only an ACCEPT can be released`, receipt);
   }
   const inputs = [];
-  for (const [doc, lines] of Object.entries(result.docs)) {
+  const docLines = result.docs_lines ?? Object.fromEntries(Object.entries(result.docs).map(([d, lines]) => [d, lines.map((l) => ({ line: l.line, sha256: l.sha256 }))]));
+  for (const [doc, lines] of Object.entries(docLines)) {
     const flagged = new Set(result.untrusted.filter((u) => u.doc === doc).map((u) => u.line));
     const clean = lines.filter((l) => !flagged.has(l.line));
     inputs.push(trusted(clean.map((l) => l.sha256).join('\n'), { source: `${result.packet}/${doc}` }));
@@ -146,6 +176,23 @@ export function approveRelease(result, { by, out = result.out } = {}) {
 /** Mark the material released. The only writer of release.json, and it runs once per authorization. */
 export async function release(result, authorization, { out = result.out } = {}) {
   const broker = brokerFor(result.packet, { out });
+  // A reused authorization is the broker's to refuse (already-used); a fresh one for material
+  // that has already gone out is refused here.
+  const reused = broker.ledger.read().some((r) => r.kind === 'authorization_consumed' && r.payload.id === authorization?.id);
+  if (!reused && alreadyReleased(broker)) {
+    const receipt = broker.ledger.append('effect_denied', { tool: RELEASE_TOOL, payload_sha256: hashOf(result.decision), rule: 'already-released', authorization_id: authorization?.id ?? null });
+    throw new BrokerRefusal('already-released', `${result.packet} has already been released; material is released once`, receipt);
+  }
+  // The files on disk must still be the ones the decision was made on.
+  if (result.packet_dir) {
+    const manifest = JSON.parse(readFileSync(path.join(result.packet_dir, 'packet.json'), 'utf8'));
+    for (const [doc, name] of Object.entries(manifest.documents)) {
+      if (sha256(readFileSync(path.join(result.packet_dir, name))) !== result.decision.files[doc]) {
+        const receipt = broker.ledger.append('effect_denied', { tool: RELEASE_TOOL, payload_sha256: hashOf(result.decision), rule: 'packet-changed', document: doc, authorization_id: authorization?.id ?? null });
+        throw new BrokerRefusal('packet-changed', `${result.packet}/${name} changed after it was inspected; inspect it again`, receipt);
+      }
+    }
+  }
   const doRelease = broker.guard(RELEASE_TOOL, async (decision) => {
     const record = { packet: decision.packet, po: decision.po, released: true, decision_sha256: hashOf(decision), authorization_id: authorization?.id };
     writeFileSync(path.join(broker.ledger.dir, 'release.json'), `${JSON.stringify(record, null, 2)}\n`);

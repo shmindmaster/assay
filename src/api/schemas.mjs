@@ -106,7 +106,7 @@ export const ReceiptChain = z.object({
 
 export const ErrorBody = z.object({
   error: z.object({
-    code: z.enum(['not-found', 'invalid-request', 'refused', 'internal']),
+    code: z.enum(['not-found', 'invalid-request', 'unsupported-media-type', 'method-not-allowed', 'refused', 'internal']),
     message: z.string(),
     rule: z.string().optional().openapi({ description: 'For a refusal: the broker rule that refused, e.g. already-used' }),
   }),
