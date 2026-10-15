@@ -60,6 +60,7 @@ npm run validate:schemas
 npm run verify:all
 npm run gate
 npm run gate:drill
+npm run test:browser   # needs a browser: npx playwright install chromium-headless-shell
 claude plugin validate .
 ```
 

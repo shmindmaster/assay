@@ -40,6 +40,7 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 | `ASSAY_LIVE=1 ASSAY_PROVIDER=openai npm run verify:live` (old default `gpt-4o-2024-08-06`) | `4699c2c` | 2026-10-15 | exit 3 (expected refusal); model INCOMPLETE; denial `untrusted-context`; exposed thin provenance (fixed) |
 | `ASSAY_LIVE=1 ASSAY_PROVIDER=openai npm run verify:live` (`gpt-6.1-sol`) | release/v0.3.0 | 2026-10-15 | exit 3 (expected refusal); `req_971f4bc010bd427db04b44503f04cff3`, 3423/808 tokens, 13.6 s; model INCOMPLETE; denial `untrusted-context`; [evidence](../evidence/live-run-2026-10-15-openai/) |
 | `node --test tests/live-provider-openai.test.mjs` | release/v0.3.0 | 2026-10-15 | 6/6 pass |
+| `npm run test:browser` | test/explorer-browser | 2026-10-15 | 4/4 pass; with the payload-hash check disabled, the tamper test fails (mutation caught) |
 
 ## By category
 
@@ -53,7 +54,7 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 | Authorization / negative | Replay after restart (separate process), never-minted forgery, payload edit, forged verdict, untrusted context, broken chain, malformed bindings | `tests/broker.test.mjs` |
 | Recovery / failure paths | Classifier refusal, prose answer, HTTP 529, schema-invalid output (provenance kept), bad effort | `tests/live-provider.test.mjs` |
 | Guard ability to fail | 9 mutations; release gate with 2 drilled regressions | `evals:mutate`, `gate:drill` |
-| End-to-end browser | **No automated browser test in CI.** The Explorer was driven by headless Playwright for the film. Of 20 recorded takes, 19 were valid with every expected response observed; one timed out on a CPU-starved machine and was re-recorded. That is demo evidence, not a test suite. | `docs/verification/DEMOS.md` |
+| End-to-end browser | `npm run test:browser` (Playwright 1.64.1, headless Chromium) in CI and in the release gate: fresh chain renders verified; Tamper one byte breaks the chain at that receipt with later receipts unverifiable; Restore; keyboard operation. Proven able to fail: disabling the page's payload-hash check fails the tamper test. Earlier, before this test existed: no automated browser test in CI. The Explorer was driven by headless Playwright for the film. Of 20 recorded takes, 19 were valid with every expected response observed; one timed out on a CPU-starved machine and was re-recorded. That is demo evidence, not a test suite. | `docs/verification/DEMOS.md` |
 | Accessibility / responsive | **Not tested.** The Explorer has keyboard focus styles, reduced-motion handling and a single-column layout under 1100 px, but nothing measures them. | — |
 | Security | CodeQL, `npm audit`, no-network-without-flag test, threat model | CI; `tests/providers.test.mjs`; `docs/threat-model.md` |
 | Performance | Not applicable at this scale; not measured | — |

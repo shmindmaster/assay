@@ -37,3 +37,7 @@ jobs:
         run: git diff --exit-code -- docs/benchmark.md
       - name: Gate drill (each deliberate regression must be blocked)
         run: npm run gate:drill
+      - name: Install the browser for the Explorer test
+        run: npx playwright install --with-deps chromium-headless-shell
+      - name: Receipt Explorer in a real browser
+        run: npm run test:browser

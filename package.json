@@ -50,7 +50,8 @@
     "verify:live": "node scripts/verify-live.mjs",
     "test": "node --test",
     "effort:log": "node scripts/effort-log.mjs",
-    "effort": "node scripts/effort-rollup.mjs"
+    "effort": "node scripts/effort-rollup.mjs",
+    "test:browser": "node --test tests-browser/explorer-in-browser.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.134.0",
@@ -60,6 +61,7 @@
   "devDependencies": {
     "@modelcontextprotocol/client": "^2.3.1",
     "ajv": "^8.17.1",
-    "ajv-formats": "^3.0.1"
+    "ajv-formats": "^3.0.1",
+    "playwright": "1.64.1"
   }
 }

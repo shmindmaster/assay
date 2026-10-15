@@ -334,6 +334,7 @@ these hold on any machine.
 | `npm run gate` | Release gate: every floor in `evals/gate.json` holds | `RELEASE ALLOWED` |
 | `npm run gate:drill` | The gate blocks each deliberate regression | 2/2 blocked |
 | `npm run explorer` | Offline Receipt Explorer over the ledger | page written |
+| `npm run test:browser` | The Explorer in headless Chromium: green chain, tamper breaks it at the right receipt, restore, keyboard | 4 tests pass |
 | `ASSAY_LIVE=1 npm run verify:live` | Opt-in: the live adapter against the real API (one paid call) | exit **3**, release refused |
 
 ---
