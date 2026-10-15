@@ -16,7 +16,8 @@ Rungs: `Planned → Implemented → Integrated → Tested → Demonstrated → P
 | S6 ledger, audit, tamper | audit, audit:tamper | CLI | `ledger/`, `audit.mjs` | filesystem | `ledger.test.mjs`, verify:all | Film 01 | v0.3.0 gate + smoke | Production-Verified |
 | Receipt Explorer | explorer | offline HTML | `render-explorer.mjs`, `explorer/chain.mjs` | none (static) | `explorer.test.mjs` (parity, blank lines, tamper bounds); `test:browser` (real Chromium) | Film 01 0:00–1:23 | v0.3.0 release gate (verify:all) | Production-Verified |
 | S7 evals, mutations, gate, drill | evals:mutate, gate, gate:drill | CLI, CI | `run-mutations.mjs`, `eval-gate.mjs`, `gate-drill.mjs` | GitHub Actions | CI on every PR and push | Film 01 2:12–2:28 | v0.3.0 gate + smoke | Production-Verified |
-| MCP server (SDK v2) | smoke:mcp, plugin | stdio MCP | `server.mjs` | Claude Code plugin | `smoke:mcp` 12/12 | none | v0.3.0 release gate (verify:all) | Production-Verified |
+| MCP server (SDK v2, dual era) | smoke:mcp, plugin | stdio MCP; loopback HTTP (`--http`) | `server.mjs` | Claude Code plugin | `smoke:mcp` 21/21; `conformance:mcp` at 2026-07-28 and 2025-11-25 | none | v0.3.0 release gate (stdio, 12 checks). The HTTP mode, strict inputs and conformance run are not yet in a release | Production-Verified (stdio); Tested (HTTP mode, conformance) |
+| Generated developer reference | docs:reference | Markdown, `catalog.json` | `reference-docs.mjs` | MCP client + schema registry | `docs:reference --check` in CI | none | not yet released | Tested |
 
 ## Integrations
 
@@ -24,7 +25,7 @@ Rungs: `Planned → Implemented → Integrated → Tested → Demonstrated → P
 |---|---|---|
 | Anthropic Messages API (Sonnet 5.5, strict tool, fallbacks) | Live-verified once; unit-tested against a stubbed transport | `docs/evidence/live-run-2026-10-14/`; `tests/live-provider.test.mjs` |
 | OpenAI structured outputs (`gpt-6.1-sol`, strict json_schema) | Live-verified once; unit-tested against a stubbed transport | `docs/evidence/live-run-2026-10-15-openai/`; `tests/live-provider-openai.test.mjs` |
-| MCP (stdio, spec 2026-07-28) | Real handshake in CI | `smoke:mcp` |
+| MCP (stdio and loopback HTTP, 2026-07-28 and 2025-11-25) | Real handshakes in CI; protocol conformance with a shrink-only baseline | `smoke:mcp`, `conformance:mcp` |
 | Claude Code plugin and PreToolUse hook | Hook unit-tested; plugin manifest validated locally | `tests/hooks.test.mjs`; `claude plugin validate .` |
 | GitHub Actions release | Ran once for v0.3.0: gate, drill, publish | Run 38707067941; [release](https://github.com/shmindmaster/assay/releases/tag/v0.3.0) |
 

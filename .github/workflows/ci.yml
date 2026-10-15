@@ -37,6 +37,12 @@ jobs:
         run: git diff --exit-code -- docs/benchmark.md
       - name: Gate drill (each deliberate regression must be blocked)
         run: npm run gate:drill
+      - name: Reference docs and MCP catalog match the server and schemas
+        run: npm run docs:reference -- --check
+      - name: Fetch main for the conformance baseline shrink check
+        run: git fetch --no-tags --depth=1 origin main:refs/remotes/origin/main
+      - name: MCP conformance at 2026-07-28 and 2025-11-25 (baseline may only shrink)
+        run: npm run conformance:mcp
       - name: Install the browser for the Explorer test
         run: npx playwright install --with-deps chromium-headless-shell
       - name: Receipt Explorer in a real browser

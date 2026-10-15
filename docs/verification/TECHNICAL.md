@@ -20,7 +20,7 @@ flowchart LR
   end
   X[Receipt Explorer<br/>offline, recomputes chain]
   H[S3 PreToolUse hook<br/>write boundary]
-  MCP[read-only MCP server<br/>10 tools, SDK v2]
+  MCP[read-only MCP server<br/>10 tools, SDK v2, dual era]
   D --> C --> M -->|draft + provenance| L
   D --> V -->|verdict| A
   C -->|trust labels| A
@@ -52,11 +52,44 @@ flowchart LR
 
 | Workflow | Trigger | Runs |
 |---|---|---|
-| `ci.yml` | PR, push to main | Node 20 and 22: `npm ci`, `npm audit` (prod, high), `verify:all`, data reproducibility, `gate`, benchmark drift (`git diff --exit-code docs/benchmark.md`), `gate:drill` |
+| `ci.yml` | PR, push to main | Node 20 and 22: `npm ci`, `npm audit` (prod, high), `verify:all`, data reproducibility, `gate`, benchmark drift (`git diff --exit-code docs/benchmark.md`), `gate:drill`, reference-docs drift (`docs:reference --check`), MCP conformance (`conformance:mcp`, baseline compared with `origin/main`), Receipt Explorer in Chromium (`test:browser`) |
 | `codeql.yml` | PR, push, schedule | JavaScript analysis |
-| `release.yml` | `v*` tag | The same gates; publishes a GitHub release with the benchmark only after they pass. **Never exercised: no tag has been pushed.** |
+| `release.yml` | `v*` tag | The same gates; publishes a GitHub release with the benchmark and gate report only after they pass. Exercised once, for v0.3.0 (run 38707067941). |
 
 All actions are pinned to commit SHAs. `release.yml` grants `contents: write` only to its publish job.
+
+## API surface and MCP decision
+
+Recorded 2026-10-15 against the fleet API surface standard and the engineering quality directive.
+
+**No HTTP API, so no OpenAPI and no Scalar page.** Assay is an offline CLI and library. Its programmatic surfaces are the typed decision schemas, the MCP server and the receipt format. Adding an HTTP service only to document it would contradict the offline boundary above.
+
+**JSON Schema is the contract.** Each decision has one canonical JSON Schema 2020-12 file in `schemas/`. The Anthropic adapter derives a strict tool from it, the OpenAI adapter derives a strict structured output, and Ajv validates every result against the canonical schema before use. That re-check matters because both vendors' strict modes drop some constraints (`minimum`, `if`/`then`, `allOf` and others). [docs/reference/decision-schemas.md](../reference/decision-schemas.md) is generated from the schemas and the adapters, and lists exactly what each provider drops.
+
+**MCP: justified, read-only.** The agent use cases are real: an agent (or the Claude Code plugin) looks up NCRs, heat lots, purchase-order certification status and audit gaps with hash-verified citations, without reading `data/` directly. Every tool is a read-only lookup. Nothing that writes, ships, signs or sends is exposed; side effects stay with the effect broker. `npm run tools:report` lists the tools deliberately not added, and why.
+
+| Standard | Assay |
+|---|---|
+| M1 SDK and era | `@modelcontextprotocol/server` 2.3.1. Serves 2026-07-28 and the 2025-11-25 handshake from one factory, over stdio (`serveStdio`) and over Streamable HTTP (`createMcpHandler`). `smoke:mcp` checks both eras on both transports. |
+| M2 transport | stdio by default (what `.mcp.json` and the plugin launch). `--http [port]` serves Streamable HTTP on `127.0.0.1` only, with Host and Origin checked against localhost; a foreign Origin gets 403 (tested). |
+| M3 authorization | Not applicable: local, single-user, no credentials, synthetic data only. |
+| M4 catalogue | Every tool has a title, all four annotations, a strict input schema (`additionalProperties: false`) and an output schema with `structuredContent`. The `tools/list` result is snapshotted to [catalog.json](../../mcp-servers/kestrel-foundry-data/catalog.json) and rendered to [docs/reference/mcp-tools.md](../reference/mcp-tools.md); CI fails on drift. `tools/list` and `server/discover` carry a one-hour public cache hint. |
+| M5 conformance | `@modelcontextprotocol/conformance` 0.2.0-alpha.12, pinned as a devDependency, at 2026-07-28 and 2025-11-25 in CI and in the release gate. The committed baselines may only shrink (see below). |
+| M6 discovery | `server/discover` comes from the SDK. No Server Card, because there is no hosted endpoint. Not registered in AgentHub's `registry/mcps.json`, because this server serves a synthetic demo dataset, not a fleet capability. |
+| M7 approval | Not applicable: no tool has a side effect. |
+
+**Conformance results.** At 2026-07-28: 24 checks pass and 17 are expected failures. At 2025-11-25: 34 pass and 25 are expected failures, plus 1 warning. Every expected failure is a feature the server deliberately does not offer: resources, prompts, completion, logging, sampling and elicitation, or the suite's own `test_*` fixture tools. Every core check passes: initialize, ping, tools/list, DNS-rebinding protection and wire-schema validity of every message. The warning is the 2025-era HTTP fallback issuing no session ID, which is correct for a stateless server. The baselines (`mcp-servers/kestrel-foundry-data/conformance/*.yml`) list checks, not whole scenarios, so the wire-schema check inside each excluded scenario is still enforced. The run fails on an unexpected failure, on a baselined check that starts passing, and on any entry added relative to `origin/main`.
+
+**Deviations from the standard, kept on purpose:**
+- Tool names are snake_case (`get_purchase_order`), not `<area>.<verb>`. The eval cases, replay fixtures, plugin and film all use these names, and renaming them would break recorded evidence for no functional gain.
+- The catalogue lives beside its server at `mcp-servers/kestrel-foundry-data/catalog.json`, not at `mcp/catalog.json`.
+- No resources or prompts. The tools already return hash-verified bodies, and the key workflows are the CLI demos.
+
+**Gaps found and fixed by this work (2026-10-15):**
+- Tool inputs silently dropped unknown arguments. For example, `list_ncrs({ statuss: 'open' })` returned the unfiltered list as if it were an answer. Inputs are now strict objects. `smoke:mcp` asserts that the call is refused, and that check fails against the old schemas.
+- `tools:report` carried a hand-written copy of every input schema that had drifted from the server: it claimed `additionalProperties: false`, which the server did not emit. It now reads the generated catalogue, so it cannot drift.
+
+**Type safety.** The repository is JavaScript (ESM) with no TypeScript build. Types are enforced at runtime at every boundary: zod for MCP inputs and outputs (validated by the SDK on both sides), and Ajv for decision outputs. No generated client exists because there is no API to generate one from.
 
 ## Observability
 
@@ -75,5 +108,6 @@ Receipts are the observability. Each one carries its payload hash and its predec
 ## Tech debt
 
 - Three review nits (see FUNCTIONAL.md gaps).
-- Four Dependabot PRs are open against the new main: #17 (zod 4.6.6), #15 (setup-node 7.1.0), and #12 and #13 (CodeQL actions 4.38.3). They are untriaged. Dependabot closed #14 itself once PR #16 removed `@modelcontextprotocol/sdk`.
+- The Dependabot PRs from the showcase cycle are resolved: zod 4.6.6, setup-node 7.1.0 and CodeQL 4.38.3 are on main.
+- `@modelcontextprotocol/conformance` is an alpha (0.2.0-alpha.12), pinned exactly. Move to the `latest` tag when 0.2.0 ships.
 - The `claude plugin validate` warnings (unquoted `${CLAUDE_PLUGIN_ROOT}` in the hook command, no marketplace install line in the README) are untouched.
