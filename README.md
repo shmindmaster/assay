@@ -42,6 +42,12 @@ aerospace certificate of conformance at a fictional foundry. The vendors do not
 endorse this project; their guidance is [linked below](#why-this-shape) so every
 mapping can be checked.
 
+The premise has data behind it. A reproducible
+[study of 356 public system prompts](https://saroshhussain.com/blog/what-356-ai-system-prompts-write-down/)
+found that the prompts behind shipped agents state a median of 10 out of 100 on
+a 23-control checklist, and that not one of the 356 states an audit control.
+Controls that have to hold belong in code.
+
 ## Quickstart (60 seconds, no API key)
 
 ```bash
