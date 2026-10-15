@@ -17,7 +17,9 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { McpServer } from '@modelcontextprotocol/server';
+import { createServer as createHttpServer } from 'node:http';
+import { localhostHostValidation, localhostOriginValidation, toNodeHandler } from '@modelcontextprotocol/node';
+import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { z } from 'zod';
 
@@ -25,6 +27,9 @@ const SERVER_DIR = path.dirname(fileURLToPath(import.meta.url));
 const DATA_ROOT = process.env.KESTREL_DATA_ROOT
   ? path.resolve(process.env.KESTREL_DATA_ROOT)
   : path.resolve(SERVER_DIR, '..', '..', '..', 'data');
+
+// The server reports the product's own version, so a catalog snapshot names the release it came from.
+const PRODUCT_VERSION = JSON.parse(readFileSync(path.resolve(SERVER_DIR, '..', '..', '..', 'package.json'), 'utf8')).version;
 
 const loadJson = (rel) => JSON.parse(readFileSync(path.join(DATA_ROOT, ...rel.split('/')), 'utf8'));
 
@@ -73,14 +78,22 @@ const ncrCompact = z.looseObject({
 const certItem = z.looseObject({ type: z.string(), expected_path: z.string() });
 
 function createServer() {
-  const server = new McpServer({ name: 'kestrel-foundry-data', version: '0.2.0' });
+  // The catalogue is fixed for the life of a release and holds no tenant data, so 2026-07-28 clients
+  // may cache tools/list and server/discover for an hour, in shared caches too. The SDK's default
+  // ({ ttlMs: 0, cacheScope: 'private' }) would make every client re-list on every turn.
+  const listHint = { ttlMs: 3_600_000, cacheScope: 'public' };
+  const server = new McpServer(
+    { name: 'kestrel-foundry-data', version: PRODUCT_VERSION },
+    { cacheHints: { 'tools/list': listHint, 'server/discover': listHint } },
+  );
 
   const tool = (name, config, handler) =>
     server.registerTool(name, { ...config, annotations }, handler);
 
   tool('list_ncrs', {
+    title: 'List non-conformance reports',
     description: 'List non-conformance reports (compact fields). Filter by status, defect type, cell, or recency (days before the dataset anchor date).',
-    inputSchema: z.object({
+    inputSchema: z.strictObject({
       status: z.enum(['open', 'closed']).optional(),
       defect_type: z.enum(['porosity', 'shrinkage', 'sand-inclusion', 'misrun-cold-shut', 'dimensional', 'chemistry']).optional(),
       cell: z.string().optional(),
@@ -100,8 +113,9 @@ function createServer() {
   });
 
   tool('get_ncr', {
+    title: 'Get one NCR with repeat history',
     description: 'Get one NCR in full, including repeat-offender history: prior NCRs on the same part + defect + cause within 90 days before its date.',
-    inputSchema: z.object({ ncr_id: z.string().regex(/^NCR-2026-\d{4}$/) }),
+    inputSchema: z.strictObject({ ncr_id: z.string().regex(/^NCR-2026-\d{4}$/) }),
     outputSchema: ncrCompact.extend({
       part_name: z.string(), customer: z.string(), cause_text: z.string(), narrative: z.string(),
       repeat_analysis: z.object({
@@ -131,8 +145,9 @@ function createServer() {
   });
 
   tool('get_heat_lot', {
+    title: 'Get a heat lot and its records',
     description: 'Get a heat lot: alloy, chemistry, mechanical results, which certification records are on file, and NCRs referencing it.',
-    inputSchema: z.object({ heat_number: z.number().int().min(4460).max(4479) }),
+    inputSchema: z.strictObject({ heat_number: z.number().int().min(4460).max(4479) }),
     outputSchema: z.looseObject({
       heat_number: z.number(), heat_id: z.string(), alloy: z.string(),
       chemistry: z.record(z.string(), z.number()),
@@ -154,8 +169,9 @@ function createServer() {
   });
 
   tool('get_test_record', {
+    title: 'Get one certification record for a heat',
     description: 'Resolve a single certification record for a heat lot. Returns found:false with the expected path when the record is not on file — it never invents one.',
-    inputSchema: z.object({
+    inputSchema: z.strictObject({
       heat_number: z.number().int().min(4460).max(4479),
       record_type: z.enum(HEAT_RECORD_TYPES),
     }),
@@ -173,8 +189,9 @@ function createServer() {
   });
 
   tool('search_documents', {
+    title: 'Search indexed documents',
     description: 'Search the document index by path tokens (AND-matched, case-insensitive). Returns paths + sha256, never content — call get_document for the body.',
-    inputSchema: z.object({
+    inputSchema: z.strictObject({
       query: z.string().min(1),
       prefix: z.string().optional(),
       limit: z.number().int().min(1).max(50).optional(),
@@ -191,8 +208,9 @@ function createServer() {
   });
 
   tool('get_document', {
+    title: 'Read one indexed document (hash-verified)',
     description: 'Fetch one document body by its indexed path. The sha256 is re-verified against the index before anything is returned; unindexed paths are refused.',
-    inputSchema: z.object({ path: z.string().min(1) }),
+    inputSchema: z.strictObject({ path: z.string().min(1) }),
     outputSchema: z.object({ path: z.string(), sha256: z.string(), content: z.string() }),
   }, async ({ path: docPath }) => {
     const rel = docPath.replace(/\\/g, '/').replace(/^data\//, '');
@@ -207,8 +225,9 @@ function createServer() {
   });
 
   tool('list_cert_requirements', {
+    title: 'List customer certification requirements',
     description: 'List customer certificate-of-conformance requirement specifications (required record types per customer).',
-    inputSchema: z.object({ customer: z.string().optional() }),
+    inputSchema: z.strictObject({ customer: z.string().optional() }),
     outputSchema: z.object({
       total: z.number().int(),
       requirements: z.array(z.object({ req_id: z.string(), customer: z.string(), required_records: z.array(z.string()) })),
@@ -219,8 +238,9 @@ function createServer() {
   });
 
   tool('get_purchase_order', {
+    title: 'Get the certification status of a purchase order',
     description: 'Get a purchase order with its cert-of-conformance manifest: every required record, its expected path, and whether it is actually on file. The completeness verdict comes from the index, not from the model.',
-    inputSchema: z.object({ po: z.enum(purchaseOrders.map((p) => p.po)) }),
+    inputSchema: z.strictObject({ po: z.enum(purchaseOrders.map((p) => p.po)) }),
     outputSchema: z.looseObject({
       po: z.string(), customer: z.string(), heat: z.number(),
       items: z.array(certItem.extend({ on_file: z.boolean(), sha256: z.string().nullable() })),
@@ -245,8 +265,9 @@ function createServer() {
   });
 
   tool('get_scrap_records', {
+    title: 'Get scrap records',
     description: 'Scrap/yield rows by week, cell and cause code (CASTLINE export). Pruned to the requested number of most recent weeks; includes weekly totals.',
-    inputSchema: z.object({ weeks: z.number().int().min(1).max(8).optional() }),
+    inputSchema: z.strictObject({ weeks: z.number().int().min(1).max(8).optional() }),
     outputSchema: z.object({
       anchor_date: z.string(),
       weeks: z.array(z.string()),
@@ -266,8 +287,9 @@ function createServer() {
   });
 
   tool('get_audit_scope', {
+    title: 'Get an audit scope and its evidence gaps',
     description: 'Get an audit scope with each evidence area resolved against the document index: present:true/false per area. Absent areas are the gap list.',
-    inputSchema: z.object({ audit_id: z.enum([auditScope.audit_id]) }),
+    inputSchema: z.strictObject({ audit_id: z.enum([auditScope.audit_id]) }),
     outputSchema: z.object({
       audit_id: z.string(), title: z.string(), window: z.string(),
       evidence_areas: z.array(z.object({ id: z.string(), area: z.string(), expected_path: z.string(), present: z.boolean() })),
@@ -295,5 +317,29 @@ function createServer() {
 // stdio is the default transport (what .mcp.json and the Claude Code plugin launch). serveStdio
 // owns era negotiation: one factory serves both the 2026-07-28 and the 2025-era handshakes.
 // Any logging goes to stderr — stdout is protocol.
-console.error(`kestrel-foundry-data: ${Object.keys(index.documents).length} indexed documents, anchor ${ANCHOR}`);
-serveStdio(createServer);
+//
+// `--http [port]` serves Streamable HTTP on 127.0.0.1 only, for the conformance suite and local
+// HTTP clients. createMcpHandler is dual-era by default (2026-07-28 plus the 2025-era stateless
+// fallback). Host and Origin are checked against localhost before any request reaches the handler;
+// a rejected request gets 403. Port 0 picks a free port; the URL is printed on stdout.
+const httpFlag = process.argv.indexOf('--http');
+console.error(`kestrel-foundry-data ${PRODUCT_VERSION}: ${Object.keys(index.documents).length} indexed documents, anchor ${ANCHOR}`);
+if (httpFlag === -1) {
+  serveStdio(createServer);
+} else {
+  const port = Number(process.argv[httpFlag + 1] ?? 0);
+  const validateHost = localhostHostValidation();
+  const validateOrigin = localhostOriginValidation();
+  const handle = toNodeHandler(createMcpHandler(createServer));
+  const http = createHttpServer(async (req, res) => {
+    if (!validateHost(req, res) || !validateOrigin(req, res)) return;
+    if (new URL(req.url, 'http://127.0.0.1').pathname !== '/mcp') {
+      res.writeHead(404, { 'content-type': 'application/json' }).end(JSON.stringify({ error: 'not found; the MCP endpoint is /mcp' }));
+      return;
+    }
+    await handle(req, res);
+  });
+  http.listen(Number.isInteger(port) && port >= 0 ? port : 0, '127.0.0.1', () => {
+    console.log(`kestrel-foundry-data listening on http://127.0.0.1:${http.address().port}/mcp`);
+  });
+}

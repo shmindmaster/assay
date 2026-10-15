@@ -10,8 +10,9 @@ deployed_sha: 46cc33d (release v0.3.0, https://github.com/shmindmaster/assay/rel
 tests: "CI Node 20 verify:all: 12/12 @ 46cc33d; CI Node 22 verify:all: 12/12 @ 46cc33d; release.yml gate + drill: pass @ 46cc33d (run 38707067941); release report.json: 5/5 checks allowed; release smoke from published archive: 3/3 @ v0.3.0; local npm test: 98/98 @ 2555f12; live verify:live (anthropic claude-sonnet-5-5): 1/1 refusal as expected @ 1067715; live verify:live (openai gpt-6.1-sol): 1/1 refusal as expected @ 2555f12"
 films: ["D:\\OneDrive - Maya Modest LLC\\Videos\\Portfolio\\Assay\\01 - The Agent Drafts, Software Decides.mp4"]
 blockers: []
-next_action: "Add an accessibility (axe) pass to the Explorer browser test; deliver the format A executive cut when a heavy-work slot frees"
-updated: 2026-10-15T03:50:00-05:00
+api_surface: "No HTTP API by design (no OpenAPI/Scalar). JSON Schema 2020-12 decision contracts with generated reference. MCP justified and read-only: SDK 2.3.1, dual era on stdio and loopback HTTP, conformance at 2026-07-28 and 2025-11-25 in CI with a shrink-only baseline. See TECHNICAL.md, API surface and MCP decision."
+next_action: "Add an accessibility (axe) pass to the Explorer browser test; cut v0.3.1 so the MCP conformance work is in a release; deliver the format A executive cut when a heavy-work slot frees"
+updated: 2026-10-15T05:00:00-05:00
 ```
 
 # Readiness
@@ -37,6 +38,10 @@ Assay is complete for what it claims to be: an offline, open-source reference im
 | Attached gate report | `report.json`: `allowed: true`; eval-suite, guard-coverage, refusal-correctness, replay-determinism and audit-replay all pass |
 | Attached benchmark | `benchmark.md`, identical to the committed copy (CI enforces the match) |
 | Smoke from the published archive | `npm ci` clean; `verify:coc PO-AER-5519` exit 3 (incomplete); `verify:coc PO-MER-5532` exit 0 (complete); `demo:injection` exit 0 with the authorization refused and the effect denied under `untrusted-context`; 6 receipts, chain verified |
+
+## API surface and contract enforcement (2026-10-15)
+
+The engineering quality pass found two real gaps in the MCP contract and fixed both, with tests that fail on the old behavior. Tool inputs silently dropped unknown arguments, and `tools:report` carried a hand-copied set of schemas that had drifted from the server. Conformance at both protocol revisions now runs in CI and in the release gate. The baselines list only features the server deliberately does not offer, so the verdict stands. Details: [TECHNICAL.md](TECHNICAL.md#api-surface-and-mcp-decision). These changes are merged but not yet in a release (v0.3.0 predates them).
 
 ## Blockers
 

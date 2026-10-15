@@ -41,16 +41,24 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 | `ASSAY_LIVE=1 ASSAY_PROVIDER=openai npm run verify:live` (`gpt-6.1-sol`) | release/v0.3.0 | 2026-10-15 | exit 3 (expected refusal); `req_971f4bc010bd427db04b44503f04cff3`, 3423/808 tokens, 13.6 s; model INCOMPLETE; denial `untrusted-context`; [evidence](../evidence/live-run-2026-10-15-openai/) |
 | `node --test tests/live-provider-openai.test.mjs` | release/v0.3.0 | 2026-10-15 | 6/6 pass |
 | `npm run test:browser` | test/explorer-browser | 2026-10-15 | 4/4 pass; with the payload-hash check disabled, the tamper test fails (mutation caught) |
+| `npm run smoke:mcp` | feat/mcp-conformance | 2026-10-15 | 21/21 checks: 2026-07-28 and 2025-11-25 on stdio and on loopback HTTP; foreign Origin 403; strict inputs; titles; cache hint. With the old loose input schemas, the two strict-input checks fail (guard proven able to fail) |
+| `npm run conformance:mcp` | feat/mcp-conformance | 2026-10-15 | 2026-07-28: 24 pass, 17 expected failures, exit 0. 2025-11-25: 34 pass, 25 expected failures, 1 warning (stateless, no session ID), exit 0. A baselined check that passes (`tools-list`) fails the run as stale |
+| `node --test tests/conformance-baseline.test.mjs` | feat/mcp-conformance | 2026-10-15 | 4/4: a growing baseline is caught, a shrinking one passes, core checks can never be baselined |
+| `npm run docs:reference -- --check` | feat/mcp-conformance | 2026-10-15 | reference docs and `catalog.json` match the server and the schemas |
+| `npm test` | feat/mcp-conformance | 2026-10-15 | 102/102 pass |
+| `npm audit --audit-level=high` (all deps, incl. the conformance devDependency) | feat/mcp-conformance | 2026-10-15 | 0 vulnerabilities |
 
 ## By category
 
 | Category | Coverage | Evidence |
 |---|---|---|
-| Unit | Ledger, broker, authorization, providers, live adapter (stubbed transport), context, decisions, schemas, completeness, digest, explorer parity | `tests/*.test.mjs` (92 tests) |
+| Unit | Ledger, broker, authorization, providers, live adapter (stubbed transport), context, decisions, schemas, completeness, digest, explorer parity, conformance baseline rules | `tests/*.test.mjs` (102 tests) |
 | Contract / schema | Every fixture validates or is rejected as named; one schema, three enforcement paths | `validate:schemas`, `tests/schemas.test.mjs`, `schemas:report` |
 | Integration (in process) | Context, decision, verdict, mint, broker and ledger end to end | `demo`, `demo:injection`, `demo:denied` inside `verify:all` |
 | Integration (live provider) | Anthropic and OpenAI live adapters against the real APIs | One recorded `verify:live` run each |
-| Integration (MCP) | Real stdio handshake and the 10 tools | `smoke:mcp` |
+| Integration (MCP) | Both protocol eras on stdio and on loopback Streamable HTTP; the 10 tools' data facts; strict inputs; Origin check | `smoke:mcp` (21 checks) |
+| Protocol conformance (MCP) | `@modelcontextprotocol/conformance` at 2026-07-28 and 2025-11-25 against the loopback HTTP server; committed check-level baselines that may only shrink | `conformance:mcp` in CI and the release gate |
+| Generated-reference drift | `catalog.json`, `docs/reference/mcp-tools.md` and `docs/reference/decision-schemas.md` regenerated and compared | `docs:reference --check` in CI and the release gate |
 | Authorization / negative | Replay after restart (separate process), never-minted forgery, payload edit, forged verdict, untrusted context, broken chain, malformed bindings | `tests/broker.test.mjs` |
 | Recovery / failure paths | Classifier refusal, prose answer, HTTP 529, schema-invalid output (provenance kept), bad effort | `tests/live-provider.test.mjs` |
 | Guard ability to fail | 9 mutations; release gate with 2 drilled regressions | `evals:mutate`, `gate:drill` |
