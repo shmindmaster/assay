@@ -136,14 +136,15 @@
             "properties": {
               "code": {
                 "type": "string",
-                "enum": [
+                "x-extensible-enum": [
                   "not-found",
                   "invalid-request",
                   "unsupported-media-type",
                   "method-not-allowed",
                   "refused",
                   "internal"
-                ]
+                ],
+                "description": "One of not-found, invalid-request, unsupported-media-type, method-not-allowed, refused, internal; new codes may be added."
               },
               "message": {
                 "type": "string"
