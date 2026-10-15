@@ -351,3 +351,17 @@ moment.
 | Should authorizations expire on the logical clock as well as being single-use? | Whether long-lived tokens matter under concurrency (§2.5) | Repository owner |
 | What review does a change to a deterministic rule require? | The central risk in `docs/threat-model.md` §4 | Repository owner |
 | Is the token-count approximation in S1 close enough to trust near a budget edge? | Whether a bundle can silently exceed a real model's window | Repository owner |
+
+## Published guidance this follows
+
+Anthropic's and OpenAI's agent guidance converges on the same instruction: get guarantees out
+of the model. The surfaces above implement it as follows; neither vendor endorses this project.
+
+| Guidance | Surface |
+|---|---|
+| Anthropic [structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs) and [strict tool use](https://platform.claude.com/docs/en/agents-and-tools/tool-use/strict-tool-use); OpenAI [structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs) and [function calling](https://developers.openai.com/api/docs/guides/function-calling) | S2 typed decisions (`src/providers/`, `schemas/`) |
+| Anthropic [context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) | S1 context assembler (`src/context/assembler.mjs`) |
+| Claude Code [hooks](https://code.claude.com/docs/en/hooks-guide); OpenAI [Agents SDK guardrails](https://openai.github.io/openai-agents-python/guardrails/) | S3 policy and write hook (`policy/policy.json`, `hooks/publish-gate.mjs`) |
+| Anthropic [writing tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents) | the read-only MCP server (`mcp-servers/kestrel-foundry-data/`) |
+| Anthropic [agent evals](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents); OpenAI [evals](https://developers.openai.com/api/docs/guides/evals) | S7 evals, mutations and gate (`evals/`) |
+| Anthropic [building effective agents](https://www.anthropic.com/engineering/building-effective-agents); OpenAI [practical guide to building agents](https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf) | the overall shape: model in one lane, code owning effects |

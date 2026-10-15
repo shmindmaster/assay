@@ -205,7 +205,7 @@ mutation  policy/widen-write-path                   CAUGHT by policy-escape
 mutation  schema/remove-required-field              CAUGHT by schema-required-sha256
 mutation  verifier/flip-completeness-comparison     CAUGHT by coc-po-aer-5519-refusal
 
-9/9 mutations caught — every guard in this repo is demonstrably able to fail.
+15/15 mutations caught — every guard in this repo is demonstrably able to fail.
 ```
 
 `hooks/honour-env-override` is the one to look at. This repository claims there
@@ -348,47 +348,6 @@ The mutation harness above is what makes the rest of the suite believable.
 
 ---
 
-## Capability matrix
-
-Published guidance, mapped to the file that implements it and the command that
-demonstrates it. No claim in this table is unaccompanied by something you can run.
-
-| Guidance | Surface | Implementation | Command |
-|---|---|---|---|
-| Structured outputs (Anthropic) | S2 | `src/providers/anthropic.mjs`, `schemas/` | `npm run schemas:report` |
-| Strict tool use (Anthropic) | S2 | `src/providers/anthropic.mjs` | `npm run schemas:report -- --strict` |
-| Hooks and deterministic control (Claude Code) | S3 | `hooks/publish-gate.mjs`, `policy/policy.json` | `npm run demo:denied` |
-| Effective context engineering (Anthropic) | S1 | `src/context/assembler.mjs` | `npm run context -- --agent coc-assembler` |
-| Demystifying evals for agents (Anthropic) | S7 | `evals/`, `evals/mutations/` | `npm run evals:mutate` |
-| Writing effective tools for agents (Anthropic) | S2 | `mcp-servers/kestrel-foundry-data/` | `npm run tools:report` |
-| Building effective agents (Anthropic) | topology | `agents/`, `docs/architecture.md` | `npm run policy:explain` |
-| Structured outputs (OpenAI) | S2 | `src/providers/openai.mjs` | `npm run schemas:report -- --provider openai` |
-| Function calling (OpenAI) | S2 | `src/providers/openai.mjs` | `npm run tools:report -- --provider openai` |
-| Agents SDK guardrails (OpenAI) | S3 | `policy/policy.json` tripwires | `npm run demo:injection` |
-| Evals (OpenAI) | S7 | `evals/` | `npm run evals` |
-| Practical guide to building agents (OpenAI) | topology | `docs/architecture.md` | — |
-
----
-
-## The agents
-
-An orchestrator-workers topology with a deterministic router. The primary agent
-holds no tools of its own; it routes each request to exactly one subagent.
-Subagents declare their full tool inventory in frontmatter and may not exceed it.
-
-| Agent | Scope | Tier |
-|---|---|---|
-| `quality-lead` (primary) | Routes every request to one subagent; composes the weekly digest. | sonnet |
-| `ncr-triage` | One nonconformance → defect classification, likely cause code, repeat-offender flag. No dispositions. | haiku |
-| `coc-assembler` | One purchase order → certificate completeness report. Fail-closed; missing records are reported, never inferred. | sonnet |
-| `scrap-rollup` | Weekly scrap and yield rollup by cell and cause, variance against a trailing four-week average. | haiku |
-| `audit-prep` | One audit → evidence areas mapped to documents, gap list with owners and effort. | sonnet |
-
-The folder is also a Claude Code plugin. `claude --plugin-dir .` loads it for a
-session; `claude plugin validate .` checks the manifest.
-
----
-
 ## The facts the data is built around
 
 Every demo claim resolves to something in `data/`, and the generator is seeded so
@@ -461,8 +420,7 @@ src/providers/                  Anthropic strict tool use, OpenAI structured out
 src/effects/                    authorization minting and the effect broker
 src/ledger/                     append-only hash-chained receipts
 hooks/publish-gate.mjs          PreToolUse write boundary, fail-closed
-agents/                         one primary, four subagents
-skills/                         seven skills
+packages/broker/                the extracted broker: guard, approve, signed receipts, MCP proxy
 references/                     numbered domain docs 00–04
 context/                        bounded per-agent memory
 mcp-servers/kestrel-foundry-data/   read-only MCP server, ten tools

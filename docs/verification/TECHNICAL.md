@@ -62,16 +62,18 @@ All actions are pinned to commit SHAs. `release.yml` grants `contents: write` on
 
 Recorded 2026-10-15 against the fleet API surface standard and the engineering quality directive.
 
+**`packages/broker` (`@heatlot/broker`, internal) is the programmatic API.** A zero-dependency ESM library (`Broker`, `trusted`, `untrusted`, `verifyChain`, `startProxy`) and a CLI (`keygen`, `approve`, `verify`, `mcp-proxy`). Its contract is its README and its 17 tests; its six guards are in the mutation harness.
+
 **No HTTP API, so no OpenAPI and no Scalar page.** Assay is an offline CLI and library. Its programmatic surfaces are the typed decision schemas, the MCP server and the receipt format. Adding an HTTP service only to document it would contradict the offline boundary above.
 
 **JSON Schema is the contract.** Each decision has one canonical JSON Schema 2020-12 file in `schemas/`. The Anthropic adapter derives a strict tool from it, the OpenAI adapter derives a strict structured output, and Ajv validates every result against the canonical schema before use. That re-check matters because both vendors' strict modes drop some constraints (`minimum`, `if`/`then`, `allOf` and others). [docs/reference/decision-schemas.md](../reference/decision-schemas.md) is generated from the schemas and the adapters, and lists exactly what each provider drops.
 
-**MCP: justified, read-only.** The agent use cases are real: an agent (or the Claude Code plugin) looks up NCRs, heat lots, purchase-order certification status and audit gaps with hash-verified citations, without reading `data/` directly. Every tool is a read-only lookup. Nothing that writes, ships, signs or sends is exposed; side effects stay with the effect broker. `npm run tools:report` lists the tools deliberately not added, and why.
+**MCP: justified, read-only.** The agent use cases are real: an agent looks up NCRs, heat lots, purchase-order certification status and audit gaps with hash-verified citations, without reading `data/` directly. Every tool is a read-only lookup. Nothing that writes, ships, signs or sends is exposed; side effects stay with the effect broker. `npm run tools:report` lists the tools deliberately not added, and why.
 
 | Standard | Assay |
 |---|---|
 | M1 SDK and era | `@modelcontextprotocol/server` 2.3.1. Serves 2026-07-28 and the 2025-11-25 handshake from one factory, over stdio (`serveStdio`) and over Streamable HTTP (`createMcpHandler`). `smoke:mcp` checks both eras on both transports. |
-| M2 transport | stdio by default (what `.mcp.json` and the plugin launch). `--http [port]` serves Streamable HTTP on `127.0.0.1` only, with Host and Origin checked against localhost; a foreign Origin gets 403 (tested). |
+| M2 transport | stdio by default (what `.mcp.json` launches). `--http [port]` serves Streamable HTTP on `127.0.0.1` only, with Host and Origin checked against localhost; a foreign Origin gets 403 (tested). |
 | M3 authorization | Not applicable: local, single-user, no credentials, synthetic data only. |
 | M4 catalogue | Every tool has a title, all four annotations, a strict input schema (`additionalProperties: false`) and an output schema with `structuredContent`. The `tools/list` result is snapshotted to [catalog.json](../../mcp-servers/kestrel-foundry-data/catalog.json) and rendered to [docs/reference/mcp-tools.md](../reference/mcp-tools.md); CI fails on drift. `tools/list` and `server/discover` carry a one-hour public cache hint. |
 | M5 conformance | `@modelcontextprotocol/conformance` 0.2.0-alpha.12, pinned as a devDependency, at 2026-07-28 and 2025-11-25 in CI (Node 22 leg; the tool imports `fs.globSync`, Node 22+) and in the release gate (Node 22). The server's Node 20 support is covered by `smoke:mcp` on the Node 20 leg. The committed baselines may only shrink (see below). |
@@ -81,7 +83,7 @@ Recorded 2026-10-15 against the fleet API surface standard and the engineering q
 **Conformance results.** At 2026-07-28: 24 checks pass and 17 are expected failures. At 2025-11-25: 34 pass and 25 are expected failures, plus 1 warning. Every expected failure is a feature the server deliberately does not offer: resources, prompts, completion, logging, sampling and elicitation, or the suite's own `test_*` fixture tools. Every core check passes: initialize, ping, tools/list, DNS-rebinding protection and wire-schema validity of every message. The warning is the 2025-era HTTP fallback issuing no session ID, which is correct for a stateless server. The baselines (`mcp-servers/kestrel-foundry-data/conformance/*.yml`) list checks, not whole scenarios, so the wire-schema check inside each excluded scenario is still enforced. The run fails on an unexpected failure, on a baselined check that starts passing, and on any entry added relative to `origin/main`.
 
 **Deviations from the standard, kept on purpose:**
-- Tool names are snake_case (`get_purchase_order`), not `<area>.<verb>`. The eval cases, replay fixtures, plugin and film all use these names, and renaming them would break recorded evidence for no functional gain.
+- Tool names are snake_case (`get_purchase_order`), not `<area>.<verb>`. The eval cases, replay fixtures and film all use these names, and renaming them would break recorded evidence for no functional gain.
 - The catalogue lives beside its server at `mcp-servers/kestrel-foundry-data/catalog.json`, not at `mcp/catalog.json`.
 - No resources or prompts. The tools already return hash-verified bodies, and the key workflows are the CLI demos.
 
@@ -110,4 +112,4 @@ Receipts are the observability. Each one carries its payload hash and its predec
 - Three review nits (see FUNCTIONAL.md gaps).
 - The Dependabot PRs from the showcase cycle are resolved: zod 4.6.6, setup-node 7.1.0 and CodeQL 4.38.3 are on main.
 - `@modelcontextprotocol/conformance` is an alpha (0.2.0-alpha.12), pinned exactly. Move to the `latest` tag when 0.2.0 ships.
-- The `claude plugin validate` warnings (unquoted `${CLAUDE_PLUGIN_ROOT}` in the hook command, no marketplace install line in the README) are untouched.
+- The Claude Code plugin packaging (`.claude-plugin/`, `agents/`, `skills/`, `hooks/hooks.json`) was removed on 2026-10-15 with the reframe; its validate warnings went with it.

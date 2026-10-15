@@ -25,7 +25,8 @@ A runnable, offline reference implementation of a deterministic control layer ar
 | S6 | Hash-chained receipt ledger, audit replay, tamper check | `src/ledger/`, `scripts/audit.mjs` |
 | S6+ | Receipt Explorer: offline page that recomputes the chain and tampers one byte | `scripts/render-explorer.mjs`, `src/explorer/chain.mjs` |
 | S7 | Eval suite, mutation harness, eval-gated release and gate drill | `evals/`, `scripts/run-mutations.mjs`, `scripts/eval-gate.mjs`, `scripts/gate-drill.mjs` |
-| — | Read-only MCP server (10 tools, SDK v2, spec 2026-07-28) and Claude Code plugin | `mcp-servers/kestrel-foundry-data/`, `.claude-plugin/`, `agents/`, `skills/` |
+| — | Read-only MCP server (10 tools, SDK v2, spec 2026-07-28) | `mcp-servers/kestrel-foundry-data/` |
+| — | `heatlot-broker` library: guard, approve, Ed25519-signed receipts, MCP proxy | `packages/broker/` |
 
 ## The pack
 

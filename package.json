@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "The agent drafts. Software decides. A runnable reference implementation of the deterministic control layer for AI agents.",
+  "description": "A reference architecture for deterministic agent control, with a runnable example: the agent drafts, code decides, and every effect needs a payload-bound single-use authorization and leaves a signed receipt.",
   "author": "Sarosh Hussain",
   "license": "Apache-2.0",
   "repository": {
@@ -27,8 +27,6 @@
   },
   "scripts": {
     "generate:data": "node scripts/generate-data.mjs",
-    "render:digest": "node scripts/render-digest.mjs --from-data",
-    "render:atlas": "node scripts/render-atlas.mjs",
     "verify:coc": "node scripts/verify-completeness.mjs",
     "validate:schemas": "node scripts/validate-schemas.mjs",
     "evals": "node scripts/run-evals.mjs",
@@ -51,8 +49,6 @@
     "verify:all": "node scripts/verify-all.mjs",
     "verify:live": "node scripts/verify-live.mjs",
     "test": "node --test",
-    "effort:log": "node scripts/effort-log.mjs",
-    "effort": "node scripts/effort-rollup.mjs",
     "test:browser": "node --test tests-browser/explorer-in-browser.mjs"
   },
   "dependencies": {

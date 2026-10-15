@@ -83,10 +83,15 @@ function run(command, args, cwd) {
 
 function exerciseMutation(root) {
   const evals = run(process.execPath, ['scripts/run-evals.mjs'], root);
+  // The app's tests plus every package's tests: the extracted library is held to the same harness.
   const testFiles = readdirSync(path.join(root, 'tests'))
     .filter((file) => file.endsWith('.test.mjs'))
     .sort()
     .map((file) => `tests/${file}`);
+  for (const pkg of readdirSync(path.join(root, 'packages'), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort()) {
+    const dir = path.join(root, 'packages', pkg, 'test');
+    testFiles.push(...readdirSync(dir).filter((file) => file.endsWith('.test.mjs')).sort().map((file) => `packages/${pkg}/test/${file}`));
+  }
   const tests = run(process.execPath, ['--test', ...testFiles], root);
   return {
     failed: evals.status !== 0 || tests.status !== 0,
