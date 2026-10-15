@@ -72,7 +72,7 @@ Then run these three:
 
 ```bash
 npm run demo:injection   # an injected note fools the model, and still cannot release anything
-npm run evals:mutate     # 8/8 deliberate regressions caught: every guard is proven able to fail
+npm run evals:mutate     # 9/9 deliberate regressions caught: every guard is proven able to fail
 npm run explorer         # offline page that recomputes the receipt chain; tamper one byte and watch it break
 ```
 
@@ -121,9 +121,10 @@ section walks through each one with the command that demonstrates it.
 
 | Guarantee | Enforced by | Prove it |
 |---|---|---|
-| Injected instructions are labelled, not hidden, and anything downstream of them is refused | S1 tripwire + S5 broker | `npm run demo:injection` |
-| Facts are computed from files and cited by path and sha256, never asserted by the model | S4 verifier | `npm run verify:coc -- PO-AER-5519` (exit 3) and `-- PO-MER-5532` (exit 0) |
-| No side effect without a single-use, hash-bound authorization | S5 broker + S6 ledger | `npm run demo:denied` |
+| Content matching the policy's injection tripwires is labelled untrusted, not hidden, and any authorization that traces to it is refused. Novel phrasings can slip past the tripwires; the verifier still decides completeness from the files | S1 tripwire + S4 verifier + S5 broker | `npm run demo:injection` |
+| The authoritative verdict is computed from files and cites each record by path and sha256; whatever the model asserts is never trusted | S4 verifier | `npm run verify:coc -- PO-AER-5519` (exit 3) and `-- PO-MER-5532` (exit 0) |
+| No side effect without a single-use authorization that was minted on the ledger and is bound to the payload and verdict hashes | S5 broker + S6 ledger | `npm test` and `npm run evals:mutate` (replay, ledger-mint and outcome-binding mutations) |
+| Writes outside the allowed paths are blocked at the process boundary | S3 `hooks/publish-gate.mjs` | `npm run demo:denied` |
 | Permissions and write boundaries live in data, not in a prompt | S3 `policy/policy.json`, `hooks/publish-gate.mjs` | `npm run policy:explain -- --agent coc-assembler` |
 | No override flag, and that claim is tested | S7 mutation `hooks/honour-env-override` | `npm run evals:mutate` |
 | A changed byte in any receipt is detected and the broken link is named | S6 ledger | `npm run audit:tamper` |
@@ -195,6 +196,7 @@ each guard can fail:
 
 ```
 mutation  authorization/accept-already-used         CAUGHT by authorization-replay
+mutation  authorization/skip-ledger-mint-check      CAUGHT by authorization-ledger-mint
 mutation  authorization/skip-outcome-binding        CAUGHT by authorization-verdict-outcome-binding
 mutation  authorization/skip-verdict-shape           CAUGHT by authorization-verdict-shape
 mutation  hooks/honour-env-override                 CAUGHT by no-env-override
@@ -203,7 +205,7 @@ mutation  policy/widen-write-path                   CAUGHT by policy-escape
 mutation  schema/remove-required-field              CAUGHT by schema-required-sha256
 mutation  verifier/flip-completeness-comparison     CAUGHT by coc-po-aer-5519-refusal
 
-8/8 mutations caught — every guard in this repo is demonstrably able to fail.
+9/9 mutations caught — every guard in this repo is demonstrably able to fail.
 ```
 
 `hooks/honour-env-override` is the one to look at. This repository claims there
