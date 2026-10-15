@@ -34,6 +34,7 @@ function subjectOf(effect, authorization) {
   const candidate = authorization?.subject
     ?? authorization?.refusal?.verdict?.subject
     ?? effect?.payload?.subject
+    ?? effect?.subject
     ?? 'unknown-effect';
   return typeof candidate === 'string' && /^[A-Za-z0-9._-]+$/.test(candidate)
     ? candidate

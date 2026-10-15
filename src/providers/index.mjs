@@ -7,16 +7,17 @@
  * the network — requesting a live provider is an error, not a fallthrough.
  */
 import { getDecision } from '../decisions/registry.mjs';
-import { toStrictTool } from './anthropic.mjs';
 import { toStructuredOutput } from './openai.mjs';
 import { repair } from './repair.mjs';
-import { replayProvider } from './replay.mjs';
+import { replayProvider, keyFor } from './replay.mjs';
+import { completeAnthropicLive } from './anthropic-live.mjs';
 
 export { getDecision, listDecisions } from '../decisions/registry.mjs';
 export { toStrictTool, transformForAnthropic, ANTHROPIC_GRAMMAR } from './anthropic.mjs';
 export { toStructuredOutput, transformForOpenAI, toFunctionDefinition, isOpenAICompliant, OPENAI_STRUCTURED } from './openai.mjs';
 export { repair, RepairClosedError, MAX_RETRIES } from './repair.mjs';
 export { replayProvider, complete as replayComplete, fixtureKey, keyFor, MissingFixtureError } from './replay.mjs';
+export { LiveDecisionError, DEFAULT_ANTHROPIC_MODEL, DEFAULT_ANTHROPIC_EFFORT } from './anthropic-live.mjs';
 
 function liveEnabled() {
   return process.env.ASSAY_LIVE === '1';
@@ -36,36 +37,11 @@ export function liveFetch(url, options) {
   return globalThis.fetch(url, options);
 }
 
-async function completeAnthropicLive({ decision, prompt }) {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) throw new Error('ASSAY_LIVE=1 requires ANTHROPIC_API_KEY for provider anthropic');
-  const tool = toStrictTool(decision.schema, { name: decision.id });
-  const res = await liveFetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: process.env.ASSAY_ANTHROPIC_MODEL ?? 'claude-sonnet-4-5-20250929',
-      max_tokens: 4096,
-      tools: [{ name: tool.name, description: tool.description, strict: tool.strict, input_schema: tool.input_schema }],
-      tool_choice: { type: 'tool', name: tool.name },
-      messages: [{ role: 'user', content: prompt }],
-    }),
-  });
-  if (!res.ok) throw new Error(`anthropic live HTTP ${res.status}`);
-  const body = await res.json();
-  const block = (body.content ?? []).find((b) => b.type === 'tool_use' && b.name === tool.name);
-  if (!block) throw new Error('anthropic live response contained no matching tool_use block');
-  return block.input;
-}
-
 async function completeOpenAILive({ decision, prompt }) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) throw new Error('ASSAY_LIVE=1 requires OPENAI_API_KEY for provider openai');
   const format = toStructuredOutput(decision.schema, { name: decision.id });
+  const model = process.env.ASSAY_OPENAI_MODEL ?? 'gpt-4o-2024-08-06';
   const res = await liveFetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -73,7 +49,7 @@ async function completeOpenAILive({ decision, prompt }) {
       authorization: `Bearer ${key}`,
     },
     body: JSON.stringify({
-      model: process.env.ASSAY_OPENAI_MODEL ?? 'gpt-4o-2024-08-06',
+      model,
       messages: [{ role: 'user', content: prompt }],
       response_format: {
         type: format.type,
@@ -90,14 +66,14 @@ async function completeOpenAILive({ decision, prompt }) {
   const body = await res.json();
   const text = body.choices?.[0]?.message?.content;
   if (typeof text !== 'string') throw new Error('openai live response contained no content');
-  return JSON.parse(text);
+  return { value: JSON.parse(text), provenance: { provider: 'openai', model_requested: model, model_served: body.model ?? null } };
 }
 
 const anthropicLiveProvider = Object.freeze({
   name: 'anthropic',
   strict: true,
   needsRepair: false,
-  complete: ({ decision, prompt }) => completeAnthropicLive({ decision, prompt }),
+  complete: ({ decision, prompt }) => completeAnthropicLive({ decision, prompt, fetch: liveFetch }),
 });
 
 const openaiLiveProvider = Object.freeze({
@@ -122,20 +98,36 @@ export function selectProvider(name) {
 }
 
 /**
- * Run a typed decision. Replay (default) is wrapped in the repair loop because
- * it has no grammar. Live strict providers still pass through Ajv against the
- * canonical schema before anything is returned.
+ * Run a typed decision and say who produced it. Replay (default) is wrapped in
+ * the repair loop because it has no grammar. Live strict providers still pass
+ * through Ajv against the canonical schema before anything is returned.
+ *
+ * Provenance is part of the result, not a side channel: replay names the
+ * fixture key it served; a live provider names the requested and served model,
+ * request id, token usage and latency. A receipt built from it can therefore
+ * say exactly which producer a decision came from.
+ *
+ * @returns {Promise<{ value: object, provenance: object }>}
  */
-export async function complete({ decisionId, prompt, provider: providerName } = {}) {
+export async function completeWithProvenance({ decisionId, prompt, provider: providerName } = {}) {
   if (decisionId == null || prompt == null) {
     throw new Error('complete() requires decisionId and prompt');
   }
   const decision = getDecision(decisionId);
   const provider = selectProvider(providerName);
-  const generate = () => provider.complete({ decisionId, prompt, decision, providerName: provider.name });
   if (provider.needsRepair) {
-    return repair(generate, decision.schema);
+    const generate = () => provider.complete({ decisionId, prompt, decision, providerName: provider.name });
+    const value = await repair(generate, decision.schema);
+    const { key } = keyFor({ decisionId, prompt, providerName: provider.name });
+    return { value, provenance: { provider: provider.name, fixture_key: key } };
   }
-  const value = await generate();
-  return repair(async () => value, decision.schema, { maxRetries: 0 });
+  const { value: raw, provenance } = await provider.complete({ decisionId, prompt, decision, providerName: provider.name });
+  const value = await repair(async () => raw, decision.schema, { maxRetries: 0 });
+  return { value, provenance };
+}
+
+/** Run a typed decision and return only the validated value. */
+export async function complete(args = {}) {
+  const { value } = await completeWithProvenance(args);
+  return value;
 }

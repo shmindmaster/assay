@@ -11,6 +11,9 @@ Thumbs.db
 /reports/drafts/
 /reports/published/
 /reports/audit/
+/reports/live/
+/reports/explorer/
+/reports/eval-gate/
 
 # RepoWise generated index state
 .repowise/
@@ -27,3 +30,6 @@ docs/superpowers/
 SPEC.md
 .briefs/
 .agentlogs/
+
+# Scratch copies made by the mutation harness and the gate drill
+/.assay-*/

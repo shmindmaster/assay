@@ -33,6 +33,8 @@
     "validate:schemas": "node scripts/validate-schemas.mjs",
     "evals": "node scripts/run-evals.mjs",
     "evals:mutate": "node scripts/run-mutations.mjs",
+    "gate": "node scripts/eval-gate.mjs",
+    "gate:drill": "node scripts/gate-drill.mjs",
     "smoke:mcp": "node scripts/smoke-mcp.mjs",
     "demo": "node scripts/demo-run.mjs",
     "demo:injection": "node scripts/demo-injection.mjs",
@@ -44,11 +46,13 @@
     "schemas:report": "node scripts/schemas-report.mjs",
     "tools:report": "node scripts/tools-report.mjs",
     "verify:all": "node scripts/verify-all.mjs",
+    "verify:live": "node scripts/verify-live.mjs",
     "test": "node --test",
     "effort:log": "node scripts/effort-log.mjs",
     "effort": "node scripts/effort-rollup.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.134.0",
     "@modelcontextprotocol/sdk": "^1.17.0",
     "zod": "^4.6.5"
   },

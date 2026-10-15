@@ -20,7 +20,9 @@ import { fileURLToPath } from 'node:url';
 
 import { append, openLedger, readChain, verifyChain } from '../src/ledger/index.mjs';
 import {
+  authorizationConsumed,
   contextAssembled,
+  decisionFailed,
   decisionRequested,
   decisionReturned,
   tripwireFired,
@@ -69,6 +71,8 @@ const STAGE_TITLES = {
   decision_returned: 'Decision returned',
   verdict: 'Verdict',
   authorization_minted: 'Authorization minted',
+  authorization_consumed: 'Authorization consumed',
+  decision_failed: 'Decision failed',
   effect_performed: 'Effect performed',
   effect_denied: 'Effect denied',
   tripwire_fired: 'Tripwire fired',
@@ -78,6 +82,8 @@ const PAYLOAD_BUILDERS = {
   context_assembled: contextAssembled,
   decision_requested: decisionRequested,
   decision_returned: decisionReturned,
+  decision_failed: decisionFailed,
+  authorization_consumed: authorizationConsumed,
   verdict: verdictRecorded,
   tripwire_fired: tripwireFired,
 };

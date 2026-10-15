@@ -17,7 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { assemble } from '../src/context/assembler.mjs';
-import { complete } from '../src/providers/index.mjs';
+import { completeWithProvenance } from '../src/providers/index.mjs';
 import { createVerdictRecord, mintAuthorization } from '../src/effects/authorization.mjs';
 import { perform } from '../src/effects/broker.mjs';
 import { append, verifyChain, readChain } from '../src/ledger/index.mjs';
@@ -77,9 +77,9 @@ async function main() {
   // Replay named explicitly rather than relied on as the default: a demo that
   // could reach the network if ASSAY_LIVE happened to be set in the environment
   // would make the repository's offline claim conditional on the reader's shell.
-  const draft = await complete({ decisionId: 'coc-report', prompt: PROMPT, provider: 'replay' });
+  const { value: draft, provenance } = await completeWithProvenance({ decisionId: 'coc-report', prompt: PROMPT, provider: 'replay' });
   append('decision_returned', AGENT, SUBJECT, {
-    status: draft.status, missing_records: draft.missing_records, items: draft.items.length,
+    status: draft.status, missing_records: draft.missing_records, items: draft.items.length, provenance,
   });
 
   const verdict = createVerdictRecord(SUBJECT, { contextBlocks: bundle.blocks });

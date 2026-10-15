@@ -18,7 +18,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { assemble } from '../src/context/assembler.mjs';
-import { complete } from '../src/providers/index.mjs';
+import { completeWithProvenance } from '../src/providers/index.mjs';
 import { createVerdictRecord, mintAuthorization } from '../src/effects/authorization.mjs';
 import { perform } from '../src/effects/broker.mjs';
 import { append, verifyChain, readChain } from '../src/ledger/index.mjs';
@@ -83,7 +83,7 @@ async function main() {
   append('decision_requested', AGENT, SUBJECT, { decision: 'coc-report', prompt_chars: PROMPT.length });
   // Replay named explicitly. The offline claim should not depend on whether the
   // reader happens to have ASSAY_LIVE set in their shell.
-  const draft = await complete({ decisionId: 'coc-report', prompt: PROMPT, provider: 'replay' });
+  const { value: draft, provenance } = await completeWithProvenance({ decisionId: 'coc-report', prompt: PROMPT, provider: 'replay' });
   const claimed = draft.items.find((i) => i.type === 'mechanical-test');
 
   line('schema', 'coc-report.schema.json — VALID');
@@ -94,6 +94,7 @@ async function main() {
     status: draft.status,
     missing_records: draft.missing_records,
     items: draft.items.length,
+    provenance,
   });
   console.log('\n   Schema-valid and wrong. A schema proves shape, not truth — this is');
   console.log('   exactly the object a stricter schema would still have let through.');

@@ -40,7 +40,7 @@ function loadDefinitions(directory) {
 function copyRepository(destination) {
   const excluded = new Set(['.git', '.agentlogs', '.briefs', 'node_modules', 'ledger', 'reports']);
   for (const entry of readdirSync(REPO_ROOT, { withFileTypes: true })) {
-    if (excluded.has(entry.name) || entry.name.startsWith('.assay-mutation-')) continue;
+    if (excluded.has(entry.name) || entry.name.startsWith('.assay-')) continue;
     cpSync(path.join(REPO_ROOT, entry.name), path.join(destination, entry.name), {
       recursive: entry.isDirectory(),
     });

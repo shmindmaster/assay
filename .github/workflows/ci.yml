@@ -31,3 +31,9 @@ jobs:
       - run: npm run verify:all
       - name: Confirm generated corpus is reproducible
         run: test -z "$(git status --porcelain --untracked-files=all -- data/)"
+      - name: Release gate (evals/gate.json floors)
+        run: npm run gate
+      - name: Confirm the committed benchmark matches the code
+        run: git diff --exit-code -- docs/benchmark.md
+      - name: Gate drill (each deliberate regression must be blocked)
+        run: npm run gate:drill
