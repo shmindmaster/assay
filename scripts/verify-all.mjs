@@ -19,6 +19,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 // invert the whole contract.
 const STEPS = [
   { name: 'generate:data', args: ['run', 'generate:data'], expect: 0, proves: 'dataset reproduces from seed' },
+  { name: 'generate:packets', args: ['run', 'generate:packets'], expect: 0, proves: 'supplier packet PDFs reproduce byte for byte' },
   { name: 'test', args: ['test'], expect: 0, proves: 'unit tests across the deterministic layer' },
   { name: 'validate:schemas', args: ['run', 'validate:schemas'], expect: 0, proves: 'schemas compile; fixtures behave as named' },
   { name: 'evals', args: ['run', 'evals'], expect: 0, proves: 'eval suite including refusal cases' },
