@@ -10,8 +10,19 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 | 38698163920 | `bfd326c` | Node 22 verification | success (same steps, same results) |
 | 38698164047 | `bfd326c` | CodeQL JavaScript | success |
 | [38674130953](https://github.com/shmindmaster/assay/actions/runs/38674130953) | `1067715` (PR head) | Node 20, Node 22 verification | success (2026-10-15T03:03–03:04Z) |
+| [38707061289](https://github.com/shmindmaster/assay/actions/runs/38707061289) | `46cc33d` (main, v0.3.0) | Node 20, Node 22 verification | success |
+| [38707067941](https://github.com/shmindmaster/assay/actions/runs/38707067941) | `v0.3.0` tag | Release gate, then Publish release | success: gate and drill passed; release published 2026-10-15T08:40:12Z with `benchmark.md` and `report.json` (`allowed: true`, 5/5) |
 
 `verify:all` runs, each at its expected exit code: `generate:data`, `test`, `validate:schemas`, `evals`, `evals:mutate`, `smoke:mcp`, `verify:coc PO-AER-5519` (3), `verify:coc PO-MER-5532` (0), `audit:tamper`, `demo:denied`, `demo:injection`, `demo` (3).
+
+## Release smoke test (published artifact)
+
+| Command | Artifact | When (CT) | Result |
+|---|---|---|---|
+| `npm ci` from `assay-0.3.0.tar.gz` (release source archive) | v0.3.0 | 2026-10-15 | clean install |
+| `node scripts/verify-completeness.mjs PO-AER-5519` | v0.3.0 | 2026-10-15 | exit 3, INCOMPLETE (mechanical-test missing) |
+| `node scripts/verify-completeness.mjs PO-MER-5532` | v0.3.0 | 2026-10-15 | exit 0, COMPLETE |
+| `node scripts/demo-injection.mjs` | v0.3.0 | 2026-10-15 | exit 0; authorization refused and effect denied under `untrusted-context`; 6 receipts; chain verified |
 
 ## Local (Windows 11, Node 26.11.1)
 
