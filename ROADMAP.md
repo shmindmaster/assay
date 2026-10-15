@@ -12,6 +12,8 @@ without turning the repository into a hosted product.
   have been exercised on the public repository.
 - Add more adversarial cases around policy parsing, authorization binding, and
   provider-schema differences.
+- Keep the release gate's floors (`evals/gate.json`) rising with the suite; the
+  benchmark it writes is `docs/benchmark.md`.
 
 ## Next
 
@@ -20,8 +22,6 @@ without turning the repository into a hosted product.
 - Add a second synthetic domain port that demonstrates which parts are reusable
   and which must remain domain-owned.
 - Add an optional external ledger anchor and measure the guarantees it adds.
-- Publish a compact benchmark report for guard coverage, deterministic replay,
-  and refusal correctness.
 
 ## Not promised
 

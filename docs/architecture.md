@@ -173,7 +173,11 @@ An authorization is:
 
 - bound to the sha256 of the effect payload — edit the draft and it stops matching;
 - bound to the verdict's input hashes — change a source record and it stops matching;
-- single-use — a replay is refused and the refusal is recorded;
+- single-use — consumption is an `authorization_consumed` receipt on the
+  subject's ledger, so a replay is refused even by a freshly started process,
+  and the refusal is recorded;
+- ledger-minted — it carries `mint_seq`, and is honoured only if the receipt at
+  that position is its own `authorization_minted` record;
 - refused outright if any contributing context block was marked `untrusted`.
 
 There is no override flag and no environment variable that bypasses it. That
@@ -271,6 +275,15 @@ ten read-only tools, prunes its outputs, hash-verifies `get_document` against
 `data/index.json`, and refuses unindexed path traversal. There are no write tools
 on the server at all — writing is an effect, and effects go through S5.
 
+The server is built on the MCP TypeScript SDK v2 (`@modelcontextprotocol/server`
+2.3.1, spec revision 2026-07-28) over stdio, with zod 4 as the single schema
+library. Every tool carries `readOnlyHint`, `idempotentHint`, `destructiveHint:
+false` and `openWorldHint: false` annotations and an `outputSchema`; results
+return typed `structuredContent` that the SDK validates before it leaves the
+server. `serveStdio` negotiates the era, so 2025-era clients still connect.
+`npm run smoke:mcp` asserts the negotiated revision, the annotations, and the
+output schemas.
+
 `npm run tools:report` prints each tool with its input schema, its median
 response token cost measured against the fixtures, and the eval case that
 exercises it, then a section on tools deliberately not added and why.
@@ -298,6 +311,17 @@ take on trust.
 response pairs from `fixtures/provider/`, keyed by a hash of decision id, prompt
 hash and provider name. Live calls require `ASSAY_LIVE=1` and belong only to
 `npm run verify:live`, which is not part of `npm run demo` or `npm test`.
+
+The live Anthropic adapter (`src/providers/anthropic-live.mjs`) uses the official
+SDK with its transport routed through `liveFetch`, so the one gated function
+remains the only way to the network. It defaults to `claude-sonnet-5-5` with the
+decision offered as a strict tool under `tool_choice: auto` (forced tool choice
+is rejected by that model), `output_config.effort`, opt-in server-side
+fallbacks, and no retries the caller cannot see. `completeWithProvenance()`
+returns the decision with its producer: the replay fixture key, or the
+requested and served model, request id, token usage, latency and stop reason.
+Decision receipts carry that provenance; a failed live call becomes a
+`decision_failed` receipt with the same fields.
 
 Three reasons, set out in `docs/decisions/0004-replay-by-default-no-api-key.md`:
 a reviewer decides whether to read this in the first minute and a key prompt

@@ -44,7 +44,10 @@ testing around it.
 **Dropping the live path entirely.** Rejected. Without it the adapters are
 unfalsifiable — the fixtures would only ever prove they agree with themselves.
 `npm run verify:live` is how a change to an adapter gets checked against the real
-API, deliberately and by choice, rather than on every run.
+API, deliberately and by choice, rather than on every run. It replays the
+injection scenario against the live model and records provenance on every
+decision receipt; one recorded run is kept under `docs/evidence/` so a reader
+without a key can see what a live receipt contains.
 
 ## 4.4 Consequences accepted
 

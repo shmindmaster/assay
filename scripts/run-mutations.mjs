@@ -5,6 +5,12 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+// The scratch copy leaves out generated receipts; their location is policy.ledger.path, not a literal.
+function ledgerTopDir() {
+  const policy = JSON.parse(readFileSync(path.join(REPO_ROOT, 'policy', 'policy.json'), 'utf8'));
+  return policy.ledger.path.split(/[\\/]/).filter(Boolean)[0];
+}
 const DEFAULT_DEFINITIONS = path.join(REPO_ROOT, 'evals', 'mutations');
 
 function parseArgs(argv) {
@@ -38,9 +44,9 @@ function loadDefinitions(directory) {
 }
 
 function copyRepository(destination) {
-  const excluded = new Set(['.git', '.agentlogs', '.briefs', 'node_modules', 'ledger', 'reports']);
+  const excluded = new Set(['.git', '.agentlogs', '.briefs', 'node_modules', ledgerTopDir(), 'reports']);
   for (const entry of readdirSync(REPO_ROOT, { withFileTypes: true })) {
-    if (excluded.has(entry.name) || entry.name.startsWith('.assay-mutation-')) continue;
+    if (excluded.has(entry.name) || entry.name.startsWith('.assay-')) continue;
     cpSync(path.join(REPO_ROOT, entry.name), path.join(destination, entry.name), {
       recursive: entry.isDirectory(),
     });

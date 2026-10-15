@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * smoke-mcp.mjs — real client handshake against the kestrel-foundry-data MCP server.
- * Spawns the server over stdio, lists tools, and asserts the three demo-critical truths:
+ * Spawns the server over stdio, negotiates the protocol revision, checks the tool surface
+ * (ten tools, each read-only and typed with an outputSchema), and asserts the demo-critical truths:
  *   1. HT-4471 has no mechanical-test record on file (refusal case)
  *   2. PO-MER-5532 resolves complete (positive case)
  *   3. NCR-2026-0114 carries 3 prior occurrences (repeat offender)
@@ -9,8 +10,12 @@
  */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { Client } from '@modelcontextprotocol/client';
+import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
+
+// The MCP spec revision this repository targets. Pinned here on purpose: if the SDK ever
+// negotiated something older, the smoke test must fail rather than follow it.
+const EXPECTED_REVISION = '2026-07-28';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SERVER = path.join(REPO_ROOT, 'mcp-servers', 'kestrel-foundry-data', 'src', 'server.mjs');
@@ -22,10 +27,14 @@ const check = (name, ok, detail) => {
 };
 
 const transport = new StdioClientTransport({ command: process.execPath, args: [SERVER] });
-const client = new Client({ name: 'kestrel-smoke-test', version: '0.1.0' });
+const client = new Client({ name: 'kestrel-smoke-test', version: '0.2.0' }, { versionNegotiation: { mode: 'auto' } });
 
 try {
   await client.connect(transport);
+
+  check(`negotiated protocol revision is ${EXPECTED_REVISION} (modern era)`,
+    client.getNegotiatedProtocolVersion() === EXPECTED_REVISION && client.getProtocolEra() === 'modern',
+    `${client.getNegotiatedProtocolVersion()} / ${client.getProtocolEra()}`);
 
   const tools = await client.listTools();
   const expected = ['list_ncrs', 'get_ncr', 'get_heat_lot', 'get_test_record', 'search_documents',
@@ -34,9 +43,19 @@ try {
   check('tools/list exposes exactly the 10 read-only tools',
     JSON.stringify(names) === JSON.stringify(expected.sort()), names.join(', '));
 
+  const untyped = tools.tools.filter((t) => !t.outputSchema || t.outputSchema.type !== 'object').map((t) => t.name);
+  check('every tool declares an object outputSchema', untyped.length === 0, untyped.join(', '));
+  const notReadOnly = tools.tools.filter((t) => t.annotations?.readOnlyHint !== true
+    || t.annotations?.destructiveHint !== false || t.annotations?.idempotentHint !== true).map((t) => t.name);
+  check('every tool is annotated read-only, idempotent, non-destructive', notReadOnly.length === 0, notReadOnly.join(', '));
+
+  // Successful calls must carry typed structuredContent (the client validates it against the
+  // tool's outputSchema); an error result carries the NOT_FOUND text instead.
   const call = async (name, args) => {
     const res = await client.callTool({ name, arguments: args });
-    return JSON.parse(res.content[0].text);
+    if (res.isError) return JSON.parse(res.content[0].text);
+    if (!res.structuredContent) throw new Error(`${name}: missing structuredContent`);
+    return res.structuredContent;
   };
 
   const heat = await call('get_heat_lot', { heat_number: 4471 });
