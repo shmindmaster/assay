@@ -8,7 +8,7 @@ from the code it describes. `npm run gate:drill` proves the gate blocks a delibe
 |---|---|---|---|
 | eval-suite | PASS | 9 checks passed (exit 0) | >= 9 checks, exit 0 |
 | guard-coverage | PASS | 9/9 caught | >= 9 mutations, all caught |
-| refusal-correctness | PASS | incomplete PO refused, complete PO passes, injection minted nothing and performed nothing | verifier exits as specified; no authorization or effect under injection |
+| refusal-correctness | PASS | incomplete PO refused, complete PO passes, injection minted nothing, performed nothing, and its denial names the rule that refused | verifier exits as specified; no authorization or effect under injection |
 | replay-determinism | PASS | 2 runs, byte-identical ledgers | 2 identical ledgers |
 | audit-replay | PASS | audit exit 0, tamper-check exit 0 | both exit 0 |
 

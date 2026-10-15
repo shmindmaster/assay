@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 
 import { canonicalize as explorerCanonicalize, sha256Hex, tamperOneByte, verifyLines } from '../src/explorer/chain.mjs';
 import { append, canonicalize, verifyChain } from '../src/ledger/index.mjs';
-import { renderExplorer } from '../scripts/render-explorer.mjs';
+import { loadLedgerLines, renderExplorer } from '../scripts/render-explorer.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const policy = JSON.parse(readFileSync(path.join(REPO_ROOT, 'policy', 'policy.json'), 'utf8'));
@@ -101,4 +101,38 @@ test('the rendered page is deterministic, offline, and carries the verifier', ()
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('a blank line in the ledger file breaks the chain in the page exactly as it does in the ledger', () => {
+  const chain = scratchChain('EXPLORER-BLANK');
+  try {
+    const cases = {
+      'extra trailing newline': `${chain.lines.join('\n')}\n\n`,
+      'blank line mid-file': `${chain.lines.slice(0, 2).join('\n')}\n\n${chain.lines.slice(2).join('\n')}\n`,
+    };
+    for (const [name, raw] of Object.entries(cases)) {
+      writeFileSync(chain.file, raw);
+      const page = verifyLines(loadLedgerLines(chain.file), { subject: 'EXPLORER-BLANK', kinds: KINDS });
+      const ledger = verifyChain('EXPLORER-BLANK', chain.options);
+      assert.equal(ledger.ok, false, name);
+      assert.equal(page.ok, false, `${name}: the page must not show a green chain the ledger refuses`);
+      assert.equal(page.brokenAt, ledger.brokenAt, name);
+      assert.equal(page.reason, ledger.reason, name);
+    }
+    writeFileSync(chain.file, `${chain.lines.join('\n')}\n`);
+    assert.equal(verifyLines(loadLedgerLines(chain.file), { subject: 'EXPLORER-BLANK', kinds: KINDS }).ok, true, 'one trailing newline is a terminator');
+  } finally {
+    rmSync(chain.root, { recursive: true, force: true });
+  }
+});
+
+test('tampering stays inside the payload object', () => {
+  const line = JSON.stringify({ seq: 1, kind: 'verdict', payload: { count: 3, items: [1, 2] }, payload_sha256: 'abcdef', sha256: 'fedcba' });
+  assert.throws(() => tamperOneByte(line), /no tamperable byte found in payload/);
+
+  const nested = JSON.stringify({ seq: 1, payload: { note: '{"x":"}', rule: 'untrusted-context' }, payload_sha256: 'abc' });
+  const flip = tamperOneByte(nested);
+  const start = nested.indexOf('"payload":');
+  const end = nested.indexOf(',"payload_sha256"');
+  assert.equal(flip.offset > start && flip.offset < end, true, 'the flipped byte is inside the payload');
 });

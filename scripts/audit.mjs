@@ -18,7 +18,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { append, openLedger, readChain, verifyChain } from '../src/ledger/index.mjs';
+import { append, ledgerPath, openLedger, readChain, verifyChain } from '../src/ledger/index.mjs';
 import {
   authorizationConsumed,
   contextAssembled,
@@ -271,9 +271,8 @@ function runTamperCheck() {
     }
 
     const copyRoot = path.join(scratch, 'copy');
-    const copyDir = path.join(copyRoot, 'ledger');
-    mkdirSync(copyDir, { recursive: true });
-    const copyFile = path.join(copyDir, `${subject}.jsonl`);
+    const copyFile = ledgerPath(subject, { ledgerRoot: copyRoot });
+    mkdirSync(path.dirname(copyFile), { recursive: true });
     copyFileSync(original, copyFile);
     const raw = readFileSync(copyFile, 'utf8');
     const flipped = flipOneByteInSha256(raw);

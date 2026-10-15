@@ -130,26 +130,58 @@ export function verifyLines(lines, { subject, kinds }) {
     : { ok: false, length: lines.length, brokenAt, reason, links };
 }
 
+// Index just past the JSON value that starts at `from` (an object or array), honouring strings and escapes.
+function valueEnd(line, from) {
+  let depth = 0;
+  let inString = false;
+  for (let i = from; i < line.length; i++) {
+    const ch = line[i];
+    if (inString) {
+      if (ch === '\\') i++;
+      else if (ch === '"') inString = false;
+    } else if (ch === '"') inString = true;
+    else if (ch === '{' || ch === '[') depth++;
+    else if (ch === '}' || ch === ']') {
+      depth--;
+      if (depth === 0) return i + 1;
+    }
+  }
+  return -1;
+}
+
 /**
  * Flip exactly one byte inside a receipt's payload: the first letter or digit of
- * the first string value after `"payload":`, advanced by one within its class
- * (a→b, 9→0). Keys are never touched, so the line still parses and the break is
- * caught by the hash check rather than the JSON parser. Returns the new line and
- * where the change landed, so the page can show the exact byte.
+ * the first string value inside the payload object (array elements included),
+ * advanced by one within its class (a→b, 9→0). Keys and escape sequences are never
+ * touched, so the line still parses and the break is caught by the hash check
+ * rather than the JSON parser. The scan stops at the payload's closing brace; a
+ * payload with no string value is refused rather than tampering a hash field next
+ * to it. Returns the new line and where the change landed, so the page can show
+ * the exact byte.
  */
 export function tamperOneByte(line) {
-  const start = line.indexOf('"payload":');
-  if (start === -1) throw new Error('receipt has no payload to tamper with');
-  const value = /:"([^"\\]*)"/g;
-  value.lastIndex = start + '"payload":'.length - 1;
-  for (let match = value.exec(line); match; match = value.exec(line)) {
-    const body = match[1];
-    const at = body.search(/[0-9A-Za-z]/);
-    if (at === -1) continue;
-    const offset = match.index + 2 + at;
-    const ch = line[offset];
+  const key = line.indexOf('"payload":');
+  if (key === -1) throw new Error('receipt has no payload to tamper with');
+  const open = key + '"payload":'.length;
+  const end = line[open] === '{' ? valueEnd(line, open) : -1;
+  if (end === -1) throw new Error('receipt payload is not an object');
+  for (let i = open; i < end; i++) {
+    if (line[i] !== '"') continue;
+    // Walk to the closing quote, remembering the first flippable character that is not part of an escape.
+    let candidate = -1;
+    let close = i + 1;
+    for (; close < end && line[close] !== '"'; close++) {
+      if (line[close] === '\\') { close++; continue; }
+      if (candidate === -1 && /[0-9A-Za-z]/.test(line[close])) candidate = close;
+    }
+    let after = close + 1;
+    while (line[after] === ' ') after++;
+    const isKey = line[after] === ':';
+    i = close;
+    if (isKey || candidate === -1) continue;
+    const ch = line[candidate];
     const next = ch === '9' ? '0' : ch === 'z' ? 'a' : ch === 'Z' ? 'A' : String.fromCharCode(ch.charCodeAt(0) + 1);
-    return { line: line.slice(0, offset) + next + line.slice(offset + 1), offset, before: ch, after: next };
+    return { line: line.slice(0, candidate) + next + line.slice(candidate + 1), offset: candidate, before: ch, after: next };
   }
   throw new Error('no tamperable byte found in payload');
 }

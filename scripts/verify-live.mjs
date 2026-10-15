@@ -29,9 +29,9 @@ import { fileURLToPath } from 'node:url';
 
 import { assemble } from '../src/context/assembler.mjs';
 import { completeWithProvenance, LiveDecisionError } from '../src/providers/index.mjs';
-import { createVerdictRecord, mintAuthorization } from '../src/effects/authorization.mjs';
-import { perform } from '../src/effects/broker.mjs';
-import { append, readChain, verifyChain } from '../src/ledger/index.mjs';
+import { createVerdictRecord } from '../src/effects/authorization.mjs';
+import { mintAndPerform } from '../src/effects/broker.mjs';
+import { append, ledgerDir, ledgerPath, readChain, verifyChain } from '../src/ledger/index.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SUBJECT = 'PO-AER-5519';
@@ -59,8 +59,8 @@ async function main() {
   }
   const provider = process.env.ASSAY_PROVIDER ?? 'anthropic';
 
-  rmSync(path.join(REPO_ROOT, 'ledger', `${SUBJECT}.jsonl`), { force: true });
-  mkdirSync(path.join(REPO_ROOT, 'ledger'), { recursive: true });
+  rmSync(ledgerPath(SUBJECT), { force: true });
+  mkdirSync(ledgerDir(), { recursive: true });
 
   console.log(`\nAssay — live verification   provider ${provider}   subject ${SUBJECT}`);
   console.log('A real model call. The prompt does not tell the model to distrust anything.\n');
@@ -92,8 +92,7 @@ async function main() {
     missing_records: verdict.missing_records, verdict_sha256: verdict.verdict_sha256,
   });
   const payload = { report: draft, destination: `reports/published/${SUBJECT}.html` };
-  const minted = mintAuthorization({ id: 'publish-coc', payload }, verdict);
-  const result = perform({ id: 'publish-coc', payload, subject: SUBJECT }, minted.authorization ?? null);
+  const { minted, result } = mintAndPerform({ id: 'publish-coc', payload, subject: SUBJECT }, verdict);
   const chain = verifyChain(SUBJECT);
   const receipts = readChain(SUBJECT);
 
@@ -112,7 +111,7 @@ async function main() {
   const outDir = path.join(REPO_ROOT, 'reports', 'live');
   mkdirSync(outDir, { recursive: true });
   const stem = `${SUBJECT}.${provider}`;
-  copyFileSync(path.join(REPO_ROOT, 'ledger', `${SUBJECT}.jsonl`), path.join(outDir, `${stem}.jsonl`));
+  copyFileSync(ledgerPath(SUBJECT), path.join(outDir, `${stem}.jsonl`));
   writeFileSync(path.join(outDir, `${stem}.summary.json`), `${JSON.stringify({
     subject: SUBJECT,
     provenance,
@@ -129,6 +128,13 @@ async function main() {
   }, null, 2)}\n`);
   line('evidence', `reports/live/${stem}.jsonl`);
 
+  // A refused mint must reach the ledger under its own rule. A denial naming a generic
+  // "no authorization" would be indistinguishable from a script that forgot to pass one.
+  const deniedRule = result.denial?.payload?.rule ?? null;
+  if (!minted.ok && deniedRule !== minted.refusal.rule) {
+    console.log(`\n   FAIL — the denial receipt names ${deniedRule}, but the mint refused with ${minted.refusal.rule}.`);
+    process.exit(1);
+  }
   if (minted.ok || result.ok || !chain.ok) {
     console.log('\n   FAIL — a guard passed an incomplete package or the chain broke.');
     process.exit(1);

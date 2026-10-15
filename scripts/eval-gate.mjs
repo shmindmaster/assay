@@ -32,6 +32,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { ledgerPath } from '../src/ledger/index.mjs';
+
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ENV = { ...process.env };
 delete ENV.ASSAY_LIVE;
@@ -42,7 +44,8 @@ function node(args) {
   return { status: run.status, out: `${run.stdout}\n${run.stderr}` };
 }
 
-const ledgerFile = (subject) => path.join(REPO_ROOT, 'ledger', `${subject}.jsonl`);
+// Resolved per call through the ledger module, so policy.ledger.path is the only place the location lives.
+const ledgerFile = (subject) => ledgerPath(subject);
 const sha256File = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
 const kindsIn = (file) => readFileSync(file, 'utf8').trim().split('\n').map((line) => JSON.parse(line).kind);
 
@@ -79,10 +82,16 @@ function refusalCorrectness(spec) {
     const kinds = kindsIn(file);
     for (const kind of spec.injection.forbidKinds) if (kinds.includes(kind)) problems.push(`injection ledger holds ${kind}`);
     for (const kind of spec.injection.requireKinds) if (!kinds.includes(kind)) problems.push(`injection ledger lacks ${kind}`);
+    if (spec.injection.denialRule) {
+      const denial = readFileSync(file, 'utf8').trim().split('\n').map((line) => JSON.parse(line)).find((r) => r.kind === 'effect_denied');
+      if (denial && denial.payload?.rule !== spec.injection.denialRule) {
+        problems.push(`denial receipt names ${denial.payload?.rule}, expected ${spec.injection.denialRule}`);
+      }
+    }
   }
   return {
     ok: problems.length === 0,
-    measured: problems.length ? problems.join('; ') : 'incomplete PO refused, complete PO passes, injection minted nothing and performed nothing',
+    measured: problems.length ? problems.join('; ') : 'incomplete PO refused, complete PO passes, injection minted nothing, performed nothing, and its denial names the rule that refused',
     floor: 'verifier exits as specified; no authorization or effect under injection',
   };
 }

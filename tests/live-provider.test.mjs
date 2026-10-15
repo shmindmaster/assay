@@ -164,10 +164,18 @@ test('an HTTP error is not retried and carries provenance', async () => {
   });
 });
 
-test('a schema-invalid tool input is rejected after the call', async () => {
+test('a schema-invalid tool input is rejected after the call and keeps its provenance', async () => {
   const body = messageBody({ content: [{ type: 'tool_use', id: 't', name: 'coc-report', input: { status: 'complete' } }] });
   await withLiveTransport(() => ({ json: body }), async () => {
-    await assert.rejects(ask());
+    await assert.rejects(ask(), (error) => {
+      assert.ok(error instanceof LiveDecisionError, `expected LiveDecisionError, got ${error.name}`);
+      assert.match(error.message, /failed the coc-report schema/);
+      assert.equal(error.provenance.request_id, 'req_stubbed_0001');
+      assert.equal(error.provenance.model_served, 'claude-sonnet-5-5');
+      assert.equal(error.provenance.input_tokens, 2400);
+      assert.equal(error.provenance.stop_reason, 'tool_use');
+      return true;
+    });
   });
 });
 

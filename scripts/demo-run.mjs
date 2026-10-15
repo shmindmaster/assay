@@ -18,9 +18,9 @@ import { fileURLToPath } from 'node:url';
 
 import { assemble } from '../src/context/assembler.mjs';
 import { completeWithProvenance } from '../src/providers/index.mjs';
-import { createVerdictRecord, mintAuthorization } from '../src/effects/authorization.mjs';
-import { perform } from '../src/effects/broker.mjs';
-import { append, verifyChain, readChain } from '../src/ledger/index.mjs';
+import { createVerdictRecord } from '../src/effects/authorization.mjs';
+import { mintAndPerform } from '../src/effects/broker.mjs';
+import { append, ledgerDir, ledgerPath, verifyChain, readChain } from '../src/ledger/index.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SUBJECT = 'PO-AER-5519';
@@ -56,8 +56,8 @@ async function main() {
     process.exit(1);
   }
 
-  rmSync(path.join(REPO_ROOT, 'ledger', `${SUBJECT}.jsonl`), { force: true });
-  mkdirSync(path.join(REPO_ROOT, 'ledger'), { recursive: true });
+  rmSync(ledgerPath(SUBJECT), { force: true });
+  mkdirSync(ledgerDir(), { recursive: true });
 
   const bundle = assemble({ agent: AGENT, task: PROMPT, entityRefs: { po: SUBJECT } });
   const untrusted = bundle.blocks.filter((b) => b.trust === 'untrusted');
@@ -79,8 +79,7 @@ async function main() {
   });
 
   const payload = { report: draft, destination: `reports/published/${SUBJECT}.html` };
-  const minted = mintAuthorization({ id: 'publish-coc', payload }, verdict);
-  const result = perform({ id: 'publish-coc', payload, subject: SUBJECT }, minted.authorization ?? null);
+  const { minted, result } = mintAndPerform({ id: 'publish-coc', payload, subject: SUBJECT }, verdict);
   const chain = verifyChain(SUBJECT);
   const receipts = readChain(SUBJECT);
 

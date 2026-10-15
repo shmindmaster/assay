@@ -10,7 +10,7 @@ import { getDecision } from '../decisions/registry.mjs';
 import { toStructuredOutput } from './openai.mjs';
 import { repair } from './repair.mjs';
 import { replayProvider, keyFor } from './replay.mjs';
-import { completeAnthropicLive } from './anthropic-live.mjs';
+import { completeAnthropicLive, LiveDecisionError } from './anthropic-live.mjs';
 
 export { getDecision, listDecisions } from '../decisions/registry.mjs';
 export { toStrictTool, transformForAnthropic, ANTHROPIC_GRAMMAR } from './anthropic.mjs';
@@ -122,8 +122,13 @@ export async function completeWithProvenance({ decisionId, prompt, provider: pro
     return { value, provenance: { provider: provider.name, fixture_key: key } };
   }
   const { value: raw, provenance } = await provider.complete({ decisionId, prompt, decision, providerName: provider.name });
-  const value = await repair(async () => raw, decision.schema, { maxRetries: 0 });
-  return { value, provenance };
+  try {
+    const value = await repair(async () => raw, decision.schema, { maxRetries: 0 });
+    return { value, provenance };
+  } catch (error) {
+    // The call happened and was billed; a schema failure must not erase who served it.
+    throw new LiveDecisionError(`live ${provider.name} output failed the ${decisionId} schema: ${error.message}`, provenance);
+  }
 }
 
 /** Run a typed decision and return only the validated value. */

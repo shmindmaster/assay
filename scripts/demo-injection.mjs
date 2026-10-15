@@ -19,9 +19,9 @@ import { fileURLToPath } from 'node:url';
 
 import { assemble } from '../src/context/assembler.mjs';
 import { completeWithProvenance } from '../src/providers/index.mjs';
-import { createVerdictRecord, mintAuthorization } from '../src/effects/authorization.mjs';
-import { perform } from '../src/effects/broker.mjs';
-import { append, verifyChain, readChain } from '../src/ledger/index.mjs';
+import { createVerdictRecord } from '../src/effects/authorization.mjs';
+import { mintAndPerform } from '../src/effects/broker.mjs';
+import { append, ledgerDir, ledgerPath, verifyChain, readChain } from '../src/ledger/index.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SUBJECT = 'PO-AER-5519';
@@ -40,8 +40,8 @@ const line = (k, v) => console.log(`   ${k.padEnd(26)}${v}`);
 function freshLedger() {
   // The chain is the demo's output, so it starts empty every run. Receipts are
   // gitignored and regenerated; nothing here destroys anything a reviewer wrote.
-  rmSync(path.join(REPO_ROOT, 'ledger', `${SUBJECT}.jsonl`), { force: true });
-  mkdirSync(path.join(REPO_ROOT, 'ledger'), { recursive: true });
+  rmSync(ledgerPath(SUBJECT), { force: true });
+  mkdirSync(ledgerDir(), { recursive: true });
 }
 
 async function main() {
@@ -107,7 +107,9 @@ async function main() {
   // ── 4. Authorization ───────────────────────────────────────────────────────
   step(4, 'Mint an authorization — refused, twice over');
   const payload = { report: draft, destination: 'reports/published/PO-AER-5519.html' };
-  const minted = mintAuthorization({ id: 'publish-coc', payload }, verdict);
+  // One call mints and then attempts the effect with whatever the mint returned, so a
+  // refused mint reaches the broker, and the ledger, under its own rule.
+  const { minted, result } = mintAndPerform({ id: 'publish-coc', payload, subject: SUBJECT }, verdict);
 
   if (minted.ok) {
     console.error('   FAIL: an authorization was minted for an incomplete package.');
@@ -123,7 +125,6 @@ async function main() {
 
   // ── 5. Effect ──────────────────────────────────────────────────────────────
   step(5, 'Attempt the effect anyway — the broker refuses');
-  const result = perform({ id: 'publish-coc', payload, subject: SUBJECT }, minted.authorization ?? null);
   if (result.ok) {
     console.error('   FAIL: the effect was performed without a valid authorization.');
     process.exitCode = 1;

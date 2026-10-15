@@ -25,6 +25,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { assemble } from '../src/context/assembler.mjs';
+import { ledgerPath, splitJsonl } from '../src/ledger/index.mjs';
 import { verifyCompleteness } from './verify-completeness.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -36,7 +37,7 @@ const TASK =
   'If any required record is not on file, report it as missing — never fabricate one.';
 
 const DEFAULT_SOURCES = [
-  { id: 'replay', title: 'Replay demo', note: 'npm run demo — recorded model response', file: path.join(REPO_ROOT, 'ledger', `${SUBJECT}.jsonl`) },
+  { id: 'replay', title: 'Replay demo', note: 'npm run demo — recorded model response', file: ledgerPath(SUBJECT) },
   { id: 'live', title: 'Live run, Claude Sonnet 5.5', note: 'npm run verify:live — 2026-10-14', file: path.join(REPO_ROOT, 'docs', 'evidence', 'live-run-2026-10-14', `${SUBJECT}.anthropic.jsonl`) },
 ];
 
@@ -94,11 +95,20 @@ function jsonForScript(value) {
   return JSON.stringify(value).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
 }
 
+/**
+ * Read a ledger file into the lines the page verifies, split exactly as src/ledger splits them.
+ * Dropping empty lines here would let the page show a green chain the broker refuses.
+ */
+export function loadLedgerLines(file) {
+  return splitJsonl(readFileSync(file, 'utf8'));
+}
+
 export function renderExplorer({ sources, context }) {
   const policy = JSON.parse(readFileSync(path.join(REPO_ROOT, 'policy', 'policy.json'), 'utf8'));
   const ledgers = sources.map((source) => {
-    const lines = readFileSync(source.file, 'utf8').split('\n').filter((line) => line !== '');
-    const first = lines.length ? JSON.parse(lines[0]) : {};
+    const lines = loadLedgerLines(source.file);
+    let first = {};
+    try { first = lines.length ? JSON.parse(lines[0]) : {}; } catch { /* the page reports the malformed line */ }
     return { id: source.id, title: source.title, note: source.note ?? rel(source.file), file: rel(source.file), subject: first.subject ?? null, lines };
   });
   const data = { kinds: policy.ledger.kinds, ledgers, context };

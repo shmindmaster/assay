@@ -5,7 +5,7 @@ import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'no
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { broker } from '../src/effects/broker.mjs';
+import { broker, mintAndPerform } from '../src/effects/broker.mjs';
 import { createVerdictRecord, mintAuthorization, sha256 } from '../src/effects/authorization.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -199,6 +199,20 @@ test('authorization tracing to an untrusted context block is refused', () => {
   assert.equal(result.denial.payload.rule, 'untrusted-context');
   assert.equal(result.denial.payload.mismatch.actual, 'untrusted');
   assert.equal(existsSync(published('broker-untrusted.json')), false);
+});
+
+test('mintAndPerform records the refused mint under its own rule, not a generic one', () => {
+  const effect = completeEffect('broker-mint-and-perform.json');
+  const verdict = createVerdictRecord(effect.payload.subject, {
+    contextBlocks: [{ source: 'retrieved/injected.md', sha256: 'b'.repeat(64), trust: 'untrusted' }],
+  });
+  const { minted, result } = mintAndPerform(effect, verdict);
+  assert.equal(minted.ok, false);
+  assert.equal(result.ok, false);
+  assert.equal(result.denial.payload.rule, minted.refusal.rule);
+  assert.equal(result.denial.payload.rule, 'untrusted-context');
+  assert.notEqual(result.denial.payload.rule, 'authorization-required');
+  assert.equal(existsSync(published('broker-mint-and-perform.json')), false);
 });
 
 test('malformed authorization bindings return a denial instead of throwing', () => {
