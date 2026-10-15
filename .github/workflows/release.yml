@@ -30,6 +30,8 @@ jobs:
       - run: git diff --exit-code -- docs/benchmark.md
       - run: npm run gate:drill
       - run: npm run docs:reference -- --check
+      - run: npm run docs:openapi -- --check
+      - run: npm run lint:openapi
       - run: npm run conformance:mcp
       - run: npx playwright install --with-deps chromium-headless-shell
       - run: npm run test:browser

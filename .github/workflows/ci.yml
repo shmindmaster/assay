@@ -39,6 +39,10 @@ jobs:
         run: npm run gate:drill
       - name: Reference docs and MCP catalog match the server and schemas
         run: npm run docs:reference -- --check
+      - name: OpenAPI document matches the code
+        run: npm run docs:openapi -- --check
+      - name: OpenAPI lint (Redocly, recommended ruleset)
+        run: npm run lint:openapi
       - name: Fetch main for the conformance baseline shrink check
         run: git fetch --no-tags --depth=1 origin main:refs/remotes/origin/main
       - name: MCP conformance at 2026-07-28 and 2025-11-25 (baseline may only shrink)

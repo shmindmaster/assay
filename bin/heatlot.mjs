@@ -5,6 +5,7 @@
  * heatlot approve <packet-dir> --by "<inspector>"     mint a single-use release authorization
  * heatlot release <packet-dir>                         release with the saved authorization (once)
  * heatlot receipts <packet-dir>                        verify the packet's signed receipt chain
+ * heatlot serve [--port 4140]                          HTTP API on 127.0.0.1, docs at /docs/api
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -53,6 +54,15 @@ async function main(argv) {
   const [command, ...rest] = argv;
   const opts = parse(rest);
   const out = opts.out ? path.resolve(opts.out) : DEFAULT_OUT;
+  if (command === 'serve') {
+    const { serve } = await import('@hono/node-server');
+    const { createApp } = await import('../src/api/app.mjs');
+    const port = Number(opts.port ?? 4140);
+    serve({ fetch: createApp({ out }).fetch, port, hostname: '127.0.0.1' }, (info) => {
+      console.log(`heatlot API on http://127.0.0.1:${info.port}  ·  docs http://127.0.0.1:${info.port}/docs/api`);
+    });
+    return null;
+  }
   const dir = opts._[0] && path.resolve(opts._[0]);
   if (!dir || !existsSync(path.join(dir, 'packet.json'))) {
     console.error('usage: heatlot <verify|approve|release|receipts> <packet-dir> [options]');
@@ -93,7 +103,7 @@ async function main(argv) {
   return 2;
 }
 
-main(process.argv.slice(2)).then((code) => { process.exitCode = code; }).catch((error) => {
+main(process.argv.slice(2)).then((code) => { if (code !== null) process.exitCode = code; }).catch((error) => {
   if (error instanceof BrokerRefusal) { console.error(C.red(error.message)); process.exitCode = 5; }
   else { console.error(`heatlot: ${error.message}`); process.exitCode = 2; }
 });

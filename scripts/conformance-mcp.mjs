@@ -21,8 +21,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SERVER = path.join(REPO_ROOT, 'mcp-servers', 'kestrel-foundry-data', 'src', 'server.mjs');
-const BASELINE_DIR = path.join(REPO_ROOT, 'mcp-servers', 'kestrel-foundry-data', 'conformance');
+// Every MCP server in the repo, each with its own committed baselines in <server>/conformance/.
+const SERVERS = ['heatlot', 'kestrel-foundry-data'];
+const serverPath = (name) => path.join(REPO_ROOT, 'mcp-servers', name, 'src', 'server.mjs');
+const baselineDir = (name) => path.join(REPO_ROOT, 'mcp-servers', name, 'conformance');
 const CONFORMANCE = path.join(REPO_ROOT, 'node_modules', '@modelcontextprotocol', 'conformance', 'dist', 'index.js');
 const REVISIONS = ['2026-07-28', '2025-11-25'];
 const BASELINE_REF = process.env.BASELINE_REF ?? 'origin/main';
@@ -42,8 +44,8 @@ export function grownEntries(currentText, baseText) {
   return baselineEntries(currentText).filter((id) => !before.has(id));
 }
 
-function baseVersion(revision) {
-  const rel = path.posix.join('mcp-servers', 'kestrel-foundry-data', 'conformance', `${revision}.yml`);
+function baseVersion(name, revision) {
+  const rel = path.posix.join('mcp-servers', name, 'conformance', `${revision}.yml`);
   try {
     return execFileSync('git', ['-C', REPO_ROOT, 'show', `${BASELINE_REF}:${rel}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
   } catch {
@@ -51,8 +53,8 @@ function baseVersion(revision) {
   }
 }
 
-function startServer() {
-  const proc = spawn(process.execPath, [SERVER, '--http', '0'], { stdio: ['ignore', 'pipe', 'inherit'], windowsHide: true });
+function startServer(name) {
+  const proc = spawn(process.execPath, [serverPath(name), '--http', '0'], { stdio: ['ignore', 'pipe', 'inherit'], windowsHide: true });
   const url = new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('MCP HTTP server did not start within 15 s')), 15000);
     proc.stdout.on('data', (chunk) => {
@@ -64,10 +66,10 @@ function startServer() {
   return { proc, url };
 }
 
-function runConformance(url, revision) {
-  const baseline = path.join(BASELINE_DIR, `${revision}.yml`);
+function runConformance(name, url, revision) {
+  const baseline = path.join(baselineDir(name), `${revision}.yml`);
   const args = [CONFORMANCE, 'server', '--url', url, '--spec-version', revision,
-    '--output-dir', path.join(REPO_ROOT, 'reports', 'conformance', revision)];
+    '--output-dir', path.join(REPO_ROOT, 'reports', 'conformance', name, revision)];
   if (existsSync(baseline)) args.push('--expected-failures', baseline);
   return new Promise((resolve) => {
     const child = spawn(process.execPath, args, { stdio: 'inherit', windowsHide: true });
@@ -87,31 +89,34 @@ async function main() {
     process.exit(1);
   }
   let failed = false;
-  for (const revision of REVISIONS) {
-    const file = path.join(BASELINE_DIR, `${revision}.yml`);
-    const current = existsSync(file) ? readFileSync(file, 'utf8') : '';
-    const base = baseVersion(revision);
-    if (base === null) {
-      console.log(`note  ${revision}: no baseline on ${BASELINE_REF} to compare against`);
-    } else {
-      const added = grownEntries(current, base);
-      if (added.length) {
-        console.error(`FAIL  ${revision}: baseline grew (${added.join(', ')}); a baseline may only shrink`);
-        failed = true;
+  for (const name of SERVERS) {
+    for (const revision of REVISIONS) {
+      const file = path.join(baselineDir(name), `${revision}.yml`);
+      const current = existsSync(file) ? readFileSync(file, 'utf8') : '';
+      const base = baseVersion(name, revision);
+      if (base === null) {
+        console.log(`note  ${name} ${revision}: no baseline on ${BASELINE_REF} to compare against`);
+      } else {
+        const added = grownEntries(current, base);
+        if (added.length) {
+          console.error(`FAIL  ${name} ${revision}: baseline grew (${added.join(', ')}); a baseline may only shrink`);
+          failed = true;
+        }
       }
     }
-  }
-  const { proc, url } = startServer();
-  try {
-    const endpoint = await url;
-    for (const revision of REVISIONS) {
-      console.log(`\n=== conformance ${revision} against ${endpoint}`);
-      const code = await runConformance(endpoint, revision);
-      console.log(`${code === 0 ? 'PASS' : 'FAIL'}  conformance ${revision} (exit ${code})`);
-      if (code !== 0) failed = true;
+    const { proc, url } = startServer(name);
+    try {
+      const endpoint = await url;
+      for (const revision of REVISIONS) {
+        console.log(`
+=== ${name}: conformance ${revision} against ${endpoint}`);
+        const code = await runConformance(name, endpoint, revision);
+        console.log(`${code === 0 ? 'PASS' : 'FAIL'}  ${name} conformance ${revision} (exit ${code})`);
+        if (code !== 0) failed = true;
+      }
+    } finally {
+      proc.kill();
     }
-  } finally {
-    proc.kill();
   }
   process.exit(failed ? 1 : 0);
 }

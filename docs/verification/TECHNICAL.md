@@ -60,38 +60,31 @@ All actions are pinned to commit SHAs. `release.yml` grants `contents: write` on
 
 ## API surface and MCP decision
 
-Recorded 2026-10-15 against the fleet API surface standard and the engineering quality directive.
+Re-recorded 2026-10-15 for Heatlot, against the fleet API surface standard and the engineering quality directive.
 
-**`packages/broker` (`@heatlot/broker`, internal) is the programmatic API.** A zero-dependency ESM library (`Broker`, `trusted`, `untrusted`, `verifyChain`, `startProxy`) and a CLI (`keygen`, `approve`, `verify`, `mcp-proxy`). Its contract is its README and its 17 tests; its six guards are in the mutation harness.
-
-**No HTTP API, so no OpenAPI and no Scalar page.** Heatlot is an offline CLI and library. Its programmatic surfaces are the typed decision schemas, the MCP server and the receipt format. Adding an HTTP service only to document it would contradict the offline boundary above.
-
-**JSON Schema is the contract.** Each decision has one canonical JSON Schema 2020-12 file in `schemas/`. The Anthropic adapter derives a strict tool from it, the OpenAI adapter derives a strict structured output, and Ajv validates every result against the canonical schema before use. That re-check matters because both vendors' strict modes drop some constraints (`minimum`, `if`/`then`, `allOf` and others). [docs/reference/decision-schemas.md](../reference/decision-schemas.md) is generated from the schemas and the adapters, and lists exactly what each provider drops.
-
-**MCP: justified, read-only.** The agent use cases are real: an agent looks up NCRs, heat lots, purchase-order certification status and audit gaps with hash-verified citations, without reading `data/` directly. Every tool is a read-only lookup. Nothing that writes, ships, signs or sends is exposed; side effects stay with the effect broker. `npm run tools:report` lists the tools deliberately not added, and why.
+**HTTP API: yes.** Heatlot is a product with a receiving queue, so it has an HTTP API (`src/api/app.mjs`, Hono), served by `heatlot serve` on `127.0.0.1:4140`.
 
 | Standard | Heatlot |
 |---|---|
-| M1 SDK and era | `@modelcontextprotocol/server` 2.3.1. Serves 2026-07-28 and the 2025-11-25 handshake from one factory, over stdio (`serveStdio`) and over Streamable HTTP (`createMcpHandler`). `smoke:mcp` checks both eras on both transports. |
-| M2 transport | stdio by default (what `.mcp.json` launches). `--http [port]` serves Streamable HTTP on `127.0.0.1` only, with Host and Origin checked against localhost; a foreign Origin gets 403 (tested). |
-| M3 authorization | Not applicable: local, single-user, no credentials, synthetic data only. |
-| M4 catalogue | Every tool has a title, all four annotations, a strict input schema (`additionalProperties: false`) and an output schema with `structuredContent`. The `tools/list` result is snapshotted to [catalog.json](../../mcp-servers/kestrel-foundry-data/catalog.json) and rendered to [docs/reference/mcp-tools.md](../reference/mcp-tools.md); CI fails on drift. `tools/list` and `server/discover` carry a one-hour public cache hint. |
-| M5 conformance | `@modelcontextprotocol/conformance` 0.2.0-alpha.12, pinned as a devDependency, at 2026-07-28 and 2025-11-25 in CI on Node 22 and 24, and in the release gate. The committed baselines may only shrink (see below). |
-| M6 discovery | `server/discover` comes from the SDK. No Server Card, because there is no hosted endpoint. Not registered in AgentHub's `registry/mcps.json`, because this server serves a synthetic demo dataset, not a fleet capability. |
-| M7 approval | Not applicable: no tool has a side effect. |
+| A1 version | **OpenAPI 3.1.1.** The generator (`@hono/zod-openapi` 1.6.3, `doc31`) emits 3.1, and Redocly validates 3.1 cleanly. 3.2.1 is the target once the generator emits it; bumping the version string without real 3.2 compliance is not done. |
+| A2 source of truth | The zod schemas in `src/api/schemas.mjs` validate every request at runtime, and the document is generated from the same route declarations. `docs/api/openapi.json` is committed, and CI fails if it drifts (`npm run docs:openapi -- --check`). |
+| A3 CI validation | Redocly CLI 2.64.0 `lint` with the `recommended` ruleset (`redocly.yaml`). Two rules are off, each with its reason in the file: `security-defined` (local service, no auth) and `operation-4xx-response` (health and queue take no input). |
+| Contract tests | `tests/api.test.mjs` parses every response with the route's own zod schema: queue, inspection, refusals, release, receipts, 400 and 404. Schemathesis and an oasdiff breaking-change check against main's published spec are not wired yet (M7). |
+| Errors | One envelope everywhere: `{ error: { code, message, rule? } }`. Broker refusals are 409, with the refusing rule (for example `already-used`). |
+| Auth | None. Bound to 127.0.0.1; the release authorization is the control that matters, and it is single use and decision-bound. Multi-user auth is out of scope until the product is hosted. |
+| D1 docs | Scalar at `/docs/api`, themed with the Heatlot tokens (heat-orange accent, paper and ink backgrounds), generated from the live document. |
 
-**Conformance results.** At 2026-07-28: 24 checks pass and 17 are expected failures. At 2025-11-25: 34 pass and 25 are expected failures, plus 1 warning. Every expected failure is a feature the server deliberately does not offer: resources, prompts, completion, logging, sampling and elicitation, or the suite's own `test_*` fixture tools. Every core check passes: initialize, ping, tools/list, DNS-rebinding protection and wire-schema validity of every message. The warning is the 2025-era HTTP fallback issuing no session ID, which is correct for a stateless server. The baselines (`mcp-servers/kestrel-foundry-data/conformance/*.yml`) list checks, not whole scenarios, so the wire-schema check inside each excluded scenario is still enforced. The run fails on an unexpected failure, on a baselined check that starts passing, and on any entry added relative to `origin/main`.
+**MCP: yes, for the agent use case "verify this packet, and cite why".** `mcp-servers/heatlot` exposes `packets.list`, `packets.inspect`, `documents.lines` and `receipts.verify`. The tools call the HTTP API's routes in process, so both surfaces share one contract and one code path, and their schemas are the API's zod schemas.
 
-**Deviations from the standard, kept on purpose:**
-- Tool names are snake_case (`get_purchase_order`), not `<area>.<verb>`. The eval cases, replay fixtures and film all use these names, and renaming them would break recorded evidence for no functional gain.
-- The catalogue lives beside its server at `mcp-servers/kestrel-foundry-data/catalog.json`, not at `mcp/catalog.json`.
-- No resources or prompts. The tools already return hash-verified bodies, and the key workflows are the CLI demos.
+| Standard | Heatlot MCP |
+|---|---|
+| M1 | `@modelcontextprotocol/server` 2.3.1; 2026-07-28 and the 2025-11-25 handshake from one factory, over stdio and loopback HTTP (`tests/heatlot-mcp.test.mjs`). |
+| M2 | stdio by default (`.mcp.json`); `--http [port]` on 127.0.0.1 with Host and Origin checks. |
+| M4 | `<area>.<verb>` names, titles, all four annotations, strict inputs, output schemas, 1 h public cache hint. Only `packets.inspect` writes, and it only appends receipts. Catalogue snapshot `mcp-servers/heatlot/catalog.json`, reference `docs/reference/heatlot-mcp-tools.md`; CI fails on drift. |
+| M5 | Conformance at both revisions in CI on Node 22 and 24 with a shrink-only, check-level baseline (`mcp-servers/heatlot/conformance/`): 24 pass and 17 baselined at 2026-07-28, 34 pass and 25 baselined at 2025-11-25. Every baselined check is a capability the server deliberately does not offer. |
+| M7 | **No release or approval tool.** Release is an inspector's decision, made with a single-use authorization in the CLI or console. An agent can explain a verdict; it cannot ship material. |
 
-**Gaps found and fixed by this work (2026-10-15):**
-- Tool inputs silently dropped unknown arguments. For example, `list_ncrs({ statuss: 'open' })` returned the unfiltered list as if it were an answer. Inputs are now strict objects. `smoke:mcp` asserts that the call is refused, and that check fails against the old schemas.
-- `tools:report` carried a hand-written copy of every input schema that had drifted from the server: it claimed `additionalProperties: false`, which the server did not emit. It now reads the generated catalogue, so it cannot drift.
-
-**Type safety.** The repository is JavaScript (ESM) with no TypeScript build. Types are enforced at runtime at every boundary: zod for MCP inputs and outputs (validated by the SDK on both sides), and Ajv for decision outputs. No generated client exists because there is no API to generate one from.
+The original foundry example's MCP server (`mcp-servers/kestrel-foundry-data`) stays as is, under the same conformance run.
 
 ## Observability
 

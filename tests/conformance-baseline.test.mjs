@@ -27,8 +27,8 @@ test('a baseline that grows is caught, naming the added entry', () => {
 });
 
 test('the committed baselines only list features the server does not offer', () => {
-  for (const rev of ['2026-07-28', '2025-11-25']) {
-    const text = readFileSync(new URL(`../mcp-servers/kestrel-foundry-data/conformance/${rev}.yml`, import.meta.url), 'utf8');
+  for (const [server, rev] of ['heatlot', 'kestrel-foundry-data'].flatMap((s) => ['2026-07-28', '2025-11-25'].map((r) => [s, r]))) {
+    const text = readFileSync(new URL(`../mcp-servers/${server}/conformance/${rev}.yml`, import.meta.url), 'utf8');
     const lines = text.split('\n').filter((l) => l.startsWith('  - '));
     assert.ok(lines.length > 0, `${rev} baseline is empty`);
     for (const line of lines) {
