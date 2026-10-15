@@ -76,6 +76,12 @@ function runConformance(url, revision) {
 }
 
 async function main() {
+  // @modelcontextprotocol/conformance 0.2.0-alpha.12 imports fs.globSync (Node 22+). The server
+  // under test supports Node 20; only this harness needs 22.
+  if (Number(process.versions.node.split('.')[0]) < 22) {
+    console.error(`conformance:mcp needs Node 22 or newer (the conformance tool imports fs.globSync); this is Node ${process.versions.node}`);
+    process.exit(1);
+  }
   if (!existsSync(CONFORMANCE)) {
     console.error('conformance tool not installed: run npm install (it is a devDependency)');
     process.exit(1);

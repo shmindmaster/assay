@@ -74,7 +74,7 @@ Recorded 2026-10-15 against the fleet API surface standard and the engineering q
 | M2 transport | stdio by default (what `.mcp.json` and the plugin launch). `--http [port]` serves Streamable HTTP on `127.0.0.1` only, with Host and Origin checked against localhost; a foreign Origin gets 403 (tested). |
 | M3 authorization | Not applicable: local, single-user, no credentials, synthetic data only. |
 | M4 catalogue | Every tool has a title, all four annotations, a strict input schema (`additionalProperties: false`) and an output schema with `structuredContent`. The `tools/list` result is snapshotted to [catalog.json](../../mcp-servers/kestrel-foundry-data/catalog.json) and rendered to [docs/reference/mcp-tools.md](../reference/mcp-tools.md); CI fails on drift. `tools/list` and `server/discover` carry a one-hour public cache hint. |
-| M5 conformance | `@modelcontextprotocol/conformance` 0.2.0-alpha.12, pinned as a devDependency, at 2026-07-28 and 2025-11-25 in CI and in the release gate. The committed baselines may only shrink (see below). |
+| M5 conformance | `@modelcontextprotocol/conformance` 0.2.0-alpha.12, pinned as a devDependency, at 2026-07-28 and 2025-11-25 in CI (Node 22 leg; the tool imports `fs.globSync`, Node 22+) and in the release gate (Node 22). The server's Node 20 support is covered by `smoke:mcp` on the Node 20 leg. The committed baselines may only shrink (see below). |
 | M6 discovery | `server/discover` comes from the SDK. No Server Card, because there is no hosted endpoint. Not registered in AgentHub's `registry/mcps.json`, because this server serves a synthetic demo dataset, not a fleet capability. |
 | M7 approval | Not applicable: no tool has a side effect. |
 
