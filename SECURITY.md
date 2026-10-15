@@ -6,8 +6,8 @@ provider-adapter patterns in systems that do make real changes.
 
 ## Supported version
 
-Security fixes target the current `main` branch. This project has not published
-a stable release line yet.
+Security fixes target the current `main` branch and the latest tagged release
+(currently v0.3.x). The project is pre-1.0, so there is no long-term support line.
 
 ## Report a vulnerability
 

@@ -1,27 +1,48 @@
+<div align="center">
+
+<img src="docs/media/social-preview.png" alt="Assay: the agent drafts, software decides. A deterministic control layer for AI agents." width="100%">
+
 # Assay
+
+### The agent drafts. Software decides.
+
+**An open-source control layer that stops an AI agent's mistake, or a prompt injection, from becoming a real-world effect.**
 
 [![CI](https://github.com/shmindmaster/assay/actions/workflows/ci.yml/badge.svg)](https://github.com/shmindmaster/assay/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/shmindmaster/assay/actions/workflows/codeql.yml/badge.svg)](https://github.com/shmindmaster/assay/actions/workflows/codeql.yml)
+[![Release](https://img.shields.io/github/v/release/shmindmaster/assay?sort=semver)](https://github.com/shmindmaster/assay/releases)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-339933?logo=node.js&logoColor=white)](package.json)
 
-**The agent drafts. Software decides.**
+[Quickstart](#quickstart-60-seconds-no-api-key) · [Watch the film](#see-it-run) · [Architecture](#how-it-works) · [Guardrails](#guardrails) · [Status and limits](#status-and-limits) · [Contributing](#contributing-security-and-license)
 
-A runnable reference implementation of a deterministic control layer synthesized
-from published guidance by Anthropic and OpenAI, demonstrated on a domain where
-being wrong leaves a paper trail: manufacturing quality and
-certificate-of-conformance release. The vendors do not endorse this project;
-their primary guidance is linked below so each mapping can be checked.
+</div>
 
-Anything that needs a hard guarantee — schema, permission, routing, approval,
-side effect, final state — is owned and enforced by code. The model supplies
-judgment and language, and nothing else. Every boundary between the two is
-typed, enforced, and recorded.
+---
 
-Clone it and run it in sixty seconds. Past `npm install`, there is no API key, no
-account, and no network call in any documented command — the default provider
-replays recorded responses, so the demos are reproducible byte-for-byte and cost
-nothing to run.
+## Why it exists
+
+AI agents now draft decisions that release parts, move money and file records.
+Most guardrails still ask the model to behave: a sterner system prompt, a
+classifier in front of it, a reviewer who skims the output. A prompt injection
+changes what the model says, so every one of those defenses sits on the side
+of the line the attacker controls.
+
+Assay moves the decision across that line. The model supplies judgment and
+language. Code owns everything that needs a hard guarantee: the schema, the
+permission, the computed facts, the authorization, the side effect and the
+record. Every boundary between the two is typed, enforced and written to a
+hash-chained receipt.
+
+It is a runnable reference implementation of what published guidance from
+Anthropic and OpenAI converges on (externalize state, type the decisions, put
+policy in configuration, route effects through code, record what happened),
+demonstrated on a domain where being wrong leaves a paper trail: releasing an
+aerospace certificate of conformance at a fictional foundry. The vendors do not
+endorse this project; their guidance is [linked below](#why-this-shape) so every
+mapping can be checked.
+
+## Quickstart (60 seconds, no API key)
 
 ```bash
 git clone https://github.com/shmindmaster/assay
@@ -29,20 +50,11 @@ cd assay && npm install
 npm run demo
 ```
 
-> **Everything here is synthetic.** Kestrel Castings is a fictional aluminium and
-> magnesium sand-casting foundry. Every heat lot, nonconformance, purchase order
-> and certificate under `data/` is generated from a seed by
-> `scripts/generate-data.mjs`. No real company, system, or record is involved.
-> The domain is specific on purpose — a generic widget dataset cannot demonstrate
-> a refusal that matters.
+Past `npm install` there is no API key, no account and no network call in any
+documented command. The default provider replays recorded model responses, so
+every run is byte-for-byte reproducible and free. Node 20 or later.
 
----
-
-## 1. The three demos
-
-### `npm run demo` — the refusal
-
-The battery runs and ends on a refusal:
+The demo ends on a refusal, and exits `3` on purpose:
 
 ```
 PO-AER-5519   heat HT-4471
@@ -54,8 +66,100 @@ PO-AER-5519   heat HT-4471
   receipt                    ledger/PO-AER-5519.jsonl (chain verified, 7 receipts)
 
  The model said complete. The files said otherwise. Nothing shipped.
-exit 3
 ```
+
+Then run these three:
+
+```bash
+npm run demo:injection   # an injected note fools the model, and still cannot release anything
+npm run evals:mutate     # 8/8 deliberate regressions caught: every guard is proven able to fail
+npm run explorer         # offline page that recomputes the receipt chain; tamper one byte and watch it break
+```
+
+## See it run
+
+<a href="https://saroshhussain.com/films/assay-the-agent-drafts-software-decides.mp4">
+  <img src="docs/media/assay-demo.gif" alt="Assay demo: the model drafts COMPLETE, the verifier computes INCOMPLETE, the broker refuses, and the Receipt Explorer shows a one-byte tamper breaking the chain." width="100%">
+</a>
+
+**[Watch the 2½-minute walkthrough film →](https://saroshhussain.com/films/assay-the-agent-drafts-software-decides.mp4)**
+It follows one injected purchase order receipt by receipt, shows a live run on
+Claude Sonnet 5.5 with its request ID and token counts on the decision receipt,
+and ends in the source of the broker and the mutation harness.
+
+## How it works
+
+```mermaid
+flowchart LR
+  REQ([Typed request]) --> S1
+  subgraph MODEL[" The model's lane "]
+    S2["S2 · Typed decision<br/>schema-constrained draft"]
+  end
+  subgraph CODE[" Code's lane: deterministic "]
+    S1["S1 · Context assembler<br/>trust-labels every block"]
+    S4["S4 · Verifier<br/>computes facts from files"]
+    S5{"S5 · Effect broker<br/>the only code that can publish"}
+    S3[["S3 · policy.json + hooks"]]
+    S6[("S6 · Receipt ledger<br/>hash-chained, replayable")]
+  end
+  S1 --> S2 --> S4 --> S5
+  S3 -. permissions, write boundary .-> S5
+  S5 -- "authorization bound to payload<br/>and verdict hashes" --> OUT([Effect: publish CoC])
+  S5 -- refused --> NO([No effect])
+  S1 & S2 & S4 & S5 --> S6
+  S7["S7 · Evals + mutation harness"] -. proves each guard can fail .-> CODE
+```
+
+The model runs in exactly one place (S2). Its draft is evidence for the
+verifier, never an instruction to the broker. An authorization is minted only
+from a computed verdict, is bound to the payload hash and the verdict's input
+hashes, is single-use, and is refused outright if any context block that fed
+the decision was labelled untrusted. The [seven control surfaces](#the-seven-control-surfaces)
+section walks through each one with the command that demonstrates it.
+
+## Guardrails
+
+| Guarantee | Enforced by | Prove it |
+|---|---|---|
+| Injected instructions are labelled, not hidden, and anything downstream of them is refused | S1 tripwire + S5 broker | `npm run demo:injection` |
+| Facts are computed from files and cited by path and sha256, never asserted by the model | S4 verifier | `npm run verify:coc -- PO-AER-5519` (exit 3) and `-- PO-MER-5532` (exit 0) |
+| No side effect without a single-use, hash-bound authorization | S5 broker + S6 ledger | `npm run demo:denied` |
+| Permissions and write boundaries live in data, not in a prompt | S3 `policy/policy.json`, `hooks/publish-gate.mjs` | `npm run policy:explain -- --agent coc-assembler` |
+| No override flag, and that claim is tested | S7 mutation `hooks/honour-env-override` | `npm run evals:mutate` |
+| A changed byte in any receipt is detected and the broken link is named | S6 ledger | `npm run audit:tamper` |
+| A release cannot ship if a guard stops catching its regression | `evals/gate.json` floors | `npm run gate` and `npm run gate:drill` |
+
+## Status and limits
+
+**v0.3.0, released 2026-10-15.** A reference implementation, not a hosted
+product. Every record under `data/` is synthetic and generated from a seed.
+The replay provider is the default; live paths for Anthropic (Claude Sonnet 5.5,
+strict tool use) and OpenAI (structured outputs) are verified with recorded
+evidence under [`docs/evidence/`](docs/evidence/) and run only when you opt in
+with `ASSAY_LIVE=1` and your own key.
+
+What it does not do, stated plainly: the receipt chain detects partial
+tampering but is not unforgeable, because the chain head lives on the same host
+and nothing anchors it externally. Single use is recorded on that same ledger,
+and two processes appending to one subject at the same instant are not
+serialised. It cannot save you from a deterministic rule that is wrong, a schema
+that permits too much, a compromised host, or a verifier fed the wrong inputs.
+What it buys is that each of those failures leaves a receipt.
+[`docs/threat-model.md`](docs/threat-model.md) sets this out in full.
+
+> **Everything here is synthetic.** Kestrel Castings is a fictional aluminium and
+> magnesium sand-casting foundry. Every heat lot, nonconformance, purchase order
+> and certificate under `data/` is generated by `scripts/generate-data.mjs`. No
+> real company, system or record is involved. The domain is specific on purpose:
+> a generic widget dataset cannot demonstrate a refusal that matters.
+
+---
+
+## The demos in detail
+
+### `npm run demo` — the refusal
+
+The output is shown in the [quickstart](#quickstart-60-seconds-no-api-key).
 
 The exit code is deliberate: `3` is what the verifier returns for an incomplete
 package, and the demo working means the release not happening.
@@ -147,7 +251,7 @@ the gate passes.
 
 ---
 
-## 2. Why this shape
+## Why this shape
 
 Published guidance from Anthropic and OpenAI converges on the same instruction,
 phrased six different ways: get it out of the model. Externalize state rather
@@ -181,28 +285,9 @@ Primary guidance used for the mapping:
 
 ---
 
-## 3. The seven control surfaces
+## The seven control surfaces
 
-```
-   typed request
-        │
-   ┌────▼─────────────────────────┐
-   │  S1  context assembler       │   state, not prose
-   ├──────────────────────────────┤
-   │  S2  typed decision          │   the model runs here, and only here
-   ├──────────────────────────────┤
-   │  S3  policy engine + hooks   │   permissions as data
-   ├──────────────────────────────┤
-   │  S4  deterministic verifier  │   facts, computed
-   ├──────────────────────────────┤
-   │  S5  effect broker           │   no effect without an authorization
-   ├──────────────────────────────┤
-   │  S6  receipt ledger          │   hash-chained, replayable
-   └──────────────────────────────┘
-   ┌──────────────────────────────┐
-   │  S7  eval + mutation harness │   proves S1–S6 can fail
-   └──────────────────────────────┘
-```
+The Mermaid diagram under [How it works](#how-it-works) shows how these fit together.
 
 **S1 — Context assembler.** No state lives in a prompt. Context is assembled per
 turn from typed stores by `src/context/assembler.mjs`, against a token budget
@@ -261,7 +346,7 @@ The mutation harness above is what makes the rest of the suite believable.
 
 ---
 
-## 4. Capability matrix
+## Capability matrix
 
 Published guidance, mapped to the file that implements it and the command that
 demonstrates it. No claim in this table is unaccompanied by something you can run.
@@ -283,7 +368,7 @@ demonstrates it. No claim in this table is unaccompanied by something you can ru
 
 ---
 
-## 5. The agents
+## The agents
 
 An orchestrator-workers topology with a deterministic router. The primary agent
 holds no tools of its own; it routes each request to exactly one subagent.
@@ -302,7 +387,7 @@ session; `claude plugin validate .` checks the manifest.
 
 ---
 
-## 6. The facts the data is built around
+## The facts the data is built around
 
 Every demo claim resolves to something in `data/`, and the generator is seeded so
 these hold on any machine.
@@ -317,7 +402,7 @@ these hold on any machine.
 
 ---
 
-## 7. Verification
+## Verification
 
 | Command | Proves | Green |
 |---|---|---|
@@ -338,7 +423,7 @@ these hold on any machine.
 
 ---
 
-## 8. What this does not do
+## What this does not do
 
 Worth stating plainly, because a control layer that claims too much is worse than
 none. This design stops an injected instruction from changing an outcome, a model
@@ -362,7 +447,7 @@ inputs. Those failures are still yours. What the layer buys is that they are
 
 ---
 
-## 9. Layout
+## Layout
 
 ```
 policy/policy.json              permissions, write boundary, tripwires — as data
@@ -393,9 +478,22 @@ foundries; the foundry is what makes it legible.
 
 ---
 
-## 10. Licence
+---
 
-[Apache-2.0](LICENSE). Security reports belong in a
-[private vulnerability report](SECURITY.md), while changes and design proposals
-follow [CONTRIBUTING.md](CONTRIBUTING.md) and [GOVERNANCE.md](GOVERNANCE.md).
-The bounded next steps are tracked in [ROADMAP.md](ROADMAP.md).
+## Contributing, security and license
+
+- **Contributing:** issues and pull requests are welcome. Read
+  [CONTRIBUTING.md](CONTRIBUTING.md) first; every change must keep
+  `npm run verify:all` and `npm run gate` green, and a new guard needs a
+  mutation that proves it can fail. Design proposals follow
+  [GOVERNANCE.md](GOVERNANCE.md); planned work is in [ROADMAP.md](ROADMAP.md).
+- **Security:** report vulnerabilities privately through a
+  [GitHub security advisory](https://github.com/shmindmaster/assay/security/advisories/new),
+  as described in [SECURITY.md](SECURITY.md). Please do not open a public issue.
+- **License:** [Apache-2.0](LICENSE).
+
+Created and maintained by [Sarosh Hussain](https://saroshhussain.com). Related
+open source: [CrewScore](https://github.com/shmindmaster/crewscore) checks
+whether an agent's prompt writes its safeguards down;
+[GitPin](https://github.com/shmindmaster/gitpin) makes agent-authored pull
+requests carry exact, re-checkable evidence.
