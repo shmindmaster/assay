@@ -59,5 +59,5 @@ Fail closed throughout. A missing fixture, malformed policy, invalid subject, br
 |---|---|---|
 | The ledger is not unforgeable: no external anchor, so whoever can rewrite it can also forget a consumed authorization | Design limit | Documented (README §8, threat model §3.5); roadmap item |
 | Concurrent appends to one subject are not serialised | Low for a reference | Documented |
-| The OpenAI live adapter has never been run live | Medium for the cross-provider claim | Open; needs one `ASSAY_PROVIDER=openai` live run |
+| The OpenAI live adapter had never been run live | Medium for the cross-provider claim | **Fixed 2026-10-15.** Run live on `gpt-6.1-sol` (and on the old `gpt-4o-2024-08-06` default before the upgrade); the adapter now records full provenance and fails closed like the Anthropic one |
 | Review nits not yet addressed: `effect_performed` uses `authorization.subject`; `deny()` returns an unwritten receipt if `append` throws; guards call `readChain` with no `ledgerRoot` (tests use the repo ledger) | Low | Open; candidates for the next change |

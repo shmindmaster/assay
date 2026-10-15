@@ -7,29 +7,30 @@ functional_ready: yes
 demo_ready: yes
 production_ready: no
 deployed_sha: none
-tests: "CI Node 20 verify:all: 12/12 @ bfd326c; CI Node 22 verify:all: 12/12 @ bfd326c; CI gate: 5/5 @ bfd326c; CI gate:drill: 2/2 @ bfd326c; local npm test: 92/92 @ 1067715; local evals:mutate: 9/9 @ 1067715; local smoke:mcp: 12/12 @ a0a07c0; live verify:live (anthropic): 1/1 refusal as expected @ 1067715"
+tests: "CI Node 20 verify:all: 12/12 @ bfd326c; CI Node 22 verify:all: 12/12 @ bfd326c; CI gate: 5/5 @ bfd326c; CI gate:drill: 2/2 @ bfd326c; local npm test: 92/92 @ 1067715; local evals:mutate: 9/9 @ 1067715; local smoke:mcp: 12/12 @ a0a07c0; live verify:live (anthropic): 1/1 refusal as expected @ 1067715; live verify:live (openai gpt-6.1-sol): 1/1 refusal as expected @ release/v0.3.0; openai adapter tests: 6/6"
 films: ["D:\\OneDrive - Maya Modest LLC\\Videos\\Portfolio\\Assay\\01 - The Agent Drafts, Software Decides.mp4"]
-blockers: ["No release has been cut: release.yml has never run", "OpenAI live adapter never exercised live"]
-next_action: "Push tag v0.3.0 to exercise release.yml and publish the gated release with the benchmark attached (needs owner go-ahead: it is a public release)"
-updated: 2026-10-15T02:26:57-05:00
+blockers: ["No gated release yet: v0.2.0 was published by hand; release.yml has never run"]
+next_action: "Tag v0.3.0 on main so release.yml runs the gates and publishes the release with the benchmark attached; record the release URL as the production rung"
+updated: 2026-10-15T03:34:45-05:00
 ```
 
 # Readiness
 
 ## Verdict: Partially Verified
 
-Assay works end to end as an offline reference and is fully demonstrable. It is not production-verified, because nothing has been released. The verdict is not `Verified End-to-End Ready` for that reason alone.
+Assay works end to end as an offline reference and is fully demonstrable. It is not production-verified: the only release, `v0.2.0` (2026-09-16), was published by hand before the gated release workflow existed. The verdict is not `Verified End-to-End Ready` for that reason alone.
 
 | Readiness | Status | Why |
 |---|---|---|
-| Functional | **Yes** | Every journey in [FUNCTIONAL.md](FUNCTIONAL.md) runs and is covered by an executed test or CI step on `bfd326c`. The live Anthropic path ran once against the real API. |
+| Functional | **Yes** | Every journey in [FUNCTIONAL.md](FUNCTIONAL.md) runs and is covered by an executed test or CI step on `bfd326c`. The live Anthropic and OpenAI paths each ran against the real API. |
 | Demo | **Yes** | Film 01 (format B) is delivered with every release gate passing on the exact file. The Explorer and all demo scripts run offline with no key. Format A is in progress; format C is not started. |
-| Production | **No** | No GitHub release exists and `release.yml` has never been triggered. Assay is deliberately not a hosted service, so "production" here means a published, gate-checked release. |
+| Production | **No** | `v0.2.0` was published by hand on 2026-09-16; no release has gone through `release.yml`. Assay is deliberately not a hosted service, so "production" here means a published, gate-checked release. |
 
 ## Blockers
 
-1. **No release.** The gate, the drill and the benchmark run in CI, but the release workflow that would publish them has never run. Pushing a `v*` tag would exercise it. That is a public, outward action, so it needs the owner's go-ahead.
-2. **OpenAI live path unverified.** The cross-provider claim (one schema, Anthropic and OpenAI) is unit-tested but has never been called live. One `ASSAY_LIVE=1 ASSAY_PROVIDER=openai npm run verify:live` run would move it from Implemented to Demonstrated. Under the media and model cost rule it is a single cheap call.
+1. **No gated release.** The gate, the drill and the benchmark run in CI, but the release workflow that would publish them has never run. `v0.3.0` is being cut to exercise it.
+
+Resolved 2026-10-15: the OpenAI live path. It ran live on `gpt-6.1-sol` with full provenance, and the release was refused for `untrusted-context`, the same as on Anthropic.
 
 ## Risks
 
@@ -39,9 +40,7 @@ Assay works end to end as an offline reference and is fully demonstrable. It is 
 
 ## Next highest-value action
 
-Cut `v0.3.0`: push the tag, let `release.yml` run the gates and publish the release with `docs/benchmark.md` attached, then record the release URL here as the production rung. This needs the owner's approval.
-
-Without that approval, the next best action is the single OpenAI live run, followed by triaging the Dependabot PRs.
+Cut `v0.3.0`: push the tag, let `release.yml` run the gates and publish the release with `docs/benchmark.md` attached, then record the release URL here as the production rung. After that, triage the Dependabot PRs.
 
 ## Gap tracking
 

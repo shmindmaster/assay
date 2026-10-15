@@ -34,6 +34,7 @@ Narration: ElevenLabs Bella, `eleven_v4`, not the owner's voice. The bed reuses 
 | Item | Label | Where |
 |---|---|---|
 | Live Sonnet 5.5 run: receipts and summary | Real recording | [`docs/evidence/live-run-2026-10-14/`](../evidence/live-run-2026-10-14/) |
+| Live OpenAI `gpt-6.1-sol` run: receipts and summary | Real recording | [`docs/evidence/live-run-2026-10-15-openai/`](../evidence/live-run-2026-10-15-openai/) |
 | Replay demo ledger (`npm run demo`) | Real run, model response replayed from a recorded fixture (labelled as replay on the receipt) | Regenerated on every run; not committed |
 | Benchmark (`npm run gate`) | Real run | [`docs/benchmark.md`](../benchmark.md) |
 | CI runs on `bfd326c` | Real | See [TESTS.md](TESTS.md) |

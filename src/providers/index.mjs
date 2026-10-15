@@ -7,10 +7,10 @@
  * the network — requesting a live provider is an error, not a fallthrough.
  */
 import { getDecision } from '../decisions/registry.mjs';
-import { toStructuredOutput } from './openai.mjs';
 import { repair } from './repair.mjs';
 import { replayProvider, keyFor } from './replay.mjs';
 import { completeAnthropicLive, LiveDecisionError } from './anthropic-live.mjs';
+import { completeOpenAILive } from './openai-live.mjs';
 
 export { getDecision, listDecisions } from '../decisions/registry.mjs';
 export { toStrictTool, transformForAnthropic, ANTHROPIC_GRAMMAR } from './anthropic.mjs';
@@ -18,6 +18,7 @@ export { toStructuredOutput, transformForOpenAI, toFunctionDefinition, isOpenAIC
 export { repair, RepairClosedError, MAX_RETRIES } from './repair.mjs';
 export { replayProvider, complete as replayComplete, fixtureKey, keyFor, MissingFixtureError } from './replay.mjs';
 export { LiveDecisionError, DEFAULT_ANTHROPIC_MODEL, DEFAULT_ANTHROPIC_EFFORT } from './anthropic-live.mjs';
+export { DEFAULT_OPENAI_MODEL } from './openai-live.mjs';
 
 function liveEnabled() {
   return process.env.ASSAY_LIVE === '1';
@@ -37,38 +38,6 @@ export function liveFetch(url, options) {
   return globalThis.fetch(url, options);
 }
 
-async function completeOpenAILive({ decision, prompt }) {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) throw new Error('ASSAY_LIVE=1 requires OPENAI_API_KEY for provider openai');
-  const format = toStructuredOutput(decision.schema, { name: decision.id });
-  const model = process.env.ASSAY_OPENAI_MODEL ?? 'gpt-4o-2024-08-06';
-  const res = await liveFetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      authorization: `Bearer ${key}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: 'user', content: prompt }],
-      response_format: {
-        type: format.type,
-        json_schema: {
-          name: format.json_schema.name,
-          description: format.json_schema.description,
-          strict: format.json_schema.strict,
-          schema: format.json_schema.schema,
-        },
-      },
-    }),
-  });
-  if (!res.ok) throw new Error(`openai live HTTP ${res.status}`);
-  const body = await res.json();
-  const text = body.choices?.[0]?.message?.content;
-  if (typeof text !== 'string') throw new Error('openai live response contained no content');
-  return { value: JSON.parse(text), provenance: { provider: 'openai', model_requested: model, model_served: body.model ?? null } };
-}
-
 const anthropicLiveProvider = Object.freeze({
   name: 'anthropic',
   strict: true,
@@ -80,7 +49,7 @@ const openaiLiveProvider = Object.freeze({
   name: 'openai',
   strict: true,
   needsRepair: false,
-  complete: ({ decision, prompt }) => completeOpenAILive({ decision, prompt }),
+  complete: ({ decision, prompt }) => completeOpenAILive({ decision, prompt, fetch: liveFetch }),
 });
 
 export function selectProvider(name) {
