@@ -73,3 +73,5 @@ jobs:
         run: npx playwright install --with-deps chromium-headless-shell
       - name: Receipt Explorer in a real browser
         run: npm run test:browser
+      - name: Inspection console in a real browser (flows, keyboard, axe WCAG 2.2 AA)
+        run: npm run test:console

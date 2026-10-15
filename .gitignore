@@ -15,6 +15,7 @@ Thumbs.db
 /reports/explorer/
 /reports/eval-gate/
 /reports/conformance/
+/reports/console-shots/
 
 # RepoWise generated index state
 .repowise/

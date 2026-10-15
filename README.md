@@ -63,7 +63,7 @@ milestones:
 | Extraction with page and line citations (replayed by default) | **Done**; live model adapters planned |
 | Specification rules, verdicts, single-use release, quarantine and NCR | **Done**, CLI `heatlot verify` |
 | HTTP API with a generated OpenAPI 3.1 document and Scalar docs; MCP server | **Done**, `heatlot serve`, `/docs/api` |
-| Inspection console: queue, PDF with cited highlights, rule-by-rule verdict, receipt replay | Next |
+| Inspection console: queue, PDF with cited highlights, rule-by-rule verdict, release, receipt replay | **Done**, `npm run serve` then http://127.0.0.1:4140 |
 | npm package `heatlot` | Ready: packed, installed and run in CI (`smoke:package`); first publish waits on the maintainer's npm login ([RELEASING.md](docs/RELEASING.md)) |
 
 Every record, company, mill, part number and specification in this repository is synthetic.
@@ -114,7 +114,7 @@ Exit codes: `0` ACCEPT, `3` INCOMPLETE, `4` NONCONFORMING, `5` refused by the br
 The same flow over HTTP and MCP:
 
 ```bash
-npm run serve        # http://127.0.0.1:4140, API reference at /docs/api (OpenAPI 3.1, generated from the code)
+npm run serve        # console at http://127.0.0.1:4140, API reference at /docs/api (OpenAPI 3.1, generated from the code)
 ```
 
 The MCP server (`.mcp.json`) gives an agent `packets.list`, `packets.inspect`, `documents.lines`
@@ -185,6 +185,7 @@ stating a control does nothing to enforce it.
 | `npm run gate` / `gate:drill` | The release gate holds its floors and blocks each deliberate regression |
 | `npm run docs:openapi -- --check` / `lint:openapi` | The committed OpenAPI 3.1 document is generated from the code, and passes Redocly |
 | Schemathesis, oasdiff (in CI) | The live API holds to its spec under fuzzing; no breaking change against main |
+| `npm run test:console` | The inspection console in headless Chromium: the hero flow, release once, receipts, keyboard, axe WCAG 2.2 AA |
 | `npm run smoke:package` | The npm package installs from its tarball and runs on its own |
 | `npm run smoke:mcp` / `conformance:mcp` | The MCP server across both protocol eras, plus the official conformance suite with a baseline that may only shrink |
 
