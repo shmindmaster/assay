@@ -11,6 +11,11 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 | 38698164047 | `bfd326c` | CodeQL JavaScript | success |
 | [38674130953](https://github.com/shmindmaster/assay/actions/runs/38674130953) | `1067715` (PR head) | Node 20, Node 22 verification | success (2026-10-15T03:03–03:04Z) |
 | [38707061289](https://github.com/shmindmaster/assay/actions/runs/38707061289) | `46cc33d` (main, v0.3.0) | Node 20, Node 22 verification | success |
+| [38715583822](https://github.com/shmindmaster/assay/actions/runs/38715583822) | `afea269` (PR #26 head) | Node 20 verification | **failure**, conformance step only: `@modelcontextprotocol/conformance` imports `fs.globSync`, which Node 20 lacks. Fixed in `7450320`, which runs conformance on the Node 22 leg with a version guard. Node 22 passed in the same run |
+| [38716923519](https://github.com/shmindmaster/assay/actions/runs/38716923519) | `7450320` (PR #26 head) | Node 20, Node 22 verification; CodeQL | success; merged as `d76aa1e` |
+| [38734598133](https://github.com/shmindmaster/assay/actions/runs/38734598133) | `d76aa1e` (main) | Node 20 verification | success: `verify:all` ALL GREEN 12/12 (incl. `smoke:mcp` 21/21); `gate` RELEASE ALLOWED; `docs:reference --check` clean; `conformance-baseline` 4/4; conformance skipped by design on Node 20 |
+| 38734598133 | `d76aa1e` | Node 22 verification | success: as Node 20, plus `conformance:mcp` 2026-07-28 exit 0 (24 pass, 17 baselined) and 2025-11-25 exit 0 (34 pass, 25 baselined) |
+| 38734598001 | `d76aa1e` | CodeQL JavaScript | success |
 | [38707067941](https://github.com/shmindmaster/assay/actions/runs/38707067941) | `v0.3.0` tag | Release gate, then Publish release | success: gate and drill passed; release published 2026-10-15T08:40:12Z with `benchmark.md` and `report.json` (`allowed: true`, 5/5) |
 
 `verify:all` runs, each at its expected exit code: `generate:data`, `test`, `validate:schemas`, `evals`, `evals:mutate`, `smoke:mcp`, `verify:coc PO-AER-5519` (3), `verify:coc PO-MER-5532` (0), `audit:tamper`, `demo:denied`, `demo:injection`, `demo` (3).
@@ -41,12 +46,12 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 | `ASSAY_LIVE=1 ASSAY_PROVIDER=openai npm run verify:live` (`gpt-6.1-sol`) | release/v0.3.0 | 2026-10-15 | exit 3 (expected refusal); `req_971f4bc010bd427db04b44503f04cff3`, 3423/808 tokens, 13.6 s; model INCOMPLETE; denial `untrusted-context`; [evidence](../evidence/live-run-2026-10-15-openai/) |
 | `node --test tests/live-provider-openai.test.mjs` | release/v0.3.0 | 2026-10-15 | 6/6 pass |
 | `npm run test:browser` | test/explorer-browser | 2026-10-15 | 4/4 pass; with the payload-hash check disabled, the tamper test fails (mutation caught) |
-| `npm run smoke:mcp` | feat/mcp-conformance | 2026-10-15 | 21/21 checks: 2026-07-28 and 2025-11-25 on stdio and on loopback HTTP; foreign Origin 403; strict inputs; titles; cache hint. With the old loose input schemas, the two strict-input checks fail (guard proven able to fail) |
-| `npm run conformance:mcp` | feat/mcp-conformance | 2026-10-15 | 2026-07-28: 24 pass, 17 expected failures, exit 0. 2025-11-25: 34 pass, 25 expected failures, 1 warning (stateless, no session ID), exit 0. A baselined check that passes (`tools-list`) fails the run as stale |
-| `node --test tests/conformance-baseline.test.mjs` | feat/mcp-conformance | 2026-10-15 | 4/4: a growing baseline is caught, a shrinking one passes, core checks can never be baselined |
-| `npm run docs:reference -- --check` | feat/mcp-conformance | 2026-10-15 | reference docs and `catalog.json` match the server and the schemas |
-| `npm test` | feat/mcp-conformance | 2026-10-15 | 102/102 pass |
-| `npm audit --audit-level=high` (all deps, incl. the conformance devDependency) | feat/mcp-conformance | 2026-10-15 | 0 vulnerabilities |
+| `npm run smoke:mcp` | `afea269` (PR #26) | 2026-10-15 | 21/21 checks: 2026-07-28 and 2025-11-25 on stdio and on loopback HTTP; foreign Origin 403; strict inputs; titles; cache hint. With the old loose input schemas, the two strict-input checks fail (guard proven able to fail) |
+| `npm run conformance:mcp` | `afea269` (PR #26) | 2026-10-15 | 2026-07-28: 24 pass, 17 expected failures, exit 0. 2025-11-25: 34 pass, 25 expected failures, 1 warning (stateless, no session ID), exit 0. A baselined check that passes (`tools-list`) fails the run as stale |
+| `node --test tests/conformance-baseline.test.mjs` | `afea269` (PR #26) | 2026-10-15 | 4/4: a growing baseline is caught, a shrinking one passes, core checks can never be baselined |
+| `npm run docs:reference -- --check` | `afea269` (PR #26) | 2026-10-15 | reference docs and `catalog.json` match the server and the schemas |
+| `npm test` | `afea269` (PR #26) | 2026-10-15 | 102/102 pass |
+| `npm audit --audit-level=high` (all deps, incl. the conformance devDependency) | `afea269` (PR #26) | 2026-10-15 | 0 vulnerabilities |
 
 ## By category
 
