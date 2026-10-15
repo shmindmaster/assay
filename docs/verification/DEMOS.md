@@ -43,7 +43,20 @@ Narration: ElevenLabs Bella, `eleven_v4`, not the owner's voice. The bed reuses 
 
 `npm run demo`, `npm run demo:injection`, `npm run demo:denied`, `npm run explorer`, `npm run audit -- --po PO-AER-5519`, `npm run policy:explain -- --agent coc-assembler`, `ASSAY_LIVE=1 npm run verify:live`.
 
-## Not yet made
+## Production plan (A, C, vertical short)
 
-- **Format A (60–90 s executive cut):** in progress, cut from film 01's receipt-bound takes and narration with no new renders.
-- **Format C (technical architecture walkthrough):** not started.
+All three reuse film 01's receipt-bound footage where they can. They render only in an assigned heavy-work slot.
+
+| Asset | Treatment | Length | Picture | Voice and sound | Status |
+|---|---|---|---|---|---|
+| **A. Hero / executive cut** | Problem-first commercial, two-voice cold open. The agent says "Certificate package complete. Ready to release." The narrator answers "It wasn't." Then proof: injection labelled, live provenance, tamper, guards proven able to fail. Ends on a CTA card. | about 72 s | Film 01 clips S01, S02, S05, S06 and S11 plus the end card; no new capture | ElevenLabs `eleven_v4`: Bella narrates, plus one library voice for the agent's single line (about 780 characters). Reused bed; one signature SFX ("link snaps"), reused across assets. | Screenplay locked in the media workspace (`assay-exec-20261015/story/a-cut-screenplay.md`). The earlier 78 s pure-recut draft is superseded. |
+| **C. Technical deep dive** | Technical visualization. Follow one receipt from `append()` to the hash chain to `verifyChain()`, then the page's own verifier; then `mint_seq` and the ledger-backed single-use authorization, the broker's check order, live provenance on both adapters, and the mutation harness with the release gate and drill. | 5–6 min | Code stage over real source at the release commit; real JSONL receipts, `npm run audit`, `audit:tamper`, `test:browser` output; one earned diagram (the hash chain); Explorer clips from film 01 | Local Qwen3-TTS narrator (free); the same bed and sting | Not started. Outline above; script next. |
+| **Vertical short** | The hook plus the tamper payoff | ≤ 45 s, 1080x1920 | Reframed from A with per-shot source regions: the chain column for the receipts, the seal for the verdict and break, the payload for the claim. Not letterboxed. | A's audio, trimmed | Not started. Cut after A is approved. |
+
+**Remaster due on film 01:** it measures -1.3 dBTP true peak, which passed the release gate in force at the time (≤ -1). The current craft bar is ≤ -1.5. An audio-only remaster and remux in the next slot fixes it without re-rendering the picture.
+
+**ElevenLabs budget for Assay:** about 4,000 TTS characters in total.
+
+- Used: about 2,350, for film 01, before the cost-first rule.
+- Planned: about 780, for the A-cut, plus one SFX.
+- Remaining after A: about 870.
