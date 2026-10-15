@@ -326,6 +326,17 @@ async function openPacket(id) {
     state.detail = detail;
     renderViewerHead();
   } catch { /* the header keeps the queue summary */ }
+  // A packet inspected earlier opens on its stored inspection: every cited finding, no new receipts.
+  if (!state.inspections.has(id) && summaryOf(id)?.verdict) {
+    try {
+      const stored = await api(`/api/packets/${id}/inspection`);
+      if (state.open !== id) return;
+      state.inspections.set(id, stored);
+      renderPanel();
+      renderActions();
+      renderDoc();
+    } catch { /* not inspected yet: the panel offers Inspect */ }
+  }
   loadReceipts(id);
 }
 
