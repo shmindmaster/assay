@@ -14,7 +14,7 @@ Rungs: `Planned → Implemented → Integrated → Tested → Demonstrated → P
 | S4 verifier | verify:coc | CLI | `verify-completeness.mjs` | data index | `completeness.test.mjs`, evals | Film 01 (exit 3) | v0.3.0 gate + smoke | Production-Verified |
 | S5 broker and authorization (ledger-backed single use) | demo, demo:injection | CLI | `effects/` | ledger | `broker.test.mjs` (incl. cross-process replay) | Film 01 0:43–0:53, 1:46–2:12 | v0.3.0 gate + smoke | Production-Verified |
 | S6 ledger, audit, tamper | audit, audit:tamper | CLI | `ledger/`, `audit.mjs` | filesystem | `ledger.test.mjs`, verify:all | Film 01 | v0.3.0 gate + smoke | Production-Verified |
-| Receipt Explorer | explorer | offline HTML | `render-explorer.mjs`, `explorer/chain.mjs` | none (static) | `explorer.test.mjs` (parity, blank lines, tamper bounds) | Film 01 0:00–1:23 | v0.3.0 release gate (verify:all) | Production-Verified |
+| Receipt Explorer | explorer | offline HTML | `render-explorer.mjs`, `explorer/chain.mjs` | none (static) | `explorer.test.mjs` (parity, blank lines, tamper bounds); `test:browser` (real Chromium) | Film 01 0:00–1:23 | v0.3.0 release gate (verify:all) | Production-Verified |
 | S7 evals, mutations, gate, drill | evals:mutate, gate, gate:drill | CLI, CI | `run-mutations.mjs`, `eval-gate.mjs`, `gate-drill.mjs` | GitHub Actions | CI on every PR and push | Film 01 2:12–2:28 | v0.3.0 gate + smoke | Production-Verified |
 | MCP server (SDK v2) | smoke:mcp, plugin | stdio MCP | `server.mjs` | Claude Code plugin | `smoke:mcp` 12/12 | none | v0.3.0 release gate (verify:all) | Production-Verified |
 

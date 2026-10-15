@@ -10,7 +10,7 @@ deployed_sha: 46cc33d (release v0.3.0, https://github.com/shmindmaster/assay/rel
 tests: "CI Node 20 verify:all: 12/12 @ 46cc33d; CI Node 22 verify:all: 12/12 @ 46cc33d; release.yml gate + drill: pass @ 46cc33d (run 38707067941); release report.json: 5/5 checks allowed; release smoke from published archive: 3/3 @ v0.3.0; local npm test: 98/98 @ 2555f12; live verify:live (anthropic claude-sonnet-5-5): 1/1 refusal as expected @ 1067715; live verify:live (openai gpt-6.1-sol): 1/1 refusal as expected @ 2555f12"
 films: ["D:\\OneDrive - Maya Modest LLC\\Videos\\Portfolio\\Assay\\01 - The Agent Drafts, Software Decides.mp4"]
 blockers: []
-next_action: "Add an automated browser test of the Receipt Explorer to CI, then triage the four open Dependabot PRs"
+next_action: "Add an accessibility (axe) pass to the Explorer browser test; deliver the format A executive cut when a heavy-work slot frees"
 updated: 2026-10-15T03:50:00-05:00
 ```
 
@@ -49,13 +49,11 @@ Resolved 2026-10-15:
 ## Risks
 
 - The ledger has no external anchor, so it is tamper-evident but not unforgeable. This is documented, not hidden: README §8 and threat model §3.5.
-- No automated browser test covers the Explorer. A rendering regression would be caught only by the parity tests on its verifier.
 - Accessibility of the Explorer is designed for (focus styles, reduced motion, a narrow layout) but not measured.
-- Four Dependabot PRs (#12, #13, #15, #17) are open and untriaged.
 
 ## Next highest-value action
 
-Add a headless browser test of the Receipt Explorer to CI. It would render the page, press Tamper one byte, and assert that the chain breaks at the right receipt. Then triage the Dependabot PRs.
+Measure the Explorer's accessibility (an axe pass in the browser test), then deliver the format A executive cut once a heavy-work slot frees.
 
 ## Gap tracking
 
