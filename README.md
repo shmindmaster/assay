@@ -288,7 +288,7 @@ these hold on any machine.
 | `npm test` | Unit tests across the deterministic layer | all pass |
 | `npm run evals` | Eval suite including refusal cases | all cases behave as named |
 | `npm run evals:mutate` | Every guard can fail | all mutations caught |
-| `npm run smoke:mcp` | Real MCP handshake, ten read-only tools, plus the data facts | 9 checks pass |
+| `npm run smoke:mcp` | Real MCP handshake (spec 2026-07-28), ten annotated read-only tools with output schemas, plus the data facts | 12 checks pass |
 | `npm run verify:coc -- PO-AER-5519 --json` | The refusal, agent-free | exit **3**, `missing_records: ["mechanical-test"]` |
 | `npm run verify:coc -- PO-MER-5532` | The positive case | exit **0** |
 | `npm run validate:schemas` | Schemas compile; fixtures validate or are rejected as named | all good |
