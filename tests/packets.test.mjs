@@ -17,6 +17,7 @@ const lines = async (pkt, doc) => textLines(read(pkt, doc));
 test('every packet on disk matches its indexed hashes', () => {
   const index = JSON.parse(read('index.json'));
   assert.equal(index.packets.length, SCENARIOS.length);
+  assert.ok(index.packets.some((p) => p.packet === "PKT-24002R"), "the hero packet has a corrected resubmission");
   for (const entry of index.packets) {
     for (const [file, hash] of Object.entries(entry.files)) assert.equal(sha256(read(entry.packet, file)), hash, `${entry.packet}/${file}`);
   }

@@ -44,7 +44,7 @@ function loadDefinitions(directory) {
 }
 
 function copyRepository(destination) {
-  const excluded = new Set(['.git', '.agentlogs', '.briefs', 'node_modules', ledgerTopDir(), 'reports']);
+  const excluded = new Set(['.git', '.agentlogs', '.briefs', '.heatlot', 'node_modules', ledgerTopDir(), 'reports']);
   for (const entry of readdirSync(REPO_ROOT, { withFileTypes: true })) {
     if (excluded.has(entry.name) || entry.name.startsWith('.heatlot-')) continue;
     cpSync(path.join(REPO_ROOT, entry.name), path.join(destination, entry.name), {

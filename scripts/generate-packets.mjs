@@ -167,7 +167,7 @@ export async function generate() {
       writeFileSync(path.join(dir, name), bytes);
       hashes[name] = sha256(bytes);
     }
-    const packet = { packet: sc.packet, received: '2026-09-14', po, documents: { mtr: 'mtr.pdf', coc: 'coc.pdf' }, sha256: hashes,
+    const packet = { packet: sc.packet, received: sc.resubmits ? '2026-09-16' : '2026-09-14', resubmits: sc.resubmits, po, documents: { mtr: 'mtr.pdf', coc: 'coc.pdf' }, sha256: hashes,
       expected: { verdict: sc.expect, reasons: sc.reasons }, story: sc.story };
     writeFileSync(path.join(dir, 'packet.json'), `${JSON.stringify(packet, null, 2)}\n`);
     index.packets.push({ packet: sc.packet, po: sc.po, expected: sc.expect, files: hashes });
