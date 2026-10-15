@@ -3,7 +3,7 @@
  * way in, and the OpenAPI 3.1 document at /openapi.json is generated from the same declarations.
  * Scalar renders it at /docs/api. Every error uses one envelope: { error: { code, message, rule? } }.
  */
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
@@ -27,6 +27,56 @@ export const SCALAR_THEME = `
   .light-mode { --scalar-background-1: #fbfaf7; --scalar-background-2: #f2f0ea; --scalar-color-1: #14181f; --scalar-color-2: #4b5563; }
   .dark-mode { --scalar-background-1: #0f1216; --scalar-background-2: #171b21; --scalar-color-1: #eceae4; --scalar-color-2: #9aa3ae; --scalar-color-accent: #f97316; }
 `;
+
+/**
+ * The inspection console: static files, served without a build step. Declared with plain app.get,
+ * so none of it appears in the OpenAPI document. Only files under the console directory and the
+ * named pdf.js files are reachable; every other path is a 404.
+ */
+const CONSOLE_DIR = path.join(REPO_ROOT, 'console');
+const PDFJS_DIR = path.join(REPO_ROOT, 'node_modules', 'pdfjs-dist');
+const PDFJS_FILES = { 'pdf.mjs': 'build/pdf.mjs', 'pdf.worker.mjs': 'build/pdf.worker.mjs' };
+const CONTENT_TYPES = {
+  '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json', '.ttf': 'font/ttf', '.pfb': 'application/octet-stream',
+};
+/** No third-party origin is ever contacted: everything the console loads comes from this server. */
+export const CONSOLE_CSP = [
+  "default-src 'self'", "script-src 'self'", "style-src 'self'", "img-src 'self' data: blob:", "font-src 'self' data: blob:",
+  "connect-src 'self'", "worker-src 'self' blob:", "object-src 'none'", "base-uri 'none'", "frame-ancestors 'none'", "form-action 'none'",
+].join('; ');
+
+function within(root, rel) {
+  let decoded;
+  try { decoded = decodeURIComponent(rel); } catch { return null; }
+  const file = path.resolve(root, decoded);
+  if (!file.startsWith(root + path.sep) || !existsSync(file) || !statSync(file).isFile()) return null;
+  return file;
+}
+
+function mountConsole(app) {
+  const send = (c, file) => {
+    const type = CONTENT_TYPES[path.extname(file)];
+    if (!type) return c.json({ error: { code: 'not-found', message: `no route GET ${c.req.path}` } }, 404);
+    const headers = { 'content-type': type, 'cache-control': 'no-cache', 'x-content-type-options': 'nosniff' };
+    if (type.startsWith('text/html')) Object.assign(headers, { 'content-security-policy': CONSOLE_CSP, 'referrer-policy': 'no-referrer' });
+    return c.body(readFileSync(file), 200, headers);
+  };
+  const missing = (c) => c.json({ error: { code: 'not-found', message: `no route GET ${c.req.path}` } }, 404);
+  app.get('/', (c) => send(c, path.join(CONSOLE_DIR, 'index.html')));
+  app.get('/console/*', (c) => {
+    const file = within(CONSOLE_DIR, c.req.path.slice('/console/'.length));
+    return file ? send(c, file) : missing(c);
+  });
+  app.get('/vendor/pdfjs/standard_fonts/*', (c) => {
+    const file = within(path.join(PDFJS_DIR, 'standard_fonts'), c.req.path.slice('/vendor/pdfjs/standard_fonts/'.length));
+    return file ? send(c, file) : missing(c);
+  });
+  app.get('/vendor/pdfjs/:file', (c) => {
+    const rel = PDFJS_FILES[c.req.param('file')];
+    return rel ? send(c, path.join(PDFJS_DIR, rel)) : missing(c);
+  });
+}
 
 export function createApp({ packetsRoot = path.join(REPO_ROOT, 'data', 'packets'), out = DEFAULT_OUT, provider = 'replay' } = {}) {
   const app = new OpenAPIHono({
@@ -169,6 +219,7 @@ export function createApp({ packetsRoot = path.join(REPO_ROOT, 'data', 'packets'
     ],
   });
   app.get('/docs/api', Scalar({ url: '/openapi.json', pageTitle: 'Heatlot API', customCss: SCALAR_THEME, hideClientButton: false }));
+  mountConsole(app);
   // Framework errors keep their status inside the one envelope: a body that is not JSON is 415,
   // malformed JSON is 400. Only a genuine fault is 500.
   app.onError((err, c) => {
