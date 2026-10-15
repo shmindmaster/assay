@@ -57,7 +57,7 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 
 | Category | Coverage | Evidence |
 |---|---|---|
-| Unit | Ledger, broker, authorization, providers, live adapter (stubbed transport), context, decisions, schemas, completeness, digest, explorer parity, conformance baseline rules | `tests/*.test.mjs` (102 tests) |
+| Unit | Ledger, broker, authorization, providers, live adapter (stubbed transport), context, decisions, schemas, completeness, explorer parity, conformance baseline rules; `packages/broker` (guard, approve, receipts, MCP proxy, CLI: 17 tests) | `tests/*.test.mjs` (102 tests) |
 | Contract / schema | Every fixture validates or is rejected as named; one schema, three enforcement paths | `validate:schemas`, `tests/schemas.test.mjs`, `schemas:report` |
 | Integration (in process) | Context, decision, verdict, mint, broker and ledger end to end | `demo`, `demo:injection`, `demo:denied` inside `verify:all` |
 | Integration (live provider) | Anthropic and OpenAI live adapters against the real APIs | One recorded `verify:live` run each |

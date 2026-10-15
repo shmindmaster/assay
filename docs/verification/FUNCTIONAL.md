@@ -27,7 +27,7 @@ Write boundary: only `reports/drafts/` is writable. `reports/published/` is guar
 | Ask what an agent may do | `npm run policy:explain -- --agent coc-assembler` | Reads, tools, decisions, effects, binding, single use | Film 01 (terminal stage, real output) |
 | Prove the guards can fail | `npm run evals:mutate` | 9/9 mutations caught | `verify:all`, gate `guard-coverage` |
 | Gate a release | `npm run gate`, `npm run gate:drill` | RELEASE ALLOWED; 2/2 deliberate regressions blocked | CI on every PR and push to main |
-| Use from Claude Code | plugin + `.mcp.json` | Read-only MCP tools over the synthetic data | `npm run smoke:mcp` (12 checks) |
+| Use from an MCP client | `.mcp.json` | Read-only MCP tools over the synthetic data | `npm run smoke:mcp` (12 checks) |
 
 ## Business rules (code-owned)
 

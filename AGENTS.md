@@ -37,9 +37,11 @@ the tests pass.
 
 - Dataset changes go through `scripts/generate-data.mjs`, which is seeded and
   reproducible. Never hand-edit anything under `data/`.
-- Changing a subagent's scope means updating, in the same commit: its file in
-  `agents/`, its schema in `schemas/`, its entry in `policy/policy.json`, its
-  eval cases in `evals/cases/`, and `docs/architecture.md`.
+- Changing a decision's scope means updating, in the same commit: its schema in
+  `schemas/`, its entry in `policy/policy.json`, its eval cases in `evals/cases/`,
+  and `docs/architecture.md`.
+- `packages/broker/` is the published library. A change to it keeps its own
+  tests and its mutations in `evals/mutations/` green, and bumps its version.
 - **Adding a guard means adding a mutation.** A new check in the control layer
   is not finished until `evals/mutations/` contains a patch that defeats it and
   the harness proves the suite catches that patch. A guard with no mutation is
@@ -61,7 +63,6 @@ npm run verify:all
 npm run gate
 npm run gate:drill
 npm run test:browser   # needs a browser: npx playwright install chromium-headless-shell
-claude plugin validate .
 ```
 
 Report what you verified, not what you wrote. If a command fails, fix it or say

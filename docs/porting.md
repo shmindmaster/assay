@@ -33,7 +33,7 @@ In rough order of effort.
 |---|---|---|
 | `data/` and `scripts/generate-data.mjs` | Your corpus, or a connector to the real one | Largest |
 | `mcp-servers/` | Read-only tools over your sources | Large |
-| `references/`, `skills/`, `agents/`, `context/` | Your domain vocabulary and tasks | Moderate |
+| `references/`, `context/` | Your domain vocabulary and memory | Moderate |
 | `schemas/` | Your decision contracts | Moderate |
 | `scripts/verify-*.mjs` | Your deterministic rules | Moderate, and the part to get right |
 | `policy/policy.json` | Your agents, boundaries, effects, tripwires | Small |
