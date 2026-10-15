@@ -24,7 +24,7 @@
  * can fail.
  *
  * Exit 0 release allowed, 1 release blocked, 2 usage or baseline error.
- * Offline: children run with ASSAY_LIVE stripped.
+ * Offline: children run with HEATLOT_LIVE stripped.
  */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -36,7 +36,7 @@ import { ledgerPath } from '../src/ledger/index.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ENV = { ...process.env };
-delete ENV.ASSAY_LIVE;
+delete ENV.HEATLOT_LIVE;
 
 function node(args) {
   const run = spawnSync(process.execPath, args, { cwd: REPO_ROOT, encoding: 'utf8', env: ENV });

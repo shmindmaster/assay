@@ -37,14 +37,14 @@ flowchart LR
 
 ## Boundaries
 
-- **Network:** `liveFetch` in `src/providers/index.mjs` is the only function that reaches the network. It refuses unless `ASSAY_LIVE=1`. The Anthropic SDK's `fetch` is set to it. `verify:all`, the gate, the drill and the demos strip `ASSAY_LIVE` from their children.
+- **Network:** `liveFetch` in `src/providers/index.mjs` is the only function that reaches the network. It refuses unless `HEATLOT_LIVE=1`. The Anthropic SDK's `fetch` is set to it. `verify:all`, the gate, the drill and the demos strip `HEATLOT_LIVE` from their children.
 - **Secrets:** none in the repository. `verify:live` reads the provider key from the process environment, or from an `ant` profile through the SDK. Tests use a placeholder key.
 - **Filesystem:** the broker writes only under `reports/published/`, and only with a valid authorization. The hook enforces the same boundary for agent tool calls.
 - **Data:** synthetic only. No real company, person or record (AGENTS.md section 2).
 
 ## AI
 
-- **Models:** replay fixtures by default; live `claude-sonnet-5-5` with effort `medium`, overridable with `ASSAY_ANTHROPIC_MODEL` and `ASSAY_ANTHROPIC_EFFORT`. Live OpenAI: `gpt-6.1-sol` with strict `json_schema` structured outputs, overridable with `ASSAY_OPENAI_MODEL`. Live-verified on 2026-10-15 (`req_971f4bc010bd427db04b44503f04cff3`).
+- **Models:** replay fixtures by default; live `claude-sonnet-5-5` with effort `medium`, overridable with `HEATLOT_ANTHROPIC_MODEL` and `HEATLOT_ANTHROPIC_EFFORT`. Live OpenAI: `gpt-6.1-sol` with strict `json_schema` structured outputs, overridable with `HEATLOT_OPENAI_MODEL`. Live-verified on 2026-10-15 (`req_971f4bc010bd427db04b44503f04cff3`).
 - **Prompts:** the decision prompt is the task plus the assembled records. Nothing in it tells the model to distrust anything; trust is a code concern.
 - **Evals:** 6 eval cases, 2 CoC draft-contract checks and a schema contract (9 checks); 9 mutations; release-gate floors in `evals/gate.json`.
 
@@ -52,7 +52,7 @@ flowchart LR
 
 | Workflow | Trigger | Runs |
 |---|---|---|
-| `ci.yml` | PR, push to main | Node 20 and 22: `npm ci`, `npm audit` (prod, high), `verify:all`, data reproducibility, `gate`, benchmark drift (`git diff --exit-code docs/benchmark.md`), `gate:drill`, reference-docs drift (`docs:reference --check`), MCP conformance (`conformance:mcp`, baseline compared with `origin/main`), Receipt Explorer in Chromium (`test:browser`) |
+| `ci.yml` | PR, push to main | Node 22 and 24 (Node 20 left support on 2026-10-15; it reached end of life in April 2026): `npm ci`, `npm audit` (prod, high), `verify:all`, data reproducibility, `gate`, benchmark drift (`git diff --exit-code docs/benchmark.md`), `gate:drill`, reference-docs drift (`docs:reference --check`), MCP conformance (`conformance:mcp`, baseline compared with `origin/main`), Receipt Explorer in Chromium (`test:browser`) |
 | `codeql.yml` | PR, push, schedule | JavaScript analysis |
 | `release.yml` | `v*` tag | The same gates; publishes a GitHub release with the benchmark and gate report only after they pass. Exercised once, for v0.3.0 (run 38707067941). |
 
@@ -64,19 +64,19 @@ Recorded 2026-10-15 against the fleet API surface standard and the engineering q
 
 **`packages/broker` (`@heatlot/broker`, internal) is the programmatic API.** A zero-dependency ESM library (`Broker`, `trusted`, `untrusted`, `verifyChain`, `startProxy`) and a CLI (`keygen`, `approve`, `verify`, `mcp-proxy`). Its contract is its README and its 17 tests; its six guards are in the mutation harness.
 
-**No HTTP API, so no OpenAPI and no Scalar page.** Assay is an offline CLI and library. Its programmatic surfaces are the typed decision schemas, the MCP server and the receipt format. Adding an HTTP service only to document it would contradict the offline boundary above.
+**No HTTP API, so no OpenAPI and no Scalar page.** Heatlot is an offline CLI and library. Its programmatic surfaces are the typed decision schemas, the MCP server and the receipt format. Adding an HTTP service only to document it would contradict the offline boundary above.
 
 **JSON Schema is the contract.** Each decision has one canonical JSON Schema 2020-12 file in `schemas/`. The Anthropic adapter derives a strict tool from it, the OpenAI adapter derives a strict structured output, and Ajv validates every result against the canonical schema before use. That re-check matters because both vendors' strict modes drop some constraints (`minimum`, `if`/`then`, `allOf` and others). [docs/reference/decision-schemas.md](../reference/decision-schemas.md) is generated from the schemas and the adapters, and lists exactly what each provider drops.
 
 **MCP: justified, read-only.** The agent use cases are real: an agent looks up NCRs, heat lots, purchase-order certification status and audit gaps with hash-verified citations, without reading `data/` directly. Every tool is a read-only lookup. Nothing that writes, ships, signs or sends is exposed; side effects stay with the effect broker. `npm run tools:report` lists the tools deliberately not added, and why.
 
-| Standard | Assay |
+| Standard | Heatlot |
 |---|---|
 | M1 SDK and era | `@modelcontextprotocol/server` 2.3.1. Serves 2026-07-28 and the 2025-11-25 handshake from one factory, over stdio (`serveStdio`) and over Streamable HTTP (`createMcpHandler`). `smoke:mcp` checks both eras on both transports. |
 | M2 transport | stdio by default (what `.mcp.json` launches). `--http [port]` serves Streamable HTTP on `127.0.0.1` only, with Host and Origin checked against localhost; a foreign Origin gets 403 (tested). |
 | M3 authorization | Not applicable: local, single-user, no credentials, synthetic data only. |
 | M4 catalogue | Every tool has a title, all four annotations, a strict input schema (`additionalProperties: false`) and an output schema with `structuredContent`. The `tools/list` result is snapshotted to [catalog.json](../../mcp-servers/kestrel-foundry-data/catalog.json) and rendered to [docs/reference/mcp-tools.md](../reference/mcp-tools.md); CI fails on drift. `tools/list` and `server/discover` carry a one-hour public cache hint. |
-| M5 conformance | `@modelcontextprotocol/conformance` 0.2.0-alpha.12, pinned as a devDependency, at 2026-07-28 and 2025-11-25 in CI (Node 22 leg; the tool imports `fs.globSync`, Node 22+) and in the release gate (Node 22). The server's Node 20 support is covered by `smoke:mcp` on the Node 20 leg. The committed baselines may only shrink (see below). |
+| M5 conformance | `@modelcontextprotocol/conformance` 0.2.0-alpha.12, pinned as a devDependency, at 2026-07-28 and 2025-11-25 in CI on Node 22 and 24, and in the release gate. The committed baselines may only shrink (see below). |
 | M6 discovery | `server/discover` comes from the SDK. No Server Card, because there is no hosted endpoint. Not registered in AgentHub's `registry/mcps.json`, because this server serves a synthetic demo dataset, not a fleet capability. |
 | M7 approval | Not applicable: no tool has a side effect. |
 

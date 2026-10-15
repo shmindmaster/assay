@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Read-only MCP boundary over the assay synthetic foundry dataset. Stands in for the future AWS warehouse + SharePoint estate in the demo.",
+  "description": "Read-only MCP boundary over the heatlot synthetic foundry dataset. Stands in for the future AWS warehouse + SharePoint estate in the demo.",
   "main": "src/server.mjs",
   "dependencies": {
     "@modelcontextprotocol/server": "2.3.1",

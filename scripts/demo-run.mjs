@@ -40,7 +40,7 @@ function check(label, args, expect = 0) {
 }
 
 async function main() {
-  console.log('\nAssay — the agent drafts, software decides.');
+  console.log('\nHeatlot — the agent drafts, software decides.');
   console.log('Offline: no API key, no network.\n');
 
   console.log(`deterministic checks\n${BAR}`);
@@ -65,7 +65,7 @@ async function main() {
 
   append('decision_requested', AGENT, SUBJECT, { decision: 'coc-report', prompt_chars: PROMPT.length });
   // Replay named explicitly rather than relied on as the default: a demo that
-  // could reach the network if ASSAY_LIVE happened to be set in the environment
+  // could reach the network if HEATLOT_LIVE happened to be set in the environment
   // would make the repository's offline claim conditional on the reader's shell.
   const { value: draft, provenance } = await completeWithProvenance({ decisionId: 'coc-report', prompt: PROMPT, provider: 'replay' });
   append('decision_returned', AGENT, SUBJECT, {

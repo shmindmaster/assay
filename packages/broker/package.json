@@ -16,7 +16,7 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13"
   },
   "scripts": {
     "test": "node --test"
@@ -35,12 +35,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shmindmaster/assay.git",
+    "url": "git+https://github.com/shmindmaster/heatlot.git",
     "directory": "packages/broker"
   },
-  "homepage": "https://github.com/shmindmaster/assay/tree/main/packages/broker#readme",
+  "homepage": "https://github.com/shmindmaster/heatlot/tree/main/packages/broker#readme",
   "bugs": {
-    "url": "https://github.com/shmindmaster/assay/issues"
+    "url": "https://github.com/shmindmaster/heatlot/issues"
   },
   "private": true
 }

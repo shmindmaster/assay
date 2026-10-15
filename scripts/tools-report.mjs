@@ -122,7 +122,7 @@ function printTool(tool, { provider }) {
 
 function main() {
   const flags = parseArgs(process.argv.slice(2));
-  console.log(`assay tools:report — kestrel-foundry-data, ${TOOLS.length} read-only tools (from catalog.json)`);
+  console.log(`heatlot tools:report — kestrel-foundry-data, ${TOOLS.length} read-only tools (from catalog.json)`);
   console.log('Token costs are median JSON.stringify(response).length/4 against fixtures/provider.');
   console.log('That is a deterministic estimate, not a vendor tokenizer.');
   if (flags.provider === 'openai') {

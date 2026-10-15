@@ -31,7 +31,7 @@ let browser;
 let page;
 
 before(async () => {
-  root = mkdtempSync(path.join(os.tmpdir(), 'assay-explorer-browser-'));
+  root = mkdtempSync(path.join(os.tmpdir(), 'heatlot-explorer-browser-'));
   const options = { ledgerRoot: root };
   append('context_assembled', 'coc-assembler', SUBJECT, { blocks: 3, untrusted: ['data/docs/x.md'] }, options);
   append('decision_returned', 'coc-assembler', SUBJECT, { status: 'complete', missing_records: [], provenance: { provider: 'replay', fixture_key: 'a'.repeat(64) } }, options);

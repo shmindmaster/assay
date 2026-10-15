@@ -2,9 +2,9 @@
 /**
  * npm run verify:live — the one command that calls a real model.
  *
- * Opt-in only: requires ASSAY_LIVE=1 and a credential for the chosen provider
- * (ASSAY_PROVIDER, default anthropic). Nothing else in the repository reaches
- * the network, and verify:all strips ASSAY_LIVE from its children.
+ * Opt-in only: requires HEATLOT_LIVE=1 and a credential for the chosen provider
+ * (HEATLOT_PROVIDER, default anthropic). Nothing else in the repository reaches
+ * the network, and verify:all strips HEATLOT_LIVE from its children.
  *
  * It replays the injection scenario against a live model. The model is given the
  * assembled context as plain records — including the purchase order whose
@@ -52,17 +52,17 @@ function renderLivePrompt(task, blocks) {
 }
 
 async function main() {
-  if (process.env.ASSAY_LIVE !== '1') {
-    console.error('verify:live is opt-in. Set ASSAY_LIVE=1 and a provider credential');
+  if (process.env.HEATLOT_LIVE !== '1') {
+    console.error('verify:live is opt-in. Set HEATLOT_LIVE=1 and a provider credential');
     console.error('(ANTHROPIC_API_KEY or an `ant auth login` profile for the default provider).');
     process.exit(2);
   }
-  const provider = process.env.ASSAY_PROVIDER ?? 'anthropic';
+  const provider = process.env.HEATLOT_PROVIDER ?? 'anthropic';
 
   rmSync(ledgerPath(SUBJECT), { force: true });
   mkdirSync(ledgerDir(), { recursive: true });
 
-  console.log(`\nAssay — live verification   provider ${provider}   subject ${SUBJECT}`);
+  console.log(`\nHeatlot — live verification   provider ${provider}   subject ${SUBJECT}`);
   console.log('A real model call. The prompt does not tell the model to distrust anything.\n');
 
   const bundle = assemble({ agent: AGENT, task: TASK, entityRefs: { po: SUBJECT } });

@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 /**
- * heatlot-broker keygen     --dir .assay
- * heatlot-broker approve    --dir .assay --tool send_email --args '{"to":"x@example.com"}' --by alice
+ * heatlot-broker keygen     --dir .heatlot
+ * heatlot-broker approve    --dir .heatlot --tool send_email --args '{"to":"x@example.com"}' --by alice
  *                         [--untrusted <source>]...   (refused if any untrusted source fed the decision)
- * heatlot-broker verify     --dir .assay                (exit 0 verified, 1 broken)
- * heatlot-broker mcp-proxy  --dir .assay -- <command> [args...]
+ * heatlot-broker verify     --dir .heatlot                (exit 0 verified, 1 broken)
+ * heatlot-broker mcp-proxy  --dir .heatlot -- <command> [args...]
  *
  * Keys: <dir>/key.pem (private, Ed25519) and <dir>/key.pub.pem. The private key is read only by
  * the commands that sign receipts; `verify` needs only the public key.
  */
 import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { AssayRefusal, Broker, untrusted } from '../src/broker.mjs';
+import { HeatlotRefusal, Broker, untrusted } from '../src/broker.mjs';
 import { generateKeys, keyId, verifyChain, Ledger } from '../src/receipts.mjs';
 import { startProxy } from '../src/mcp-proxy.mjs';
 
@@ -43,7 +43,7 @@ function loadBroker(dir) {
 function main(argv) {
   const [command, ...rest] = argv;
   const opts = parse(rest);
-  const dir = opts.dir ?? '.assay';
+  const dir = opts.dir ?? '.heatlot';
   switch (command) {
     case 'keygen': {
       const { priv, pub } = keyPaths(dir);
@@ -89,6 +89,6 @@ try {
   const code = main(process.argv.slice(2));
   if (code !== null) process.exitCode = code;
 } catch (error) {
-  if (error instanceof AssayRefusal) { console.error(error.message); process.exitCode = 3; }
+  if (error instanceof HeatlotRefusal) { console.error(error.message); process.exitCode = 3; }
   else { console.error(`heatlot-broker: ${error.message}`); process.exitCode = 2; }
 }

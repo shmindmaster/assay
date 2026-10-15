@@ -36,7 +36,7 @@ function sortKeys(value) {
 }
 
 async function catalog() {
-  const client = new Client({ name: 'assay-reference-docs', version: '1' }, { versionNegotiation: { mode: 'auto' } });
+  const client = new Client({ name: 'heatlot-reference-docs', version: '1' }, { versionNegotiation: { mode: 'auto' } });
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [SERVER] }));
   try {
     const listed = await client.listTools();

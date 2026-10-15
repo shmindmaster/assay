@@ -39,7 +39,7 @@ const TASK =
 const DEFAULT_SOURCES = [
   { id: 'replay', title: 'Replay demo', note: 'npm run demo — recorded model response', file: ledgerPath(SUBJECT) },
   { id: 'live', title: 'Live run, Claude Sonnet 5.5', note: 'npm run verify:live — 2026-10-14', file: path.join(REPO_ROOT, 'docs', 'evidence', 'live-run-2026-10-14', `${SUBJECT}.anthropic.jsonl`) },
-  { id: 'live-openai', title: 'Live run, OpenAI', note: 'ASSAY_PROVIDER=openai npm run verify:live — 2026-10-15', file: path.join(REPO_ROOT, 'docs', 'evidence', 'live-run-2026-10-15-openai', `${SUBJECT}.openai.jsonl`) },
+  { id: 'live-openai', title: 'Live run, OpenAI', note: 'HEATLOT_PROVIDER=openai npm run verify:live — 2026-10-15', file: path.join(REPO_ROOT, 'docs', 'evidence', 'live-run-2026-10-15-openai', `${SUBJECT}.openai.jsonl`) },
 ];
 
 function rel(file) {
@@ -48,7 +48,7 @@ function rel(file) {
 
 /** The context bundle and verdict inputs for the subject, computed without touching the repo ledger. */
 export function buildContext() {
-  const scratch = mkdtempSync(path.join(os.tmpdir(), 'assay-explorer-context-'));
+  const scratch = mkdtempSync(path.join(os.tmpdir(), 'heatlot-explorer-context-'));
   try {
     const bundle = assemble({ agent: 'coc-assembler', task: TASK, entityRefs: { po: SUBJECT } }, { ledgerRoot: scratch });
     const verifier = verifyCompleteness(SUBJECT);
@@ -123,8 +123,8 @@ const PAGE = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Assay Receipt Explorer: the hash-chained decision ledger, verified in the page.">
-<title>Assay Receipt Explorer</title>
+<meta name="description" content="Heatlot Receipt Explorer: the hash-chained decision ledger, verified in the page.">
+<title>Heatlot Receipt Explorer</title>
 <style>
 :root {
   --paper: #e8ebed; --panel: #f6f7f8; --ink: #1a1f24; --muted: #59636c; --rule: #c9d0d5;
@@ -257,7 +257,7 @@ h3 { font-size: 0.95rem; font-weight: 600; margin: 0 0 8px; color: var(--muted);
 </head>
 <body>
 <header>
-  <div class="mark"><b>Assay</b>Receipt Explorer</div>
+  <div class="mark"><b>Heatlot</b>Receipt Explorer</div>
   <nav class="sources" aria-label="Ledger"></nav>
   <div class="seal" role="status" aria-live="polite" id="seal"></div>
 </header>

@@ -1,33 +1,33 @@
 ```yaml
-product: Assay
-repo: C:\Repos\shmindmaster\assay (github.com/shmindmaster/assay)
-commit: d76aa1e
-verdict: Verified End-to-End Ready
-functional_ready: yes
-demo_ready: yes
-production_ready: yes
-deployed_sha: 46cc33d (release v0.3.0, https://github.com/shmindmaster/assay/releases/tag/v0.3.0)
-tests: "CI Node 20 verify:all: 12/12 @ d76aa1e (run 38734598133); CI Node 22 verify:all: 12/12 + MCP conformance 2026-07-28 and 2025-11-25 against shrink-only baselines @ d76aa1e (run 38734598133); smoke:mcp 21/21 @ d76aa1e; release.yml gate + drill: pass @ 46cc33d (run 38707067941); release report.json: 5/5 checks allowed; release smoke from published archive: 3/3 @ v0.3.0; local npm test: 98/98 @ 2555f12; live verify:live (anthropic claude-sonnet-5-5): 1/1 refusal as expected @ 1067715; live verify:live (openai gpt-6.1-sol): 1/1 refusal as expected @ 2555f12"
-films: ["D:\\OneDrive - Maya Modest LLC\\Videos\\Portfolio\\Assay\\01 - The Agent Drafts, Software Decides.mp4"]
-blockers: []
-api_surface: "No HTTP API by design (no OpenAPI/Scalar). JSON Schema 2020-12 decision contracts with generated reference. MCP justified and read-only: SDK 2.3.1, dual era on stdio and loopback HTTP, conformance at 2026-07-28 and 2025-11-25 in CI with a shrink-only baseline. See TECHNICAL.md, API surface and MCP decision."
-next_action: "Add an accessibility (axe) pass to the Explorer browser test; cut v0.3.1 so the MCP conformance work is in a release; deliver the format A executive cut when a heavy-work slot frees"
-updated: 2026-10-15T07:35:00-05:00
+product: Heatlot (rebuild of Assay)
+repo: C:\Repos\shmindmaster\assay (github.com/shmindmaster/heatlot; renamed from shmindmaster/assay on 2026-10-15)
+commit: e522e8e
+verdict: In Development
+functional_ready: partial
+demo_ready: no
+production_ready: no
+deployed_sha: 46cc33d (release v0.3.0, published as Assay, https://github.com/shmindmaster/heatlot/releases/tag/v0.3.0)
+tests: "CI Node 20 + 22 verify:all 12/12, gate RELEASE ALLOWED with 15/15 mutations @ e522e8e (run 38741917669)"
+films: ["D:\\OneDrive - Maya Modest LLC\\Videos\\Portfolio\\Assay\\01 - The Agent Drafts, Software Decides.mp4 (Assay; superseded by the Heatlot film, not yet made)"]
+blockers: ["npm publish of heatlot needs the owner's one-time npm login"]
+api_surface: "Planned for Heatlot: CLI heatlot verify, HTTP API with generated OpenAPI + Scalar, MCP server. Today: the Assay-era read-only MCP server and the internal packages/broker library."
+next_action: "M2: synthetic supplier packets (CoC + MTR PDFs, malicious hidden-text packet) and spec tables"
+updated: 2026-10-15T08:45:00-05:00
 ```
 
 # Readiness
 
-## Verdict: Verified End-to-End Ready
+## Verdict: In Development
 
-Assay is complete for what it claims to be: an offline, open-source reference implementation of a deterministic control layer. Every journey runs and is tested. Both live providers have been exercised against the real APIs, and the product is demonstrated on film. On 2026-10-15 it was released through the gated workflow, and the published artifact was smoke-tested.
+Re-rated on 2026-10-15. Assay was verified end to end as a reference implementation of the control layer (see the history below and in [TESTS.md](TESTS.md)). The product is now Heatlot, AI verification of supplier certificates at receiving inspection, and its flow (supplier packets, cited extraction, spec rules, inspection console, API) is being built milestone by milestone. Until that flow runs and is tested, the honest verdict is In Development. The control layer it is built on stays green in CI: every guard is proven able to fail, 15 of 15.
 
 | Readiness | Status | Why |
 |---|---|---|
-| Functional | **Yes** | Every journey in [FUNCTIONAL.md](FUNCTIONAL.md) runs and is covered by an executed test or CI step. The live Anthropic (`claude-sonnet-5-5`) and OpenAI (`gpt-6.1-sol`) paths each ran against the real API and refused the injected release for `untrusted-context`. |
-| Demo | **Yes** | Film 01 (format B) is delivered with every release gate passing on the exact file. The Explorer and all demo scripts run offline with no key. Format A (executive cut) is staged and waiting for a heavy-work slot; format C is not started. |
-| Production | **Yes** | [v0.3.0](https://github.com/shmindmaster/assay/releases/tag/v0.3.0) was published by `release.yml` (run 38707067941) only after its gate and drill passed. The attached `report.json` records `allowed: true` with 5/5 checks. A clean install from the published source archive passed the path smoke test. |
+| Functional | **Partial** | The control layer (broker, receipts, verifier, mutation harness) works and is tested. The certificate-verification flow is not built yet. |
+| Demo | **No** | The Assay film shows the control layer on foundry data. The Heatlot film comes after the product works end to end. |
+| Production | **No** | v0.3.0 was released as Assay. No Heatlot release yet; the npm package `heatlot` is not published. |
 
-"Production" for Assay means a published, gate-checked release. It is deliberately not a hosted service, so there is nothing to health-check. The smoke test is the production check for the path.
+## History: Assay verification (v0.3.0)
 
 ## Production evidence (v0.3.0)
 

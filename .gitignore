@@ -33,4 +33,4 @@ SPEC.md
 .agentlogs/
 
 # Scratch copies made by the mutation harness and the gate drill
-/.assay-*/
+/.heatlot-*/

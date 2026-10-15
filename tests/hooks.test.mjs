@@ -44,7 +44,7 @@ test('write under references/ is blocked (exit 2)', () => {
 });
 
 test('absolute Windows path into ground truth is blocked (normalization)', () => {
-  const res = runGate(write('C:\\Repos\\shmindmaster\\assay\\schemas\\coc-report.schema.json'));
+  const res = runGate(write('C:\\Repos\\shmindmaster\\heatlot\\schemas\\coc-report.schema.json'));
   assert.equal(res.status, 2);
   assert.match(res.stderr, /schemas\//);
 });

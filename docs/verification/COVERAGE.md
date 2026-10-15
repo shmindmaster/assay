@@ -1,6 +1,6 @@
 # Coverage
 
-Rungs: `Planned → Implemented → Integrated → Tested → Demonstrated → Production-Verified`. "Production" for Assay means a published, gate-checked release. [v0.3.0](https://github.com/shmindmaster/assay/releases/tag/v0.3.0) was published by `release.yml` on 2026-10-15, and its source archive was smoke-tested (see [TESTS.md](TESTS.md)). A capability is marked Production-Verified only if that release run (which executes `verify:all`, the gate and the drill before publishing) or the artifact smoke test exercised it. The live-provider rows stay at Demonstrated: the release does not call either API.
+Rungs: `Planned → Implemented → Integrated → Tested → Demonstrated → Production-Verified`. "Production" for Heatlot means a published, gate-checked release. [v0.3.0](https://github.com/shmindmaster/heatlot/releases/tag/v0.3.0) was published by `release.yml` on 2026-10-15, and its source archive was smoke-tested (see [TESTS.md](TESTS.md)). A capability is marked Production-Verified only if that release run (which executes `verify:all`, the gate and the drill before publishing) or the artifact smoke test exercised it. The live-provider rows stay at Demonstrated: the release does not call either API.
 
 ## Capability matrix (commit `46cc33d`, release v0.3.0)
 
@@ -27,7 +27,7 @@ Rungs: `Planned → Implemented → Integrated → Tested → Demonstrated → P
 | OpenAI structured outputs (`gpt-6.1-sol`, strict json_schema) | Live-verified once; unit-tested against a stubbed transport | `docs/evidence/live-run-2026-10-15-openai/`; `tests/live-provider-openai.test.mjs` |
 | MCP (stdio and loopback HTTP, 2026-07-28 and 2025-11-25) | Real handshakes in CI; protocol conformance with a shrink-only baseline | `smoke:mcp`, `conformance:mcp` |
 | PreToolUse write-boundary hook | Hook unit-tested; the Claude Code plugin packaging was removed on 2026-10-15 | `tests/hooks.test.mjs` |
-| GitHub Actions release | Ran once for v0.3.0: gate, drill, publish | Run 38707067941; [release](https://github.com/shmindmaster/assay/releases/tag/v0.3.0) |
+| GitHub Actions release | Ran once for v0.3.0: gate, drill, publish | Run 38707067941; [release](https://github.com/shmindmaster/heatlot/releases/tag/v0.3.0) |
 
 ## Gap lists
 

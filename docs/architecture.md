@@ -1,6 +1,6 @@
 # 1. Introduction
 
-Assay is a working example of one idea: when an LLM agent is put in front of a
+Heatlot is a working example of one idea: when an LLM agent is put in front of a
 decision that matters, the model should draft and software should decide. The
 model is good at reading a heterogeneous pile of documents and writing a
 coherent account of it. It is not a place to put a guarantee. So every guarantee
@@ -309,7 +309,7 @@ take on trust.
 
 `src/providers/replay.mjs` is the default and serves recorded request and
 response pairs from `fixtures/provider/`, keyed by a hash of decision id, prompt
-hash and provider name. Live calls require `ASSAY_LIVE=1` and belong only to
+hash and provider name. Live calls require `HEATLOT_LIVE=1` and belong only to
 `npm run verify:live`, which is not part of `npm run demo` or `npm test`.
 
 The live Anthropic adapter (`src/providers/anthropic-live.mjs`) uses the official
@@ -325,7 +325,7 @@ Decision receipts carry that provenance; a failed live call becomes a
 
 The live OpenAI adapter (`src/providers/openai-live.mjs`) follows the same
 contract with strict `json_schema` structured outputs, defaulting to
-`gpt-6.1-sol` (override with `ASSAY_OPENAI_MODEL`). Its endpoint is fixed to
+`gpt-6.1-sol` (override with `HEATLOT_OPENAI_MODEL`). Its endpoint is fixed to
 `api.openai.com`, so an inherited `OPENAI_BASE_URL` cannot redirect a
 verification run. It records the request id, token usage, latency and finish
 reason, and fails closed on a refusal, an HTTP error, or empty or non-JSON content.

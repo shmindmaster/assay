@@ -10,7 +10,7 @@ const BIN = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'bin',
 const cli = (...args) => spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8', windowsHide: true });
 
 test('cli: keygen, approve, verify, and refuse an untrusted approval with exit 3', () => {
-  const dir = mkdtempSync(path.join(tmpdir(), 'assay-cli-'));
+  const dir = mkdtempSync(path.join(tmpdir(), 'heatlot-cli-'));
   assert.equal(cli('keygen', '--dir', dir).status, 0);
   assert.equal(cli('keygen', '--dir', dir).status, 2, 'never overwrites a signing key');
   const approved = cli('approve', '--dir', dir, '--tool', 'send_email', '--args', '{"to":"a@example.com"}', '--by', 'alice');

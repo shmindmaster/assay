@@ -1,9 +1,9 @@
 /**
  * Live Anthropic adapter — strict tool use on the current Sonnet, with provenance.
  *
- * Reached only through selectProvider('anthropic') with ASSAY_LIVE=1. The SDK's
+ * Reached only through selectProvider('anthropic') with HEATLOT_LIVE=1. The SDK's
  * transport is routed through liveFetch, so the one gated network function stays
- * the only way out of the process: with ASSAY_LIVE unset the SDK cannot connect
+ * the only way out of the process: with HEATLOT_LIVE unset the SDK cannot connect
  * even if something constructs it.
  *
  * Current-model rules this adapter follows (Claude Sonnet 5.5):
@@ -44,9 +44,9 @@ export function liveSystemPrompt(toolName) {
 }
 
 function effortFromEnv() {
-  const effort = process.env.ASSAY_ANTHROPIC_EFFORT ?? DEFAULT_ANTHROPIC_EFFORT;
+  const effort = process.env.HEATLOT_ANTHROPIC_EFFORT ?? DEFAULT_ANTHROPIC_EFFORT;
   if (!EFFORTS.has(effort)) {
-    throw new Error(`ASSAY_ANTHROPIC_EFFORT must be one of ${[...EFFORTS].join(', ')}; got "${effort}"`);
+    throw new Error(`HEATLOT_ANTHROPIC_EFFORT must be one of ${[...EFFORTS].join(', ')}; got "${effort}"`);
   }
   return effort;
 }
@@ -68,7 +68,7 @@ function usageOf(message) {
  */
 export async function completeAnthropicLive({ decision, prompt, fetch, now = () => performance.now() }) {
   const { default: Anthropic } = await import('@anthropic-ai/sdk');
-  const model = process.env.ASSAY_ANTHROPIC_MODEL ?? DEFAULT_ANTHROPIC_MODEL;
+  const model = process.env.HEATLOT_ANTHROPIC_MODEL ?? DEFAULT_ANTHROPIC_MODEL;
   const effort = effortFromEnv();
   const tool = toStrictTool(decision.schema, { name: decision.id });
   const provenance = {

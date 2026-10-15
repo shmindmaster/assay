@@ -1,29 +1,31 @@
 {
-  "name": "assay",
+  "name": "heatlot",
   "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "A reference architecture for deterministic agent control, with a runnable example: the agent drafts, code decides, and every effect needs a payload-bound single-use authorization and leaves a signed receipt.",
+  "description": "Every certificate, checked against the record. AI verification of supplier certificates of conformance and mill test reports at receiving inspection: the AI extracts, deterministic rules decide, every field is cited, and release needs a single-use authorization.",
   "author": "Sarosh Hussain",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shmindmaster/assay.git"
+    "url": "git+https://github.com/shmindmaster/heatlot.git"
   },
-  "homepage": "https://github.com/shmindmaster/assay#readme",
+  "homepage": "https://github.com/shmindmaster/heatlot#readme",
   "bugs": {
-    "url": "https://github.com/shmindmaster/assay/issues"
+    "url": "https://github.com/shmindmaster/heatlot/issues"
   },
   "keywords": [
+    "receiving-inspection",
+    "certificate-of-conformance",
+    "mill-test-report",
+    "supplier-quality",
+    "as9100",
     "ai-agents",
-    "agent-safety",
-    "deterministic-control",
-    "evals",
     "mcp",
-    "structured-outputs"
+    "audit-trail"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13"
   },
   "scripts": {
     "generate:data": "node scripts/generate-data.mjs",
