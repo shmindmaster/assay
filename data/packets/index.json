@@ -21,6 +21,15 @@
       }
     },
     {
+      "packet": "PKT-24002R",
+      "po": "PO-31902",
+      "expected": "ACCEPT",
+      "files": {
+        "mtr.pdf": "7f9831119cff1edc4800546187ddbc9223fad7a46e7d60d1e38833f2ecf75151",
+        "coc.pdf": "518b74d42e9715f8aad6a404d89968f9002352495155afeaf729297988db1cc7"
+      }
+    },
+    {
       "packet": "PKT-24003",
       "po": "PO-31915",
       "expected": "NONCONFORMING",

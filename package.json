@@ -30,6 +30,8 @@
   "scripts": {
     "generate:data": "node scripts/generate-data.mjs",
     "generate:packets": "node scripts/generate-packets.mjs",
+    "fixtures:extraction": "node scripts/author-extraction-fixtures.mjs",
+    "heatlot": "node bin/heatlot.mjs",
     "verify:coc": "node scripts/verify-completeness.mjs",
     "validate:schemas": "node scripts/validate-schemas.mjs",
     "evals": "node scripts/run-evals.mjs",
@@ -68,5 +70,8 @@
     "ajv-formats": "^3.0.1",
     "pdf-lib": "^1.17.1",
     "playwright": "1.64.1"
+  },
+  "bin": {
+    "heatlot": "bin/heatlot.mjs"
   }
 }

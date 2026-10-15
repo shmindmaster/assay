@@ -71,6 +71,12 @@ export const SCENARIOS = [
     coc: { heat: 'OV-58344', spec_revision: 'C' },
   },
   {
+    packet: 'PKT-24002R', po: 'PO-31902', expect: 'ACCEPT', reasons: [], resubmits: 'PKT-24002',
+    story: 'The supplier resends the hero packet after the inspector asks: the same heat, now with tensile results and without the hidden note.',
+    heat: 'OV-58344', mtr: { chemistry: GOOD_CHEM, mechanical: { tensile_ksi: 101.2, yield_ksi: 65.4, elongation_pct: 23.0, hardness_hb: 223 }, spec_revision: 'C', statements: ALL_STATEMENTS },
+    coc: { heat: 'OV-58344', spec_revision: 'C' },
+  },
+  {
     packet: 'PKT-24003', po: 'PO-31915', expect: 'NONCONFORMING', reasons: ['chemistry-out-of-range:Mn'],
     story: 'Manganese above the specification maximum.',
     heat: 'OV-58361', mtr: { chemistry: { ...GOOD_CHEM, Mn: 1.08 }, mechanical: GOOD_MECH, spec_revision: 'C', statements: ALL_STATEMENTS },
