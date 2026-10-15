@@ -24,7 +24,7 @@ const policy = JSON.parse(readFileSync(path.join(REPO_ROOT, 'policy', 'policy.js
 const KINDS = policy.ledger.kinds;
 
 function scratchChain(subject) {
-  const root = mkdtempSync(path.join(os.tmpdir(), 'assay-explorer-'));
+  const root = mkdtempSync(path.join(os.tmpdir(), 'heatlot-explorer-'));
   const options = { ledgerRoot: root };
   append('context_assembled', 'coc-assembler', subject, { blocks: 3, untrusted: ['data/docs/x.md'] }, options);
   append('decision_returned', 'coc-assembler', subject, { status: 'complete', missing_records: [], provenance: { provider: 'replay' } }, options);
@@ -84,7 +84,7 @@ test('tampering one byte in any receipt breaks both verifiers at the same index'
 });
 
 test('the rendered page is deterministic, offline, and carries the verifier', () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), 'assay-explorer-render-'));
+  const root = mkdtempSync(path.join(os.tmpdir(), 'heatlot-explorer-render-'));
   try {
     const chain = scratchChain('EXPLORER-RENDER');
     mkdirSync(path.join(root, 'ledger'), { recursive: true });

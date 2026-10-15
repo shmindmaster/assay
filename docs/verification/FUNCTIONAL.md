@@ -2,7 +2,7 @@
 
 ## Roles and permissions
 
-Assay has no human login. Its "roles" are agents, each with a policy entry in `policy/policy.json` that code enforces. A model is never asked to respect them.
+Heatlot has no human login. Its "roles" are agents, each with a policy entry in `policy/policy.json` that code enforces. A model is never asked to respect them.
 
 | Agent | May read | May call (MCP tools) | Decisions | Effects |
 |---|---|---|---|---|
@@ -21,7 +21,7 @@ Write boundary: only `reports/drafts/` is writable. `reports/published/` is guar
 | Release an incomplete certificate (the refusal) | `npm run demo` | Model drafts COMPLETE; code computes INCOMPLETE (mechanical test missing); authorization refused; effect denied; exit 3 | `verify:all` step `demo` (exit 3) |
 | The same under prompt injection | `npm run demo:injection` | Untrusted block labelled, not stripped; denial receipt names `untrusted-context` | `verify:all`, gate `refusal-correctness`, `denialRule` floor |
 | Release a complete certificate (the positive case) | `npm run verify:coc -- PO-MER-5532` | exit 0 | `verify:all`, `tests/broker.test.mjs` |
-| Live model run | `ASSAY_LIVE=1 npm run verify:live` | Real Sonnet 5.5 draft; provenance; same refusal; exit 3 | Recorded run `req_011Cg3GxmZmrYjTfuCEWQrTL` |
+| Live model run | `HEATLOT_LIVE=1 npm run verify:live` | Real Sonnet 5.5 draft; provenance; same refusal; exit 3 | Recorded run `req_011Cg3GxmZmrYjTfuCEWQrTL` |
 | Audit a decision with no model | `npm run audit -- --po PO-AER-5519` | Decision reconstructed from receipts; chain verified | `verify:all` step `audit:tamper`, gate `audit-replay` |
 | See and tamper the chain | `npm run demo && npm run explorer` | Offline page; Tamper one byte breaks the chain at that link | `tests/explorer.test.mjs` (parity on every tamper); film 01 |
 | Ask what an agent may do | `npm run policy:explain -- --agent coc-assembler` | Reads, tools, decisions, effects, binding, single use | Film 01 (terminal stage, real output) |
@@ -39,7 +39,7 @@ Write boundary: only `reports/drafts/` is writable. `reports/published/` is guar
 
 ## AI and agent behaviour
 
-- Replay is the default and needs no key or network. Live calls need `ASSAY_LIVE=1`, and `liveFetch` is the only network path; the Anthropic SDK's transport is routed through it.
+- Replay is the default and needs no key or network. Live calls need `HEATLOT_LIVE=1`, and `liveFetch` is the only network path; the Anthropic SDK's transport is routed through it.
 - Live Anthropic calls: `claude-sonnet-5-5`, strict tool under `tool_choice: auto`, `output_config.effort`, opt-in fallbacks, no hidden retries.
 - Every decision receipt carries provenance: fixture key, or requested and served model, request id, tokens, latency and stop reason. A failed call is a `decision_failed` receipt with the same provenance.
 - The prompt never tells the model to distrust anything. The defence is in the broker, not the prompt.

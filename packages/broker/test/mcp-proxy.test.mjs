@@ -12,7 +12,7 @@ import { AUTH_META_KEY, Broker, generateKeys, startProxy } from '../src/index.mj
 const SERVER = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'fixtures', 'fake-mcp-server.mjs');
 
 function harness() {
-  const broker = new Broker({ dir: mkdtempSync(path.join(tmpdir(), 'assay-proxy-')), privateKey: generateKeys().privateKey });
+  const broker = new Broker({ dir: mkdtempSync(path.join(tmpdir(), 'heatlot-proxy-')), privateKey: generateKeys().privateKey });
   const input = new PassThrough();
   const output = new PassThrough();
   const upstream = startProxy({ broker, command: process.execPath, args: [SERVER], input, output, stderr: 'ignore' });

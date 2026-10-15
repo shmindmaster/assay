@@ -1,4 +1,4 @@
-# AGENTS.md — Assay
+# AGENTS.md — Heatlot
 
 Instructions for any coding agent working in this repository.
 
@@ -21,7 +21,7 @@ the tests pass.
   `git clone` and `npm install` — obviously needs the network; nothing after it
   does. The default provider replays fixtures, demo scripts name replay
   explicitly rather than relying on the default, and spawned children have
-  `ASSAY_LIVE` stripped. Live calls are opt-in behind `ASSAY_LIVE=1` and belong
+  `HEATLOT_LIVE` stripped. Live calls are opt-in behind `HEATLOT_LIVE=1` and belong
   only to `npm run verify:live`.
 - **Reproducible.** Seeded generators, logical counters, no wall clock in any
   output a test or a reviewer compares. Two runs produce identical bytes.

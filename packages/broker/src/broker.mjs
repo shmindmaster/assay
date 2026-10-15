@@ -1,7 +1,7 @@
 /**
  * The broker: the only path from an agent's request to a real effect.
  *
- *   const broker = new Broker({ dir: '.assay', privateKey });
+ *   const broker = new Broker({ dir: '.heatlot', privateKey });
  *   const sendEmail = broker.guard('send_email', realSendEmail);
  *   await sendEmail(payload, { authorization });   // refused unless authorized for exactly this payload
  *
@@ -13,10 +13,10 @@
 import { randomUUID } from 'node:crypto';
 import { Ledger, hashOf, sha256, verifyChain } from './receipts.mjs';
 
-export class AssayRefusal extends Error {
+export class HeatlotRefusal extends Error {
   constructor(rule, message, receipt) {
     super(`heatlot-broker refused (${rule}): ${message}`);
-    this.name = 'AssayRefusal';
+    this.name = 'HeatlotRefusal';
     this.rule = rule;
     this.receipt = receipt;
   }
@@ -39,7 +39,7 @@ export class Broker {
 
   /**
    * Mint a single-use authorization for one tool and one exact payload.
-   * Throws AssayRefusal (and records the refusal) if any input is untrusted.
+   * Throws HeatlotRefusal (and records the refusal) if any input is untrusted.
    */
   approve(tool, payload, { by, inputs = [] } = {}) {
     if (typeof tool !== 'string' || tool === '') throw new TypeError('tool name required');
@@ -56,7 +56,7 @@ export class Broker {
         tool, payload_sha256: payloadSha, by, rule: 'untrusted-input',
         untrusted: tainted.map(({ source, sha256: s }) => ({ source, sha256: s })),
       });
-      throw new AssayRefusal('untrusted-input', `${tainted.length} untrusted input(s) fed this decision: ${tainted.map((t) => t.source).join(', ')}`, receipt);
+      throw new HeatlotRefusal('untrusted-input', `${tainted.length} untrusted input(s) fed this decision: ${tainted.map((t) => t.source).join(', ')}`, receipt);
     }
     const id = randomUUID();
     const receipt = this.ledger.append('authorization_minted', {
@@ -86,12 +86,12 @@ export class Broker {
     return { ok: true, mint };
   }
 
-  /** Consume an authorization (records it) or throw AssayRefusal (records the denial). */
+  /** Consume an authorization (records it) or throw HeatlotRefusal (records the denial). */
   consume(tool, payload, authorization) {
     const verdict = this.check(tool, payload, authorization);
     if (!verdict.ok) {
       const receipt = this.ledger.append('effect_denied', { tool, payload_sha256: hashOf(payload), rule: verdict.rule, authorization_id: authorization?.id ?? null });
-      throw new AssayRefusal(verdict.rule, verdict.message, receipt);
+      throw new HeatlotRefusal(verdict.rule, verdict.message, receipt);
     }
     this.ledger.append('authorization_consumed', { id: authorization.id, tool });
     return verdict.mint;

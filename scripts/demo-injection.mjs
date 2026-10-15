@@ -47,7 +47,7 @@ function freshLedger() {
 async function main() {
   freshLedger();
 
-  console.log(`\nAssay — prompt injection walkthrough   subject ${SUBJECT}`);
+  console.log(`\nHeatlot — prompt injection walkthrough   subject ${SUBJECT}`);
   console.log('Offline: the model response is replayed from a recorded fixture.');
 
   // ── 1. Context ─────────────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ async function main() {
   step(2, 'Ask the model — it believes the injected note');
   append('decision_requested', AGENT, SUBJECT, { decision: 'coc-report', prompt_chars: PROMPT.length });
   // Replay named explicitly. The offline claim should not depend on whether the
-  // reader happens to have ASSAY_LIVE set in their shell.
+  // reader happens to have HEATLOT_LIVE set in their shell.
   const { value: draft, provenance } = await completeWithProvenance({ decisionId: 'coc-report', prompt: PROMPT, provider: 'replay' });
   const claimed = draft.items.find((i) => i.type === 'mechanical-test');
 

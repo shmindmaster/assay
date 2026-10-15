@@ -26,22 +26,22 @@ const completion = (overrides = {}) => ({
 });
 
 async function withTransport(respond, fn) {
-  const saved = { fetch: globalThis.fetch, live: process.env.ASSAY_LIVE, key: process.env.OPENAI_API_KEY, model: process.env.ASSAY_OPENAI_MODEL, base: process.env.OPENAI_BASE_URL };
+  const saved = { fetch: globalThis.fetch, live: process.env.HEATLOT_LIVE, key: process.env.OPENAI_API_KEY, model: process.env.HEATLOT_OPENAI_MODEL, base: process.env.OPENAI_BASE_URL };
   const requests = [];
   globalThis.fetch = async (url, init) => {
     requests.push({ url: String(url), body: init?.body ? JSON.parse(init.body) : null, headers: new Headers(init?.headers) });
     const { status = 200, json } = respond();
     return new Response(JSON.stringify(json), { status, headers: { 'content-type': 'application/json', 'x-request-id': 'req_openai_stub_01' } });
   };
-  process.env.ASSAY_LIVE = '1';
+  process.env.HEATLOT_LIVE = '1';
   process.env.OPENAI_API_KEY = 'sk-test-not-a-real-key';
   process.env.OPENAI_BASE_URL = 'http://127.0.0.1/v1';
-  delete process.env.ASSAY_OPENAI_MODEL;
+  delete process.env.HEATLOT_OPENAI_MODEL;
   try {
     await fn(requests);
   } finally {
     globalThis.fetch = saved.fetch;
-    for (const [k, v] of [['ASSAY_LIVE', saved.live], ['OPENAI_API_KEY', saved.key], ['ASSAY_OPENAI_MODEL', saved.model], ['OPENAI_BASE_URL', saved.base]]) {
+    for (const [k, v] of [['HEATLOT_LIVE', saved.live], ['OPENAI_API_KEY', saved.key], ['HEATLOT_OPENAI_MODEL', saved.model], ['OPENAI_BASE_URL', saved.base]]) {
       if (v === undefined) delete process.env[k]; else process.env[k] = v;
     }
   }

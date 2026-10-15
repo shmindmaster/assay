@@ -24,7 +24,7 @@ function ledgerTopDir() {
 }
 const REGRESSIONS = path.join(REPO_ROOT, 'evals', 'regressions');
 const ENV = { ...process.env };
-delete ENV.ASSAY_LIVE;
+delete ENV.HEATLOT_LIVE;
 
 function load() {
   return readdirSync(REGRESSIONS).filter((f) => f.endsWith('.json')).sort().map((file) => {
@@ -42,7 +42,7 @@ function load() {
 function copyRepository(destination) {
   const excluded = new Set(['.git', '.agentlogs', '.briefs', 'node_modules', ledgerTopDir(), 'reports']);
   for (const entry of readdirSync(REPO_ROOT, { withFileTypes: true })) {
-    if (excluded.has(entry.name) || entry.name.startsWith('.assay-')) continue;
+    if (excluded.has(entry.name) || entry.name.startsWith('.heatlot-')) continue;
     cpSync(path.join(REPO_ROOT, entry.name), path.join(destination, entry.name), { recursive: entry.isDirectory() });
   }
 }
@@ -81,7 +81,7 @@ function main() {
   let blocked = 0;
   for (const def of definitions) {
     // Scratch lives inside the repository so Node resolves node_modules by walking up.
-    const scratch = mkdtempSync(path.join(REPO_ROOT, '.assay-drill-'));
+    const scratch = mkdtempSync(path.join(REPO_ROOT, '.heatlot-drill-'));
     try {
       copyRepository(scratch);
       apply(scratch, def);

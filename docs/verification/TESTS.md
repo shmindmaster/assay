@@ -6,17 +6,17 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 
 | Run | Commit | Job | Result |
 |---|---|---|---|
-| [38698163920](https://github.com/shmindmaster/assay/actions/runs/38698163920) | `bfd326c` (main) | Node 20 verification | success: `npm audit --omit=dev` 0 vulnerabilities; `verify:all` ALL GREEN 12/12; corpus reproducible; `gate` RELEASE ALLOWED; benchmark unchanged; `gate:drill` 2/2 blocked |
+| [38698163920](https://github.com/shmindmaster/heatlot/actions/runs/38698163920) | `bfd326c` (main) | Node 20 verification | success: `npm audit --omit=dev` 0 vulnerabilities; `verify:all` ALL GREEN 12/12; corpus reproducible; `gate` RELEASE ALLOWED; benchmark unchanged; `gate:drill` 2/2 blocked |
 | 38698163920 | `bfd326c` | Node 22 verification | success (same steps, same results) |
 | 38698164047 | `bfd326c` | CodeQL JavaScript | success |
-| [38674130953](https://github.com/shmindmaster/assay/actions/runs/38674130953) | `1067715` (PR head) | Node 20, Node 22 verification | success (2026-10-15T03:03–03:04Z) |
-| [38707061289](https://github.com/shmindmaster/assay/actions/runs/38707061289) | `46cc33d` (main, v0.3.0) | Node 20, Node 22 verification | success |
-| [38715583822](https://github.com/shmindmaster/assay/actions/runs/38715583822) | `afea269` (PR #26 head) | Node 20 verification | **failure**, conformance step only: `@modelcontextprotocol/conformance` imports `fs.globSync`, which Node 20 lacks. Fixed in `7450320`, which runs conformance on the Node 22 leg with a version guard. Node 22 passed in the same run |
-| [38716923519](https://github.com/shmindmaster/assay/actions/runs/38716923519) | `7450320` (PR #26 head) | Node 20, Node 22 verification; CodeQL | success; merged as `d76aa1e` |
-| [38734598133](https://github.com/shmindmaster/assay/actions/runs/38734598133) | `d76aa1e` (main) | Node 20 verification | success: `verify:all` ALL GREEN 12/12 (incl. `smoke:mcp` 21/21); `gate` RELEASE ALLOWED; `docs:reference --check` clean; `conformance-baseline` 4/4; conformance skipped by design on Node 20 |
+| [38674130953](https://github.com/shmindmaster/heatlot/actions/runs/38674130953) | `1067715` (PR head) | Node 20, Node 22 verification | success (2026-10-15T03:03–03:04Z) |
+| [38707061289](https://github.com/shmindmaster/heatlot/actions/runs/38707061289) | `46cc33d` (main, v0.3.0) | Node 20, Node 22 verification | success |
+| [38715583822](https://github.com/shmindmaster/heatlot/actions/runs/38715583822) | `afea269` (PR #26 head) | Node 20 verification | **failure**, conformance step only: `@modelcontextprotocol/conformance` imports `fs.globSync`, which Node 20 lacks. Fixed in `7450320`, which runs conformance on the Node 22 leg with a version guard. Node 22 passed in the same run |
+| [38716923519](https://github.com/shmindmaster/heatlot/actions/runs/38716923519) | `7450320` (PR #26 head) | Node 20, Node 22 verification; CodeQL | success; merged as `d76aa1e` |
+| [38734598133](https://github.com/shmindmaster/heatlot/actions/runs/38734598133) | `d76aa1e` (main) | Node 20 verification | success: `verify:all` ALL GREEN 12/12 (incl. `smoke:mcp` 21/21); `gate` RELEASE ALLOWED; `docs:reference --check` clean; `conformance-baseline` 4/4; conformance skipped by design on Node 20 |
 | 38734598133 | `d76aa1e` | Node 22 verification | success: as Node 20, plus `conformance:mcp` 2026-07-28 exit 0 (24 pass, 17 baselined) and 2025-11-25 exit 0 (34 pass, 25 baselined) |
 | 38734598001 | `d76aa1e` | CodeQL JavaScript | success |
-| [38707067941](https://github.com/shmindmaster/assay/actions/runs/38707067941) | `v0.3.0` tag | Release gate, then Publish release | success: gate and drill passed; release published 2026-10-15T08:40:12Z with `benchmark.md` and `report.json` (`allowed: true`, 5/5) |
+| [38707067941](https://github.com/shmindmaster/heatlot/actions/runs/38707067941) | `v0.3.0` tag | Release gate, then Publish release | success: gate and drill passed; release published 2026-10-15T08:40:12Z with `benchmark.md` and `report.json` (`allowed: true`, 5/5) |
 
 `verify:all` runs, each at its expected exit code: `generate:data`, `test`, `validate:schemas`, `evals`, `evals:mutate`, `smoke:mcp`, `verify:coc PO-AER-5519` (3), `verify:coc PO-MER-5532` (0), `audit:tamper`, `demo:denied`, `demo:injection`, `demo` (3).
 
@@ -24,7 +24,7 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 
 | Command | Artifact | When (CT) | Result |
 |---|---|---|---|
-| `npm ci` from `assay-0.3.0.tar.gz` (release source archive) | v0.3.0 | 2026-10-15 | clean install |
+| `npm ci` from `heatlot-0.3.0.tar.gz` (release source archive) | v0.3.0 | 2026-10-15 | clean install |
 | `node scripts/verify-completeness.mjs PO-AER-5519` | v0.3.0 | 2026-10-15 | exit 3, INCOMPLETE (mechanical-test missing) |
 | `node scripts/verify-completeness.mjs PO-MER-5532` | v0.3.0 | 2026-10-15 | exit 0, COMPLETE |
 | `node scripts/demo-injection.mjs` | v0.3.0 | 2026-10-15 | exit 0; authorization refused and effect denied under `untrusted-context`; 6 receipts; chain verified |
@@ -41,9 +41,9 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 | `npm run smoke:mcp` | `a0a07c0` (MCP v2 merge) | 2026-10-14 | 12/12 checks; negotiated revision 2026-07-28 |
 | `npm audit --omit=dev --audit-level=high` | `a0a07c0` | 2026-10-14 | 0 vulnerabilities |
 | `claude plugin validate .` | `a0a07c0` | 2026-10-14 | passed with two pre-existing warnings |
-| `ASSAY_LIVE=1 npm run verify:live` (Anthropic) | `1067715` | 2026-10-14 | exit 3 (expected refusal); `claude-sonnet-5-5`, `req_011Cg3GxmZmrYjTfuCEWQrTL`; denial rule `untrusted-context`; [evidence](../evidence/live-run-2026-10-14/) |
-| `ASSAY_LIVE=1 ASSAY_PROVIDER=openai npm run verify:live` (old default `gpt-4o-2024-08-06`) | `4699c2c` | 2026-10-15 | exit 3 (expected refusal); model INCOMPLETE; denial `untrusted-context`; exposed thin provenance (fixed) |
-| `ASSAY_LIVE=1 ASSAY_PROVIDER=openai npm run verify:live` (`gpt-6.1-sol`) | release/v0.3.0 | 2026-10-15 | exit 3 (expected refusal); `req_971f4bc010bd427db04b44503f04cff3`, 3423/808 tokens, 13.6 s; model INCOMPLETE; denial `untrusted-context`; [evidence](../evidence/live-run-2026-10-15-openai/) |
+| `HEATLOT_LIVE=1 npm run verify:live` (Anthropic) | `1067715` | 2026-10-14 | exit 3 (expected refusal); `claude-sonnet-5-5`, `req_011Cg3GxmZmrYjTfuCEWQrTL`; denial rule `untrusted-context`; [evidence](../evidence/live-run-2026-10-14/) |
+| `HEATLOT_LIVE=1 HEATLOT_PROVIDER=openai npm run verify:live` (old default `gpt-4o-2024-08-06`) | `4699c2c` | 2026-10-15 | exit 3 (expected refusal); model INCOMPLETE; denial `untrusted-context`; exposed thin provenance (fixed) |
+| `HEATLOT_LIVE=1 HEATLOT_PROVIDER=openai npm run verify:live` (`gpt-6.1-sol`) | release/v0.3.0 | 2026-10-15 | exit 3 (expected refusal); `req_971f4bc010bd427db04b44503f04cff3`, 3423/808 tokens, 13.6 s; model INCOMPLETE; denial `untrusted-context`; [evidence](../evidence/live-run-2026-10-15-openai/) |
 | `node --test tests/live-provider-openai.test.mjs` | release/v0.3.0 | 2026-10-15 | 6/6 pass |
 | `npm run test:browser` | test/explorer-browser | 2026-10-15 | 4/4 pass; with the payload-hash check disabled, the tamper test fails (mutation caught) |
 | `npm run smoke:mcp` | `afea269` (PR #26) | 2026-10-15 | 21/21 checks: 2026-07-28 and 2025-11-25 on stdio and on loopback HTTP; foreign Origin 403; strict inputs; titles; cache hint. With the old loose input schemas, the two strict-input checks fail (guard proven able to fail) |

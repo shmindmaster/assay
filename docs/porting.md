@@ -1,4 +1,4 @@
-# 1. Porting Assay to another domain
+# 1. Porting Heatlot to another domain
 
 The foundry is not the point. It is a domain where a wrong answer leaves a paper
 trail, which makes the control layer legible in a terminal. Everything structural

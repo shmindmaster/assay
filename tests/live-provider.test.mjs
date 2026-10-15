@@ -42,10 +42,10 @@ function messageBody(overrides = {}) {
 async function withLiveTransport(respond, fn) {
   const saved = {
     fetch: globalThis.fetch,
-    live: process.env.ASSAY_LIVE,
+    live: process.env.HEATLOT_LIVE,
     key: process.env.ANTHROPIC_API_KEY,
-    model: process.env.ASSAY_ANTHROPIC_MODEL,
-    effort: process.env.ASSAY_ANTHROPIC_EFFORT,
+    model: process.env.HEATLOT_ANTHROPIC_MODEL,
+    effort: process.env.HEATLOT_ANTHROPIC_EFFORT,
   };
   const requests = [];
   globalThis.fetch = async (url, init) => {
@@ -58,17 +58,17 @@ async function withLiveTransport(respond, fn) {
       headers: { 'content-type': 'application/json', 'request-id': 'req_stubbed_0001' },
     });
   };
-  process.env.ASSAY_LIVE = '1';
+  process.env.HEATLOT_LIVE = '1';
   process.env.ANTHROPIC_API_KEY = 'sk-ant-test-not-a-real-key';
-  delete process.env.ASSAY_ANTHROPIC_MODEL;
-  delete process.env.ASSAY_ANTHROPIC_EFFORT;
+  delete process.env.HEATLOT_ANTHROPIC_MODEL;
+  delete process.env.HEATLOT_ANTHROPIC_EFFORT;
   try {
     await fn(requests);
   } finally {
     globalThis.fetch = saved.fetch;
     for (const [env, value] of [
-      ['ASSAY_LIVE', saved.live], ['ANTHROPIC_API_KEY', saved.key],
-      ['ASSAY_ANTHROPIC_MODEL', saved.model], ['ASSAY_ANTHROPIC_EFFORT', saved.effort],
+      ['HEATLOT_LIVE', saved.live], ['ANTHROPIC_API_KEY', saved.key],
+      ['HEATLOT_ANTHROPIC_MODEL', saved.model], ['HEATLOT_ANTHROPIC_EFFORT', saved.effort],
     ]) {
       if (value === undefined) delete process.env[env];
       else process.env[env] = value;
@@ -181,8 +181,8 @@ test('a schema-invalid tool input is rejected after the call and keeps its prove
 
 test('an unknown effort level is refused before any request', async () => {
   await withLiveTransport(() => ({ json: messageBody() }), async (requests) => {
-    process.env.ASSAY_ANTHROPIC_EFFORT = 'turbo';
-    await assert.rejects(ask(), /ASSAY_ANTHROPIC_EFFORT must be one of/);
+    process.env.HEATLOT_ANTHROPIC_EFFORT = 'turbo';
+    await assert.rejects(ask(), /HEATLOT_ANTHROPIC_EFFORT must be one of/);
     assert.equal(requests.length, 0);
   });
 });

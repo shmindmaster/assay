@@ -9,7 +9,7 @@ import { Ledger, canonical, generateKeys, hashOf, verifyChain } from '../src/rec
 
 const keys = generateKeys();
 function ledgerWith(n) {
-  const ledger = new Ledger(mkdtempSync(path.join(tmpdir(), 'assay-receipts-')), { privateKey: keys.privateKey });
+  const ledger = new Ledger(mkdtempSync(path.join(tmpdir(), 'heatlot-receipts-')), { privateKey: keys.privateKey });
   for (let i = 0; i < n; i++) ledger.append('step', { i, note: `receipt ${i}` });
   return ledger;
 }

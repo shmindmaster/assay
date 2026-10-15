@@ -1,7 +1,7 @@
 /**
  * Live OpenAI adapter: structured outputs (json_schema, strict) with provenance.
  *
- * Reached only through selectProvider('openai') with ASSAY_LIVE=1, and only
+ * Reached only through selectProvider('openai') with HEATLOT_LIVE=1, and only
  * through liveFetch, so the one gated network function stays the only way out.
  * The endpoint is fixed to api.openai.com: an inherited OPENAI_BASE_URL (for a
  * local gateway, say) must not silently redirect a verification run.
@@ -24,8 +24,8 @@ const ENDPOINT = 'https://api.openai.com/v1/chat/completions';
  */
 export async function completeOpenAILive({ decision, prompt, fetch, now = () => performance.now() }) {
   const key = process.env.OPENAI_API_KEY;
-  if (!key) throw new Error('ASSAY_LIVE=1 requires OPENAI_API_KEY for provider openai');
-  const model = process.env.ASSAY_OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
+  if (!key) throw new Error('HEATLOT_LIVE=1 requires OPENAI_API_KEY for provider openai');
+  const model = process.env.HEATLOT_OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
   const format = toStructuredOutput(decision.schema, { name: decision.id });
   const provenance = {
     provider: 'openai',

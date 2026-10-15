@@ -1,6 +1,6 @@
 # Security policy
 
-Assay is a reference implementation, not a hosted service. Security reports are
+Heatlot is a reference implementation, not a hosted service. Security reports are
 still important because people may reuse its policy, authorization, ledger, and
 provider-adapter patterns in systems that do make real changes.
 

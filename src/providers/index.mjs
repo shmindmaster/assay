@@ -2,8 +2,8 @@
  * Provider selection.
  *
  * Default: replay (fixtures/provider). No API key, no network.
- * Live Anthropic / OpenAI calls require ASSAY_LIVE=1 and are not on the
- * npm test / npm run demo path. With ASSAY_LIVE unset, no code path reaches
+ * Live Anthropic / OpenAI calls require HEATLOT_LIVE=1 and are not on the
+ * npm test / npm run demo path. With HEATLOT_LIVE unset, no code path reaches
  * the network — requesting a live provider is an error, not a fallthrough.
  */
 import { getDecision } from '../decisions/registry.mjs';
@@ -21,16 +21,16 @@ export { LiveDecisionError, DEFAULT_ANTHROPIC_MODEL, DEFAULT_ANTHROPIC_EFFORT } 
 export { DEFAULT_OPENAI_MODEL } from './openai-live.mjs';
 
 function liveEnabled() {
-  return process.env.ASSAY_LIVE === '1';
+  return process.env.HEATLOT_LIVE === '1';
 }
 
 /**
- * The only function that may call globalThis.fetch. Refuses unless ASSAY_LIVE=1,
+ * The only function that may call globalThis.fetch. Refuses unless HEATLOT_LIVE=1,
  * so a mistaken call with the flag unset cannot reach the network.
  */
 export function liveFetch(url, options) {
   if (!liveEnabled()) {
-    throw new Error(`blocked network call to ${url}: ASSAY_LIVE is unset; the default provider is replay`);
+    throw new Error(`blocked network call to ${url}: HEATLOT_LIVE is unset; the default provider is replay`);
   }
   if (typeof globalThis.fetch !== 'function') {
     throw new Error(`live fetch is unavailable for ${url}`);
@@ -53,12 +53,12 @@ const openaiLiveProvider = Object.freeze({
 });
 
 export function selectProvider(name) {
-  const requested = name ?? process.env.ASSAY_PROVIDER ?? 'replay';
+  const requested = name ?? process.env.HEATLOT_PROVIDER ?? 'replay';
   if (requested === 'replay') return replayProvider;
   if (requested === 'anthropic' || requested === 'openai') {
     if (!liveEnabled()) {
       throw new Error(
-        `provider "${requested}" is live-only. Set ASSAY_LIVE=1 to opt in; the default provider is replay and never reaches the network.`,
+        `provider "${requested}" is live-only. Set HEATLOT_LIVE=1 to opt in; the default provider is replay and never reaches the network.`,
       );
     }
     return requested === 'anthropic' ? anthropicLiveProvider : openaiLiveProvider;

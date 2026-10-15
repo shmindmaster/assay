@@ -1,4 +1,4 @@
-# assay — project memory
+# heatlot — project memory
 
 A reference architecture for deterministic agent control, with a runnable example: a
 quality-control agent for Kestrel Castings (synthetic foundry data only — no real client data

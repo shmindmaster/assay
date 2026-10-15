@@ -15,7 +15,7 @@ Node 20 or later.
 
 ```js
 import { Broker } from '@heatlot/broker';
-const broker = new Broker({ dir: '.assay', privateKey: process.env.ASSAY_SIGNING_KEY });
+const broker = new Broker({ dir: '.heatlot', privateKey: process.env.HEATLOT_SIGNING_KEY });
 const sendEmail = broker.guard('send_email', realSendEmail);
 ```
 
@@ -42,7 +42,7 @@ const authorization = broker.approve('send_email', payload, {
     untrusted(supplierNote, { source: 'email/inbound/123' }),
   ],
 });
-// -> throws AssayRefusal('untrusted-input') and writes an authorization_refused receipt
+// -> throws HeatlotRefusal('untrusted-input') and writes an authorization_refused receipt
 ```
 
 The model can read untrusted content and draft whatever it likes. What it cannot do is turn that
@@ -52,8 +52,8 @@ untrusted one blocks it.
 ## Proxy an MCP server
 
 ```bash
-node packages/broker/bin/broker.mjs keygen --dir .assay
-node packages/broker/bin/broker.mjs mcp-proxy --dir .assay -- node your-mcp-server.mjs
+node packages/broker/bin/broker.mjs keygen --dir .heatlot
+node packages/broker/bin/broker.mjs mcp-proxy --dir .heatlot -- node your-mcp-server.mjs
 ```
 
 Configure your MCP client to launch the proxy instead of the server. Tools annotated
@@ -61,7 +61,7 @@ Configure your MCP client to launch the proxy instead of the server. Tools annot
 has not seen listed) needs an authorization in `params._meta["heatlot/authorization"]`:
 
 ```bash
-node packages/broker/bin/broker.mjs approve --dir .assay --tool send_email --args '{"to":"a@example.com"}' --by alice
+node packages/broker/bin/broker.mjs approve --dir .heatlot --tool send_email --args '{"to":"a@example.com"}' --by alice
 ```
 
 A refused call never reaches the upstream server; the client gets an `isError` result naming the
@@ -70,7 +70,7 @@ rule. Works with both MCP protocol eras over stdio.
 ## Verify the receipts
 
 ```bash
-node packages/broker/bin/broker.mjs verify --dir .assay
+node packages/broker/bin/broker.mjs verify --dir .heatlot
 # verified: 7 receipts, chain and signatures intact
 # BROKEN at receipt 4: payload hash does not match the payload; receipts 5..6 are unverifiable
 ```

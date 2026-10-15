@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [20, 22]
+        node: [22, 24]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -39,13 +39,9 @@ jobs:
         run: npm run gate:drill
       - name: Reference docs and MCP catalog match the server and schemas
         run: npm run docs:reference -- --check
-      # The conformance tool needs Node 22 (it imports fs.globSync). The server itself supports
-      # Node 20, which smoke:mcp inside verify:all covers on both legs.
       - name: Fetch main for the conformance baseline shrink check
-        if: matrix.node == 22
         run: git fetch --no-tags --depth=1 origin main:refs/remotes/origin/main
       - name: MCP conformance at 2026-07-28 and 2025-11-25 (baseline may only shrink)
-        if: matrix.node == 22
         run: npm run conformance:mcp
       - name: Install the browser for the Explorer test
         run: npx playwright install --with-deps chromium-headless-shell

@@ -1,6 +1,6 @@
 # Roadmap
 
-Assay is an early public reference implementation. The immediate goal is to
+Heatlot is an early public reference implementation. The immediate goal is to
 make the deterministic-control pattern easier to test, port, and evaluate
 without turning the repository into a hosted product.
 
@@ -25,6 +25,6 @@ without turning the repository into a hosted product.
 
 ## Not promised
 
-Assay is not currently a hosted service, compliance certification, generalized
+Heatlot is not currently a hosted service, compliance certification, generalized
 agent framework, or production security boundary. Those labels will not be used
 until the corresponding implementation and evidence exist.

@@ -4,14 +4,14 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
-import { AssayRefusal, Broker, generateKeys, trusted, untrusted, verifyChain } from '../src/index.mjs';
+import { HeatlotRefusal, Broker, generateKeys, trusted, untrusted, verifyChain } from '../src/index.mjs';
 
 const keys = generateKeys();
 const fresh = () => new Broker({ dir: mkdtempSync(path.join(tmpdir(), 'heatlot-broker-')), privateKey: keys.privateKey });
 const EMAIL = { to: 'buyer@example.com', subject: 'Certificate of conformance', body: 'Attached.' };
 
 function refusedWith(rule) {
-  return (error) => error instanceof AssayRefusal && error.rule === rule;
+  return (error) => error instanceof HeatlotRefusal && error.rule === rule;
 }
 
 test('an authorized effect runs once and leaves verified, signed receipts', async () => {

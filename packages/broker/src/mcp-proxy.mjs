@@ -1,7 +1,7 @@
 /**
  * A stdio MCP proxy that puts the broker in front of an existing MCP server.
  *
- *   heatlot-broker mcp-proxy --dir .assay --key .assay/key.pem -- node my-server.mjs
+ *   heatlot-broker mcp-proxy --dir .heatlot --key .heatlot/key.pem -- node my-server.mjs
  *
  * Messages are relayed unchanged in both directions (newline-delimited JSON-RPC, both protocol
  * eras). Only `tools/call` is intercepted:
@@ -13,7 +13,7 @@
  */
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
-import { AssayRefusal } from './broker.mjs';
+import { HeatlotRefusal } from './broker.mjs';
 
 export const AUTH_META_KEY = 'heatlot/authorization';
 
@@ -55,7 +55,7 @@ export function startProxy({ broker, command, args = [], input = process.stdin, 
         try {
           broker.consume(tool, args, authorization);
         } catch (error) {
-          if (!(error instanceof AssayRefusal)) throw error;
+          if (!(error instanceof HeatlotRefusal)) throw error;
           send({ jsonrpc: '2.0', id: message.id, result: { content: [{ type: 'text', text: error.message }], isError: true } });
           return;
         }

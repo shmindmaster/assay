@@ -256,7 +256,7 @@ function flipOneByteInSha256(text) {
 }
 
 function runTamperCheck() {
-  const scratch = mkdtempSync(path.join(os.tmpdir(), 'assay-audit-tamper-'));
+  const scratch = mkdtempSync(path.join(os.tmpdir(), 'heatlot-audit-tamper-'));
   const subject = 'TAMPER-CHECK';
   try {
     openLedger(subject, { ledgerRoot: scratch });

@@ -46,7 +46,7 @@ function loadDefinitions(directory) {
 function copyRepository(destination) {
   const excluded = new Set(['.git', '.agentlogs', '.briefs', 'node_modules', ledgerTopDir(), 'reports']);
   for (const entry of readdirSync(REPO_ROOT, { withFileTypes: true })) {
-    if (excluded.has(entry.name) || entry.name.startsWith('.assay-')) continue;
+    if (excluded.has(entry.name) || entry.name.startsWith('.heatlot-')) continue;
     cpSync(path.join(REPO_ROOT, entry.name), path.join(destination, entry.name), {
       recursive: entry.isDirectory(),
     });
@@ -68,12 +68,12 @@ function run(command, args, cwd) {
   const result = spawnSync(command, args, {
     cwd,
     encoding: 'utf8',
-    // ASSAY_LIVE is stripped rather than inherited. A mutation child that could
+    // HEATLOT_LIVE is stripped rather than inherited. A mutation child that could
     // reach a live provider would be non-deterministic and billable, and this
     // harness spawns one per mutation.
     env: (() => {
-      const child = { ...process.env, ASSAY_MUTATION_CHILD: '1' };
-      delete child.ASSAY_LIVE;
+      const child = { ...process.env, HEATLOT_MUTATION_CHILD: '1' };
+      delete child.HEATLOT_LIVE;
       return child;
     })(),
   });
@@ -116,7 +116,7 @@ function main() {
 
   let caught = 0;
   for (const definition of definitions) {
-    const scratch = mkdtempSync(path.join(REPO_ROOT, '.assay-mutation-'));
+    const scratch = mkdtempSync(path.join(REPO_ROOT, '.heatlot-mutation-'));
     try {
       copyRepository(scratch);
       applyMutation(scratch, definition);

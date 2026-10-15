@@ -1,10 +1,10 @@
-# Assay verification pack
+# Heatlot verification pack
 
-Evidence for one question: is Assay complete, integrated, tested, demonstrable, and production-verified? Every claim here links to a command that was run, a commit, or a recording. Nothing in this folder is a plan presented as done.
+Evidence for one question: is Heatlot complete, integrated, tested, demonstrable, and production-verified? Every claim here links to a command that was run, a commit, or a recording. Nothing in this folder is a plan presented as done.
 
-Commit the evidence ran against: `bfd326c` (main, after PR [#16](https://github.com/shmindmaster/assay/pull/16)) and its pre-merge head `1067715`, which has an identical tree.
+Commit the evidence ran against: `bfd326c` (main, after PR [#16](https://github.com/shmindmaster/heatlot/pull/16)) and its pre-merge head `1067715`, which has an identical tree.
 
-## What Assay is
+## What Heatlot is
 
 A runnable, offline reference implementation of a deterministic control layer around an LLM agent: **the agent drafts, software decides.** The demonstration domain is a fictional sand-casting foundry, Kestrel Castings, releasing certificates of conformance. Every record is synthetic and generated from a seed.
 
@@ -41,6 +41,6 @@ A runnable, offline reference implementation of a deterministic control layer ar
 
 ## Existing material this pack links to rather than repeats
 
-- Showcase assessment: `AgentHub\runtime\coding-agent-dispatch\reports\showcase\assay.md` (2026-10-14).
-- Independent review of PR #16 (Cline, five findings, all fixed in `1067715`): `...\reports\showcase-prep\assay-pr16-review.md`.
+- Showcase assessment: `AgentHub\runtime\coding-agent-dispatch\reports\showcase\heatlot.md` (2026-10-14).
+- Independent review of PR #16 (Cline, five findings, all fixed in `1067715`): `...\reports\showcase-prep\heatlot-pr16-review.md`.
 - In-repo: [architecture](../architecture.md), [threat model](../threat-model.md), [benchmark](../benchmark.md), [decisions](../decisions/), [live-run evidence](../evidence/live-run-2026-10-14/).
