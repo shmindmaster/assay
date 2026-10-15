@@ -104,9 +104,12 @@ export const ReceiptChain = z.object({
   receipts: z.array(Receipt),
 }).openapi('ReceiptChain');
 
+export const ERROR_CODES = ['not-found', 'invalid-request', 'unsupported-media-type', 'method-not-allowed', 'refused', 'internal'];
+
 export const ErrorBody = z.object({
   error: z.object({
-    code: z.enum(['not-found', 'invalid-request', 'refused', 'internal']),
+    // The set of codes may grow, so it is declared extensible: clients must tolerate a code they do not know.
+    code: z.string().openapi({ 'x-extensible-enum': ERROR_CODES, description: `One of ${ERROR_CODES.join(', ')}; new codes may be added.` }),
     message: z.string(),
     rule: z.string().optional().openapi({ description: 'For a refusal: the broker rule that refused, e.g. already-used' }),
   }),

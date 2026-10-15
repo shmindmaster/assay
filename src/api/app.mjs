@@ -7,17 +7,19 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
+import { HTTPException } from 'hono/http-exception';
 import { Scalar } from '@scalar/hono-api-reference';
 
 import { verifyChain } from '../../packages/broker/src/index.mjs';
 import { textLines } from '../documents/text-layer.mjs';
-import { BrokerRefusal, DEFAULT_OUT, approveRelease, brokerFor, inspect, release } from '../inspection/inspect.mjs';
+import { BrokerRefusal, DEFAULT_OUT, approveRelease, brokerFor, inspect, latestInspection, release } from '../inspection/inspect.mjs';
 import * as S from './schemas.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const VERSION = JSON.parse(readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8')).version;
 const json = (schema, description) => ({ content: { 'application/json': { schema } }, description });
 const errors = { 404: json(S.ErrorBody, 'Unknown packet'), 400: json(S.ErrorBody, 'Invalid request') };
+const bodyErrors = { ...errors, 415: json(S.ErrorBody, 'The body must be application/json') };
 const PacketParam = z.object({ packet: S.PacketId.openapi({ param: { name: 'packet', in: 'path' } }) });
 
 export const SCALAR_THEME = `
@@ -39,7 +41,7 @@ export function createApp({ packetsRoot = path.join(REPO_ROOT, 'data', 'packets'
   const packetIds = () => readdirSync(packetsRoot, { withFileTypes: true }).filter((d) => d.isDirectory() && exists(d.name)).map((d) => d.name).sort();
   const shape = (r) => ({
     packet: r.packet, verdict: r.verdict, reasons: r.reasons,
-    draft_verdict: r.extraction.draft_verdict ?? null, extraction_provenance: r.extraction.provenance ?? null,
+    draft_verdict: r.extraction?.draft_verdict ?? null, extraction_provenance: r.extraction?.provenance ?? null,
     findings: r.findings, rejected: r.rejected,
     untrusted: r.untrusted.map(({ doc, page, line, text, why }) => ({ doc, page, line, text, why })),
     decision: r.decision, ncr: r.ncr,
@@ -97,14 +99,27 @@ export function createApp({ packetsRoot = path.join(REPO_ROOT, 'data', 'packets'
     return c.json(shape(await inspect(dirOf(packet), { out, provider })), 200);
   });
 
-  app.openapi(createRoute({ method: 'post', operationId: 'approveRelease', path: '/api/packets/{packet}/approve', tags: ['release'], summary: "The inspector's approval: a single-use release authorization bound to this decision",
+  app.openapi(createRoute({ method: 'get', operationId: 'getInspection', path: '/api/packets/{packet}/inspection', tags: ['inspection'], summary: 'The last recorded inspection of the packet (no new receipts)',
+    request: { params: PacketParam }, responses: { 200: json(S.Inspection, 'The stored inspection'), ...errors } }),
+  (c) => {
+    const { packet } = c.req.valid('param');
+    if (!exists(packet)) return notFound(c, packet);
+    const stored = latestInspection(packet, { out });
+    if (!stored) return c.json({ error: { code: 'not-found', message: `${packet} has not been inspected yet` } }, 404);
+    return c.json(shape(stored), 200);
+  });
+
+  const notInspected = (c, packet) => c.json({ error: { code: 'refused', message: `${packet} has not been inspected; inspect it first`, rule: 'not-inspected' } }, 409);
+
+  app.openapi(createRoute({ method: 'post', operationId: 'approveRelease', path: '/api/packets/{packet}/approve', tags: ['release'], summary: "The inspector's approval of the last inspection: a single-use release authorization bound to its decision",
     request: { params: PacketParam, body: { content: { 'application/json': { schema: S.ApproveRequest } }, required: true } },
-    responses: { 200: json(S.Authorization, 'Authorization minted'), 409: json(S.ErrorBody, 'Refused: not ACCEPT, or untrusted input fed the decision'), ...errors } }),
+    responses: { 200: json(S.Authorization, 'Authorization minted'), 409: json(S.ErrorBody, 'Refused: not inspected, not ACCEPT, already released, or untrusted input fed the decision'), ...bodyErrors } }),
   async (c) => {
     const { packet } = c.req.valid('param');
     if (!exists(packet)) return notFound(c, packet);
     const { by } = c.req.valid('json');
-    const r = await inspect(dirOf(packet), { out, provider });
+    const r = latestInspection(packet, { out });
+    if (!r) return notInspected(c, packet);
     try { return c.json(approveRelease(r, { by }), 200); } catch (e) {
       if (e instanceof BrokerRefusal) return c.json({ error: { code: 'refused', message: e.message, rule: e.rule } }, 409);
       throw e;
@@ -113,12 +128,13 @@ export function createApp({ packetsRoot = path.join(REPO_ROOT, 'data', 'packets'
 
   app.openapi(createRoute({ method: 'post', operationId: 'releasePacket', path: '/api/packets/{packet}/release', tags: ['release'], summary: 'Release the material. Runs once per authorization.',
     request: { params: PacketParam, body: { content: { 'application/json': { schema: S.ReleaseRequest } }, required: true } },
-    responses: { 200: json(S.ReleaseRecord, 'Released'), 409: json(S.ErrorBody, 'Refused: already used, never minted, or the decision changed'), ...errors } }),
+    responses: { 200: json(S.ReleaseRecord, 'Released'), 409: json(S.ErrorBody, 'Refused: not inspected, already used, already released, never minted, the decision changed, or the packet changed after inspection'), ...bodyErrors } }),
   async (c) => {
     const { packet } = c.req.valid('param');
     if (!exists(packet)) return notFound(c, packet);
     const { authorization } = c.req.valid('json');
-    const r = await inspect(dirOf(packet), { out, provider });
+    const r = latestInspection(packet, { out });
+    if (!r) return notInspected(c, packet);
     try { return c.json(await release(r, authorization), 200); } catch (e) {
       if (e instanceof BrokerRefusal) return c.json({ error: { code: 'refused', message: e.message, rule: e.rule } }, 409);
       throw e;
@@ -153,7 +169,28 @@ export function createApp({ packetsRoot = path.join(REPO_ROOT, 'data', 'packets'
     ],
   });
   app.get('/docs/api', Scalar({ url: '/openapi.json', pageTitle: 'Heatlot API', customCss: SCALAR_THEME, hideClientButton: false }));
-  app.onError((err, c) => c.json({ error: { code: 'internal', message: err.message } }, 500));
-  app.notFound((c) => c.json({ error: { code: 'not-found', message: `no route ${c.req.method} ${c.req.path}` } }, 404));
+  // Framework errors keep their status inside the one envelope: a body that is not JSON is 415,
+  // malformed JSON is 400. Only a genuine fault is 500.
+  app.onError((err, c) => {
+    if (err instanceof HTTPException) {
+      const status = err.status;
+      const code = status === 415 ? 'unsupported-media-type' : status === 400 ? 'invalid-request' : status === 404 ? 'not-found' : 'internal';
+      return c.json({ error: { code, message: err.message || 'invalid request' } }, status);
+    }
+    return c.json({ error: { code: 'internal', message: err.message } }, 500);
+  });
+  // A known path called with the wrong method is 405 with an Allow header, not 404.
+  const ROUTES = [
+    [/^\/api\/health$/, ['GET']], [/^\/api\/packets$/, ['GET']], [/^\/api\/packets\/[^/]+$/, ['GET']],
+    [/^\/api\/packets\/[^/]+\/documents\/[^/]+\/(lines|pdf)$/, ['GET']], [/^\/api\/packets\/[^/]+\/(receipts|inspection)$/, ['GET']],
+    [/^\/api\/packets\/[^/]+\/(inspect|approve|release)$/, ['POST']], [/^\/openapi\.json$/, ['GET']], [/^\/docs\/api$/, ['GET']],
+  ];
+  app.notFound((c) => {
+    const allowed = ROUTES.find(([re]) => re.test(c.req.path))?.[1];
+    if (allowed && !allowed.includes(c.req.method)) {
+      return c.json({ error: { code: 'method-not-allowed', message: `${c.req.method} is not allowed on ${c.req.path}; use ${allowed.join(', ')}` } }, 405, { allow: allowed.join(', ') });
+    }
+    return c.json({ error: { code: 'not-found', message: `no route ${c.req.method} ${c.req.path}` } }, 404);
+  });
   return app;
 }

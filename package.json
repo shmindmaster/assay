@@ -1,9 +1,37 @@
 {
   "name": "heatlot",
-  "version": "0.3.0",
-  "private": true,
-  "type": "module",
+  "version": "0.4.0",
   "description": "Every certificate, checked against the record. AI verification of supplier certificates of conformance and mill test reports at receiving inspection: the AI extracts, deterministic rules decide, every field is cited, and release needs a single-use authorization.",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "heatlot": "bin/heatlot.mjs"
+  },
+  "exports": {
+    ".": "./src/inspection/inspect.mjs",
+    "./api": "./src/api/app.mjs",
+    "./broker": "./packages/broker/src/index.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/api/",
+    "src/inspection/",
+    "src/documents/",
+    "packages/broker/src/",
+    "packages/broker/README.md",
+    "mcp-servers/heatlot/src/",
+    "data/specs/",
+    "data/packets/",
+    "fixtures/extraction/",
+    "docs/api/openapi.json",
+    "console/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "author": "Sarosh Hussain",
   "license": "Apache-2.0",
   "repository": {
@@ -57,7 +85,8 @@
     "verify:all": "node scripts/verify-all.mjs",
     "verify:live": "node scripts/verify-live.mjs",
     "test": "node --test",
-    "test:browser": "node --test tests-browser/explorer-in-browser.mjs"
+    "test:browser": "node --test tests-browser/explorer-in-browser.mjs",
+    "smoke:package": "node scripts/smoke-package.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.134.0",
@@ -78,8 +107,5 @@
     "ajv-formats": "^3.0.1",
     "pdf-lib": "^1.17.1",
     "playwright": "1.64.1"
-  },
-  "bin": {
-    "heatlot": "bin/heatlot.mjs"
   }
 }

@@ -35,3 +35,4 @@ SPEC.md
 # Scratch copies made by the mutation harness and the gate drill
 /.heatlot-*/
 /.heatlot/
+/.schemathesis/
