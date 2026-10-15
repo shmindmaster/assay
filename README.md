@@ -127,7 +127,8 @@ the mismatch, and marks every later receipt unverifiable. The page's verifier is
 tested against the ledger's own, tamper by tamper, so it cannot show green for a
 chain the broker would refuse.
 
-The explorer also carries a recorded live run against Claude Sonnet 5.5
+The explorer also carries recorded live runs against OpenAI `gpt-6.1-sol` (structured outputs)
+(`docs/evidence/live-run-2026-10-15-openai/`) and against Claude Sonnet 5.5
 (`docs/evidence/live-run-2026-10-14/`), with the provider, model, request id,
 tokens and latency on the decision receipt. The live model was not fooled by the
 injected note; the release was refused anyway, because an authorization tracing

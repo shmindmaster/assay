@@ -323,6 +323,13 @@ requested and served model, request id, token usage, latency and stop reason.
 Decision receipts carry that provenance; a failed live call becomes a
 `decision_failed` receipt with the same fields.
 
+The live OpenAI adapter (`src/providers/openai-live.mjs`) follows the same
+contract with strict `json_schema` structured outputs, defaulting to
+`gpt-6.1-sol` (override with `ASSAY_OPENAI_MODEL`). Its endpoint is fixed to
+`api.openai.com`, so an inherited `OPENAI_BASE_URL` cannot redirect a
+verification run. It records the request id, token usage, latency and finish
+reason, and fails closed on a refusal, an HTTP error, or empty or non-JSON content.
+
 Three reasons, set out in `docs/decisions/0004-replay-by-default-no-api-key.md`:
 a reviewer decides whether to read this in the first minute and a key prompt
 spends it; the demos assert on exact output and a live model makes every run

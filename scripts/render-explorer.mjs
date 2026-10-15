@@ -39,6 +39,7 @@ const TASK =
 const DEFAULT_SOURCES = [
   { id: 'replay', title: 'Replay demo', note: 'npm run demo — recorded model response', file: ledgerPath(SUBJECT) },
   { id: 'live', title: 'Live run, Claude Sonnet 5.5', note: 'npm run verify:live — 2026-10-14', file: path.join(REPO_ROOT, 'docs', 'evidence', 'live-run-2026-10-14', `${SUBJECT}.anthropic.jsonl`) },
+  { id: 'live-openai', title: 'Live run, OpenAI', note: 'ASSAY_PROVIDER=openai npm run verify:live — 2026-10-15', file: path.join(REPO_ROOT, 'docs', 'evidence', 'live-run-2026-10-15-openai', `${SUBJECT}.openai.jsonl`) },
 ];
 
 function rel(file) {
@@ -367,11 +368,15 @@ function provenanceBlock(p) {
       '<div style="grid-column: span 3"><dt>Fixture key</dt><dd class="mono">' + esc(p.fixture_key) + '</dd></div></dl>';
   }
   const cell = (k, v) => '<div><dt>' + k + '</dt><dd>' + esc(v ?? '—') + '</dd></div>';
+  // Anthropic receipts carry effort, tool choice and fallback; OpenAI receipts carry the response format.
+  const openai = p.provider === 'openai';
   return '<h3>Who produced this decision</h3><dl class="prov">' +
-    cell('Model served', p.model_served) + cell('Effort', p.effort) + cell('Tokens in / out', (p.input_tokens ?? '—') + ' / ' + (p.output_tokens ?? '—')) +
+    cell('Model served', p.model_served) + (openai ? cell('Provider', 'OpenAI') : cell('Effort', p.effort)) +
+    cell('Tokens in / out', (p.input_tokens ?? '—') + ' / ' + (p.output_tokens ?? '—')) +
     cell('Latency', p.latency_ms != null ? (p.latency_ms / 1000).toFixed(1) + ' s' : '—') +
-    cell('Tool call', (p.tool_choice ?? '') + (p.strict ? ', strict' : '')) + cell('Stop reason', p.stop_reason) +
-    cell('Fallback used', p.fallback_ran ? 'yes' : 'no') +
+    (openai ? cell('Output', (p.response_format ?? '') + (p.strict ? ', strict' : '')) : cell('Tool call', (p.tool_choice ?? '') + (p.strict ? ', strict' : ''))) +
+    cell('Stop reason', p.stop_reason) +
+    (openai ? cell('Retries', 'none') : cell('Fallback used', p.fallback_ran ? 'yes' : 'no')) +
     '<div><dt>Request id</dt><dd class="mono" style="font-size:.78rem">' + esc(p.request_id ?? '—') + '</dd></div></dl>';
 }
 

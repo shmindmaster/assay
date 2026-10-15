@@ -26,6 +26,9 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 | `npm audit --omit=dev --audit-level=high` | `a0a07c0` | 2026-10-14 | 0 vulnerabilities |
 | `claude plugin validate .` | `a0a07c0` | 2026-10-14 | passed with two pre-existing warnings |
 | `ASSAY_LIVE=1 npm run verify:live` (Anthropic) | `1067715` | 2026-10-14 | exit 3 (expected refusal); `claude-sonnet-5-5`, `req_011Cg3GxmZmrYjTfuCEWQrTL`; denial rule `untrusted-context`; [evidence](../evidence/live-run-2026-10-14/) |
+| `ASSAY_LIVE=1 ASSAY_PROVIDER=openai npm run verify:live` (old default `gpt-4o-2024-08-06`) | `4699c2c` | 2026-10-15 | exit 3 (expected refusal); model INCOMPLETE; denial `untrusted-context`; exposed thin provenance (fixed) |
+| `ASSAY_LIVE=1 ASSAY_PROVIDER=openai npm run verify:live` (`gpt-6.1-sol`) | release/v0.3.0 | 2026-10-15 | exit 3 (expected refusal); `req_971f4bc010bd427db04b44503f04cff3`, 3423/808 tokens, 13.6 s; model INCOMPLETE; denial `untrusted-context`; [evidence](../evidence/live-run-2026-10-15-openai/) |
+| `node --test tests/live-provider-openai.test.mjs` | release/v0.3.0 | 2026-10-15 | 6/6 pass |
 
 ## By category
 
@@ -34,7 +37,7 @@ Every row is a command that was executed. "Commit" is the tree it ran against; `
 | Unit | Ledger, broker, authorization, providers, live adapter (stubbed transport), context, decisions, schemas, completeness, digest, explorer parity | `tests/*.test.mjs` (92 tests) |
 | Contract / schema | Every fixture validates or is rejected as named; one schema, three enforcement paths | `validate:schemas`, `tests/schemas.test.mjs`, `schemas:report` |
 | Integration (in process) | Context, decision, verdict, mint, broker and ledger end to end | `demo`, `demo:injection`, `demo:denied` inside `verify:all` |
-| Integration (live provider) | Anthropic live adapter against the real API | One recorded `verify:live` run. **OpenAI live: never run.** |
+| Integration (live provider) | Anthropic and OpenAI live adapters against the real APIs | One recorded `verify:live` run each |
 | Integration (MCP) | Real stdio handshake and the 10 tools | `smoke:mcp` |
 | Authorization / negative | Replay after restart (separate process), never-minted forgery, payload edit, forged verdict, untrusted context, broken chain, malformed bindings | `tests/broker.test.mjs` |
 | Recovery / failure paths | Classifier refusal, prose answer, HTTP 529, schema-invalid output (provenance kept), bad effort | `tests/live-provider.test.mjs` |

@@ -44,7 +44,7 @@ flowchart LR
 
 ## AI
 
-- **Models:** replay fixtures by default; live `claude-sonnet-5-5` with effort `medium`, overridable with `ASSAY_ANTHROPIC_MODEL` and `ASSAY_ANTHROPIC_EFFORT`. The OpenAI adapter exists but has not been exercised live.
+- **Models:** replay fixtures by default; live `claude-sonnet-5-5` with effort `medium`, overridable with `ASSAY_ANTHROPIC_MODEL` and `ASSAY_ANTHROPIC_EFFORT`. Live OpenAI: `gpt-6.1-sol` with strict `json_schema` structured outputs, overridable with `ASSAY_OPENAI_MODEL`. Live-verified on 2026-10-15 (`req_971f4bc010bd427db04b44503f04cff3`).
 - **Prompts:** the decision prompt is the task plus the assembled records. Nothing in it tells the model to distrust anything; trust is a code concern.
 - **Evals:** 6 eval cases, 2 CoC draft-contract checks and a schema contract (9 checks); 9 mutations; release-gate floors in `evals/gate.json`.
 
