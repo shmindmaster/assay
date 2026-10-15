@@ -58,6 +58,8 @@ npm run evals:mutate
 npm run smoke:mcp
 npm run validate:schemas
 npm run verify:all
+npm run gate
+npm run gate:drill
 claude plugin validate .
 ```
 

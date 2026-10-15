@@ -112,6 +112,38 @@ Each mutation is a declarative patch in `evals/mutations/`, applied to a scratch
 copy and reverted. A mutation the suite survives is reported as a coverage gap
 and fails the run.
 
+### `npm run explorer` — see the chain
+
+```bash
+npm run demo && npm run explorer
+```
+
+Renders `reports/explorer/index.html`, one offline page you open straight from
+disk. Every receipt is a tag on a chain; the page recomputes every hash itself,
+shows the context the agent saw with its trust labels, the records the verifier
+found, and who produced each decision. Press **Tamper one byte** and a single
+byte of the selected receipt changes: the chain turns red at that link, names
+the mismatch, and marks every later receipt unverifiable. The page's verifier is
+tested against the ledger's own, tamper by tamper, so it cannot show green for a
+chain the broker would refuse.
+
+The explorer also carries a recorded live run against Claude Sonnet 5.5
+(`docs/evidence/live-run-2026-10-14/`), with the provider, model, request id,
+tokens and latency on the decision receipt. The live model was not fooled by the
+injected note; the release was refused anyway, because an authorization tracing
+to an untrusted block is never minted, whatever the model says.
+
+### `npm run gate` — releases are eval-gated
+
+The release gate measures the tree against floors in `evals/gate.json`: eval
+suite, guard coverage, refusal correctness, replay determinism, audit replay.
+Deleting an eval case or a mutation drops a count below its floor, so coverage
+cannot be "restored" by removing the test that caught a regression. The result
+is committed as `docs/benchmark.md`, and CI fails if that file is stale.
+`npm run gate:drill` applies deliberate regressions to a scratch copy and
+requires the gate to block each one; a tagged release is published only after
+the gate passes.
+
 ---
 
 ## 2. Why this shape
@@ -208,6 +240,9 @@ tested contract: `0` complete, `3` incomplete.
 `reports/drafts/`. An authorization is minted only from a verdict, and is bound
 to the effect's payload hash, bound to the verdict's input hashes, single-use,
 and refused outright if any contributing context block was marked `untrusted`.
+Single use is a receipt on the ledger, not a flag in memory, so a restarted
+process cannot replay a spent authorization, and an authorization is honoured
+only if the ledger shows it being minted.
 Edit the draft after the verdict and the token stops matching. There is no
 override flag; adding one would be the bug.
 
@@ -295,6 +330,10 @@ these hold on any machine.
 | `npm run audit:tamper` | A tampered receipt breaks the chain | detected, link named |
 | `npm run generate:data` | The dataset reproduces byte-identically | same `data/index.json` hashes |
 | `npm run verify:all` | Everything above, in order | exit 0 |
+| `npm run gate` | Release gate: every floor in `evals/gate.json` holds | `RELEASE ALLOWED` |
+| `npm run gate:drill` | The gate blocks each deliberate regression | 2/2 blocked |
+| `npm run explorer` | Offline Receipt Explorer over the ledger | page written |
+| `ASSAY_LIVE=1 npm run verify:live` | Opt-in: the live adapter against the real API (one paid call) | exit **3**, release refused |
 
 ---
 
@@ -308,7 +347,10 @@ authorization, and a draft from being edited between approval and publication.
 It makes a record *partially* alterable without detection impossible. It does not
 make the record unforgeable: the chain head lives on the same host, so anyone with
 write access can regenerate a consistent chain. That needs an external anchor,
-which this repository does not have and does not pretend to.
+which this repository does not have and does not pretend to. The same limit
+applies to single use: it is recorded on that ledger, so whoever can rewrite the
+ledger can also forget a consumed authorization, and two processes appending to
+one subject at the same instant are not serialised.
 
 It does not save you from a deterministic rule that is wrong, a schema that
 permits something it should not, a compromised host, or a verifier fed the wrong
