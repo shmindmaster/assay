@@ -275,6 +275,15 @@ ten read-only tools, prunes its outputs, hash-verifies `get_document` against
 `data/index.json`, and refuses unindexed path traversal. There are no write tools
 on the server at all — writing is an effect, and effects go through S5.
 
+The server is built on the MCP TypeScript SDK v2 (`@modelcontextprotocol/server`
+2.3.1, spec revision 2026-07-28) over stdio, with zod 4 as the single schema
+library. Every tool carries `readOnlyHint`, `idempotentHint`, `destructiveHint:
+false` and `openWorldHint: false` annotations and an `outputSchema`; results
+return typed `structuredContent` that the SDK validates before it leaves the
+server. `serveStdio` negotiates the era, so 2025-era clients still connect.
+`npm run smoke:mcp` asserts the negotiated revision, the annotations, and the
+output schemas.
+
 `npm run tools:report` prints each tool with its input schema, its median
 response token cost measured against the fixtures, and the eval case that
 exercises it, then a section on tools deliberately not added and why.
