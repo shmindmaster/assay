@@ -62,8 +62,8 @@ milestones:
 | Synthetic supplier packets: CoC and MTR PDFs, a scanned-looking copy, a hidden-text attack | **Done** |
 | Extraction with page and line citations (replayed by default) | **Done**; live model adapters planned |
 | Specification rules, verdicts, single-use release, quarantine and NCR | **Done**, CLI `heatlot verify` |
-| HTTP API with OpenAPI and Scalar docs, an MCP server | Next |
-| Inspection console: queue, PDF with cited highlights, rule-by-rule verdict, receipt replay | Planned |
+| HTTP API with a generated OpenAPI 3.1 document and Scalar docs; MCP server | **Done**, `heatlot serve`, `/docs/api` |
+| Inspection console: queue, PDF with cited highlights, rule-by-rule verdict, receipt replay | Next |
 | npm package `heatlot` | Planned |
 
 Every record, company, mill, part number and specification in this repository is synthetic.
@@ -110,6 +110,16 @@ npm run evals:mutate                                                     # every
 ```
 
 Exit codes: `0` ACCEPT, `3` INCOMPLETE, `4` NONCONFORMING, `5` refused by the broker.
+
+The same flow over HTTP and MCP:
+
+```bash
+npm run serve        # http://127.0.0.1:4140, API reference at /docs/api (OpenAPI 3.1, generated from the code)
+```
+
+The MCP server (`.mcp.json`) gives an agent `packets.list`, `packets.inspect`, `documents.lines`
+and `receipts.verify`. It can explain any verdict with citations. It has no release tool:
+releasing material is the inspector's call.
 
 ## The agent drafts. Software decides.
 
@@ -170,7 +180,7 @@ stating a control does nothing to enforce it.
 | Command | Proves |
 |---|---|
 | `npm test` | Unit tests for the inspection flow, the control layer and `packages/broker` |
-| `npm run evals:mutate` | Every guard can fail: 23/23 mutations caught |
+| `npm run evals:mutate` | Every guard can fail: 24/24 mutations caught |
 | `npm run verify:all` | Everything deterministic, at the expected exit codes |
 | `npm run gate` / `gate:drill` | The release gate holds its floors and blocks each deliberate regression |
 | `npm run smoke:mcp` / `conformance:mcp` | The MCP server across both protocol eras, plus the official conformance suite with a baseline that may only shrink |
