@@ -2,7 +2,28 @@
 
 Rungs: `Planned → Implemented → Integrated → Tested → Demonstrated → Production-Verified`. "Production" for Heatlot means a published, gate-checked release. [v0.3.0](https://github.com/shmindmaster/heatlot/releases/tag/v0.3.0) was published by `release.yml` on 2026-10-15, and its source archive was smoke-tested (see [TESTS.md](TESTS.md)). A capability is marked Production-Verified only if that release run (which executes `verify:all`, the gate and the drill before publishing) or the artifact smoke test exercised it. The live-provider rows stay at Demonstrated: the release does not call either API.
 
-## Capability matrix (commit `46cc33d`, release v0.3.0)
+## Heatlot capability matrix (main `377bb8e`, 2026-10-15)
+
+No Heatlot release has been cut yet, so no Heatlot row is Production-Verified. "Tested" means a test that fails when the capability breaks runs in CI on Node 22 and 24.
+
+| Capability | Surface | Logic | Test | Demo | Rung reached |
+|---|---|---|---|---|---|
+| Synthetic supplier packets (CoC + MTR PDFs, scanned copy, hidden-text attack) | `data/packets/` | `scripts/generate-packets.mjs` | `tests/packets.test.mjs`; byte-for-byte reproduction in CI | console, CLI | Tested |
+| Cited text layer (page, line, hash, box; hidden-text flag) | CLI, API, MCP, console | `src/documents/text-layer.mjs` | `tests/packets.test.mjs` | console viewer boxes | Tested |
+| Citation check (value must be on a visible cited line) | all | `src/inspection/cite.mjs` | `tests/inspection.test.mjs`; mutations `cite/*` | console "Rejected extractions" | Tested |
+| Spec rules and verdict (tests, limits, revision, traceability, statements) | all | `src/inspection/rules.mjs`, `statements.mjs` | every packet's expected verdict; mutations `rules/*`, `statements/*` | console findings | Tested |
+| Untrusted text (hidden, instruction-shaped) as tripwire and broker input | all | `src/inspection/inspect.mjs` | hero-packet tests; mutation `inspect/trust-hidden-text` | console "Untrusted text" | Tested |
+| Quarantine and NCR | all | `inspect.mjs` | `tests/inspection.test.mjs` | console NCR card | Tested |
+| Release: ACCEPT-only, decision-bound, single use, once per packet, files unchanged | CLI, API, console | `inspect.mjs`, `packages/broker` | inspection, API and console tests; mutations `inspect/*`, `broker/*` | console approve/release | Tested |
+| Signed hash-chained receipts | all | `packages/broker` | broker tests; mutation `receipts/skip-signature` | console receipts drawer | Tested |
+| CLI `heatlot` (demo, verify, approve, release, receipts, serve) | terminal | `bin/heatlot.mjs` | verify:all steps; `smoke:package` | `heatlot demo` | Tested |
+| HTTP API, OpenAPI 3.1.1, Scalar | HTTP | `src/api/` | `tests/api.test.mjs`; Schemathesis; Redocly; drift check | `/docs/api` | Tested |
+| MCP server (list, inspect, lines, receipts; no release) | MCP | `mcp-servers/heatlot` | `tests/heatlot-mcp.test.mjs`; conformance at both revisions | — | Tested |
+| Inspection console | browser | `console/` | `test:console` (Chromium, axe WCAG 2.2 AA) | screenshots; film pending | Tested |
+| npm package `heatlot` | npm | `package.json` files | `smoke:package` (install the tarball, run it) | — | Implemented: not yet published |
+| Live-model extraction | — | — | — | — | Planned (replay fixtures are authored and labelled) |
+
+## History: Assay Capability matrix (commit `46cc33d`, release v0.3.0)
 
 | Capability | Journey | Surface | Logic | Integration | Test | Demo | Production | Rung reached |
 |---|---|---|---|---|---|---|---|---|

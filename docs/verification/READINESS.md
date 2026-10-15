@@ -1,31 +1,31 @@
 ```yaml
 product: Heatlot (rebuild of Assay)
 repo: C:\Repos\shmindmaster\assay (github.com/shmindmaster/heatlot; renamed from shmindmaster/assay on 2026-10-15)
-commit: e522e8e
-verdict: In Development
-functional_ready: partial
+commit: 377bb8e
+verdict: Functionally Ready (not yet released or filmed)
+functional_ready: yes
 demo_ready: no
 production_ready: no
 deployed_sha: 46cc33d (release v0.3.0, published as Assay, https://github.com/shmindmaster/heatlot/releases/tag/v0.3.0)
-tests: "CI Node 20 + 22 verify:all 12/12, gate RELEASE ALLOWED with 15/15 mutations @ e522e8e (run 38741917669)"
+tests: "CI Node 22 + 24 @ 377bb8e: verify:all, gate (26/26 mutations), Schemathesis, Redocly, OpenAPI and reference drift, MCP conformance (2 servers x 2 revisions), smoke:package, test:console (axe WCAG 2.2 AA), test:browser"
 films: ["D:\\OneDrive - Maya Modest LLC\\Videos\\Portfolio\\Assay\\01 - The Agent Drafts, Software Decides.mp4 (Assay; superseded by the Heatlot film, not yet made)"]
-blockers: ["npm publish of heatlot needs the owner's one-time npm login"]
+blockers: ["npm publish of heatlot needs the maintainer's one-time npm login (docs/RELEASING.md)"]
 api_surface: "HTTP API (Hono) with OpenAPI 3.1.1 generated from zod, Scalar at /docs/api, Redocly lint, oasdiff and Schemathesis in CI; heatlot MCP server (list/inspect/lines/receipts, no release tool) with conformance at both revisions"
-next_action: "Land the inspection console (M6); maintainer: one-time npm login and first publish per docs/RELEASING.md; then the Heatlot film on Local-AI narration"
-updated: 2026-10-15T08:45:00-05:00
+next_action: "Heatlot film (Local-AI narration) in a heavy-work slot; cut v0.4.0 once the maintainer has done the one-time npm setup"
+updated: 2026-10-15T11:30:00-05:00
 ```
 
 # Readiness
 
-## Verdict: In Development
+## Verdict: Functionally Ready (not yet released or filmed)
 
-Re-rated on 2026-10-15. Assay was verified end to end as a reference implementation of the control layer (see the history below and in [TESTS.md](TESTS.md)). The product is now Heatlot, AI verification of supplier certificates at receiving inspection, and its flow (supplier packets, cited extraction, spec rules, inspection console, API) is being built milestone by milestone. Until that flow runs and is tested, the honest verdict is In Development. The control layer it is built on stays green in CI: every guard is proven able to fail, 15 of 15.
+Re-rated on 2026-10-15 at `377bb8e`. Heatlot's whole flow runs and is tested in CI: synthetic supplier packets in, cited extraction, specification rules, ACCEPT / INCOMPLETE / NONCONFORMING with every reason cited, quarantine and NCR, a single-use decision-bound release that happens once per packet, and signed receipts, through the CLI, the HTTP API, the MCP server and the inspection console. Every guard is proven able to fail (26 of 26 mutations caught).
 
 | Readiness | Status | Why |
 |---|---|---|
-| Functional | **Partial** | The control layer (broker, receipts, verifier, mutation harness) works and is tested. The certificate-verification flow is not built yet. |
-| Demo | **No** | The Assay film shows the control layer on foundry data. The Heatlot film comes after the product works end to end. |
-| Production | **No** | v0.3.0 was released as Assay. No Heatlot release yet; the npm package `heatlot` is not published. |
+| Functional | **Yes** | Every capability in [COVERAGE.md](COVERAGE.md) is at least Tested, except live-model extraction (planned; replay fixtures are authored and labelled) and npm publication. |
+| Demo | **No** | The console and `heatlot demo` run with no key, but the Heatlot film is not made yet. |
+| Production | **No** | No Heatlot release is tagged, and `heatlot` is not on npm. The package is verified installable (`smoke:package`); the first publish needs the maintainer's npm login. |
 
 ## History: Assay verification (v0.3.0)
 
